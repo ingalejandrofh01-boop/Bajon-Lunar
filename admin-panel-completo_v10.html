@@ -899,27 +899,33 @@ window._fbReady         = true;
 
 // ── Escucha en tiempo real cotizaciones ──
 const cotQuery = query(collection(db, 'cotizaciones'), orderBy('timestamp', 'desc'));
+window._fbCotInicializado = false;
 window._unsubCot = onSnapshot(cotQuery, (snap) => {
   const nuevas = snap.docs.map(d => ({ _docId: d.id, ...d.data() }));
-  // Detectar nueva cotización para banner
-  if (window.cotizaciones && nuevas.length > window.cotizaciones.length && window.cotizaciones.length > 0) {
+
+  // Detectar nueva cotizacion (no en la primera carga)
+  const anterior = window.cotizaciones || [];
+  if (window._fbCotInicializado && nuevas.length > anterior.length) {
     const nuevaCot = nuevas[0];
     if (typeof mostrarBannerNuevaCot === 'function') mostrarBannerNuevaCot(nuevaCot);
+    // Notificacion nativa del navegador
+    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+      try {
+        new Notification('Nueva cotizacion — Bajon Lunar', {
+          body: (nuevaCot.folio||'') + ' · ' + (nuevaCot.nombre||'Cliente') + ' · $' +
+                parseFloat(nuevaCot.total||0).toLocaleString('es-MX',{minimumFractionDigits:2}),
+          tag: nuevaCot.folio || 'cot',
+        });
+      } catch(e) {}
+    }
   }
+
+  // Escribir en window — el script principal lee de ahi
   window.cotizaciones = nuevas;
-  if (window.usuarioActual && typeof actualizarStats === 'function') {
-    actualizarStats();
-    renderTabla();
-    renderRecientes();
-    renderChart();
-    renderIngresos();
-    renderAgenda();
-    renderAnticipos();
-    const pend = window.cotizaciones.filter(c=>c.estado==='pendiente').length;
-    const badge = document.getElementById('nav-badge-cot');
-    if (badge) { badge.textContent = pend; pend > 0 ? badge.classList.add('new') : badge.classList.remove('new'); }
-    if (typeof actualizarPip === 'function') actualizarPip();
-    if (typeof actualizarFbMonitor === 'function') actualizarFbMonitor();
+  window._fbCotInicializado = true;
+
+  if (window.usuarioActual && typeof window._fbRenderAll === 'function') {
+    window._fbRenderAll();
   }
 });
 
@@ -1327,6 +1333,15 @@ console.log('🔥 Firebase Firestore conectado — Bajón Lunar Admin');
           <div class="config-row">
             <div><div class="config-label">Sonido de alerta</div><div class="config-sub">Audio al recibir cotización</div></div>
             <button class="toggle" id="tog-sound" onclick="toggleConfig(this)"></button>
+          </div>
+          <div class="config-row">
+            <div>
+              <div class="config-label">Notificaciones del navegador</div>
+              <div class="config-sub">Aviso aunque la pestaña esté en segundo plano</div>
+            </div>
+            <button id="btn-notif-perm" class="ftab"
+              style="font-size:0.7rem;padding:6px 14px;white-space:nowrap;"
+              onclick="activarNotifManual()">🔔 Activar</button>
           </div>
         </div>
         <div class="config-section">
@@ -1906,7 +1921,18 @@ const DEFAULT_USERS = [
   { username: 'bajon', password: 'lunar123', name: 'Operador Bajón', initials: 'OB' },
 ];
 
-let cotizaciones = [];
+// cotizaciones: proxy a window._cotizaciones (Firestore lo llena via onSnapshot)
+// Se accede siempre como propiedad de window para que el modulo y el script compartan la misma ref
+window._cotizaciones = [];
+// Getter global: cualquier referencia a `cotizaciones` en funciones lee esto
+function getCots() { return window._cotizaciones; }
+// Para compatibilidad total con el codigo existente que usa `cotizaciones` como variable:
+// redefinir como accessor en window
+Object.defineProperty(window, 'cotizaciones', {
+  get() { return window._cotizaciones; },
+  set(v) { window._cotizaciones = v; },
+  configurable: true, enumerable: true
+});
 let cotActual = null;
 let filtroActual = 'todas';
 let usuarioActual = null;
@@ -1976,6 +2002,46 @@ function iniciarApp() {
   cargarDatos();
   iniciarReloj();
   renderEquipo();
+  // Pedir permiso de notificaciones del navegador (despues de 2s)
+  setTimeout(pedirPermisoNotif, 2000);
+}
+
+function pedirPermisoNotif() {
+  if (typeof Notification === 'undefined') return;
+  actualizarBtnNotifPerm();
+  if (Notification.permission === 'default') {
+    Notification.requestPermission().then(perm => {
+      actualizarBtnNotifPerm();
+      if (perm === 'granted') {
+        try { new Notification('Bajon Lunar Admin', { body: 'Notificaciones activadas correctamente.', tag: 'init' }); } catch(e){}
+      }
+    });
+  }
+}
+
+function activarNotifManual() {
+  if (typeof Notification === 'undefined') return;
+  if (Notification.permission === 'denied') {
+    alert('Las notificaciones estan bloqueadas. Abre la configuracion del navegador (icono de candado en la barra de direcciones) y permite las notificaciones para este sitio.');
+    return;
+  }
+  Notification.requestPermission().then(() => actualizarBtnNotifPerm());
+}
+
+function actualizarBtnNotifPerm() {
+  const btn = document.getElementById('btn-notif-perm');
+  if (!btn) return;
+  if (typeof Notification === 'undefined') { btn.textContent = 'No soportado'; btn.disabled = true; return; }
+  const p = Notification.permission;
+  if (p === 'granted') {
+    btn.textContent = '✅ Notificaciones activas'; btn.disabled = true;
+    btn.style.cssText += ';color:#4ade80;border-color:#4ade80;';
+  } else if (p === 'denied') {
+    btn.textContent = '🚫 Bloqueadas — ver config del nav.'; btn.disabled = false;
+    btn.style.cssText += ';color:#f87171;border-color:#f87171;';
+  } else {
+    btn.textContent = '🔔 Activar notificaciones'; btn.disabled = false;
+  }
 }
 
 function logout() {
@@ -1991,9 +2057,8 @@ function logout() {
 }
 
 // ════ DATOS ════
-function cargarDatos() {
-  try { cotizaciones = JSON.parse(localStorage.getItem(DB_KEY) || '[]'); } catch(e) { cotizaciones = []; }
-  if (cotizaciones.length === 0) cargarDemoData();
+// Render central — llamado por Firestore onSnapshot y por cargarDatos
+window._fbRenderAll = function() {
   actualizarStats();
   renderTabla();
   renderRecientes();
@@ -2001,13 +2066,27 @@ function cargarDatos() {
   renderIngresos();
   renderAgenda();
   renderAnticipos();
-  const pend = cotizaciones.filter(c=>c.estado==='pendiente').length;
+  const pend = window.cotizaciones.filter(c=>c.estado==='pendiente').length;
   const badge = document.getElementById('nav-badge-cot');
-  badge.textContent = pend;
-  if (pend > 0) badge.classList.add('new');
-  else badge.classList.remove('new');
-  lastCotCount = cotizaciones.length;
+  if (badge) { badge.textContent = pend; pend > 0 ? badge.classList.add('new') : badge.classList.remove('new'); }
+  lastCotCount = window.cotizaciones.length;
   if (typeof actualizarPip === 'function') actualizarPip();
+  if (typeof actualizarFbMonitor === 'function') actualizarFbMonitor();
+};
+
+function cargarDatos() {
+  // Si Firestore ya cargo datos, solo re-renderizar (no pisar con localStorage)
+  if (window._fbCotInicializado && window.cotizaciones.length > 0) {
+    window._fbRenderAll();
+    return;
+  }
+  // Fallback: localStorage mientras Firestore no ha respondido aun
+  try {
+    const local = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+    if (local.length > 0) window.cotizaciones = local;
+  } catch(e) {}
+  if (window.cotizaciones.length === 0) cargarDemoData();
+  window._fbRenderAll();
 }
 
 function cargarDemoData() {

@@ -2545,6 +2545,9 @@ function elegirPaquete(id) {
   // Mostrar configurador
   document.getElementById('cfg').style.display = 'block';
   setPaso(id === 'moonlight' ? 2 : 2);
+  // Ajustar texto del botón PDF
+  const _btnPdf = document.getElementById('btn-pdf');
+  if (_btnPdf) _btnPdf.innerHTML = id === 'moonlight' ? '👑 &nbsp;Generar Cotización Moonlight' : '🌙 &nbsp;Generar Cotización PDF';
   if (barraActiva === 'cantaritos') initCantaritos();
   // Ocultar porciones por persona en cantaritos
   const porWrap = document.getElementById('porciones-wrap');
@@ -3774,7 +3777,7 @@ async function guardarCot(data) {
 
 // ════════ PDF ════════
 async function generarPDF() {
-  if (!paqActivo || paqActivo === 'moonlight') return;
+  if (!paqActivo) return;
   const def = PAQ[paqActivo];
 
   // Validaciones
@@ -3830,8 +3833,10 @@ async function generarPDF() {
   doc.setFillColor(7, 7, 14);
   doc.rect(0, 0, 210, 297, 'F');
 
+  const isMoon = paqActivo === 'moonlight';
+
   // Header bar
-  doc.setFillColor(26, 59, 255);
+  if (isMoon) { doc.setFillColor(160, 130, 70); } else { doc.setFillColor(26, 59, 255); }
   doc.rect(0, 0, 210, 36, 'F');
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(20);
@@ -3839,8 +3844,8 @@ async function generarPDF() {
   doc.text('BAJÓN LUNAR', 14, 16);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7);
-  doc.setTextColor(190, 210, 255);
-  doc.text('SERVICIO DE BARRA  ·  COTIZACIÓN OFICIAL', 14, 23);
+  doc.setTextColor(isMoon ? 240 : 190, isMoon ? 220 : 210, isMoon ? 180 : 255);
+  doc.text(isMoon ? 'SERVICIO DE BARRA  ·  PAQUETE MOONLIGHT 👑' : 'SERVICIO DE BARRA  ·  COTIZACIÓN OFICIAL', 14, 23);
   doc.setFontSize(8);
   doc.setTextColor(255, 255, 255);
   doc.text(`Folio: ${folio}`, 190, 12, { align:'right' });
@@ -3848,18 +3853,18 @@ async function generarPDF() {
 
   // Paquete badge
   let y = 46;
-  doc.setFillColor(26, 59, 255);
+  if (isMoon) { doc.setFillColor(200, 169, 110); } else { doc.setFillColor(26, 59, 255); }
   doc.roundedRect(14, y, 182, 22, 3, 3, 'F');
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(13);
-  doc.setTextColor(255, 255, 255);
-  doc.text(def.nombre.toUpperCase(), 20, y + 8);
+  doc.setTextColor(isMoon ? 20 : 255, isMoon ? 10 : 255, isMoon ? 5 : 255);
+  doc.text(def.nombre.toUpperCase() + (isMoon ? '  \u2605 PREMIUM' : ''), 20, y + 8);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7);
-  doc.setTextColor(190, 210, 255);
+  doc.setTextColor(isMoon ? 60 : 190, isMoon ? 40 : 210, isMoon ? 10 : 255);
   doc.text(def.sub, 20, y + 15);
   doc.setFontSize(10);
-  doc.setTextColor(255, 255, 255);
+  doc.setTextColor(isMoon ? 20 : 255, isMoon ? 10 : 255, isMoon ? 5 : 255);
   doc.setFont('helvetica', 'bold');
   doc.text(`$${datos.total.toLocaleString('es-MX',{minimumFractionDigits:2})}`, 190, y + 9, { align:'right' });
   y += 30;
@@ -3944,11 +3949,11 @@ async function generarPDF() {
   y += 6;
 
   // Tabla de totales
-  doc.setFillColor(26, 59, 255);
+  if (isMoon) { doc.setFillColor(160, 130, 70); } else { doc.setFillColor(26, 59, 255); }
   doc.roundedRect(120, y, 76, 8, 2, 2, 'F');
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8);
-  doc.setTextColor(255, 255, 255);
+  doc.setTextColor(isMoon ? 20 : 255, isMoon ? 10 : 255, isMoon ? 5 : 255);
   doc.text('RESUMEN DE PAGO', 130, y + 5.5);
   y += 8;
   [
@@ -3962,18 +3967,18 @@ async function generarPDF() {
     doc.rect(120, y, 76, 7, 'F');
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
-    doc.setTextColor(160, 160, 200);
+    doc.setTextColor(isMoon ? 200 : 160, isMoon ? 170 : 160, isMoon ? 100 : 200);
     doc.text(lbl, 123, y + 5);
     doc.setTextColor(235, 235, 245);
     doc.text(val, 192, y + 5, { align:'right' });
     y += 7;
   });
   y += 2;
-  doc.setFillColor(26, 59, 255);
+  if (isMoon) { doc.setFillColor(200, 169, 110); } else { doc.setFillColor(26, 59, 255); }
   doc.roundedRect(120, y, 76, 12, 2, 2, 'F');
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
-  doc.setTextColor(255, 255, 255);
+  doc.setTextColor(isMoon ? 20 : 255, isMoon ? 10 : 255, isMoon ? 5 : 255);
   doc.text('TOTAL:', 123, y + 8);
   doc.text(`$${datos.total.toLocaleString('es-MX',{minimumFractionDigits:2})}`, 192, y + 8, { align:'right' });
   y += 14;
@@ -4041,11 +4046,11 @@ async function generarPDF() {
   });
 
   // Footer
-  doc.setFillColor(26, 59, 255);
+  if (isMoon) { doc.setFillColor(160, 130, 70); } else { doc.setFillColor(26, 59, 255); }
   doc.rect(0, 288, 210, 9, 'F');
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7);
-  doc.setTextColor(255, 255, 255);
+  doc.setTextColor(isMoon ? 20 : 255, isMoon ? 10 : 255, isMoon ? 5 : 255);
   doc.text('BAJÓN LUNAR  ·  @bajon_lunar  ·  WA: 55 7190 1664  ·  bajonlunar@gmail.com', 105, 293.5, { align:'center' });
 
   doc.save(`BajonLunar_${folio}.pdf`);
@@ -4179,7 +4184,7 @@ async function generarPDF() {
   });
 
   // Restaurar botón
-  if (btnPdf) { btnPdf.innerHTML = '🔄 &nbsp;Regenerar Cotización'; btnPdf.disabled = false; }
+  if (btnPdf) { btnPdf.innerHTML = paqActivo === 'moonlight' ? '🔄 &nbsp;Regenerar Moonlight' : '🔄 &nbsp;Regenerar Cotización'; btnPdf.disabled = false; }
 }
 
 // ════════ NUEVA COT ════════
@@ -4376,6 +4381,47 @@ renderSaboresVit();
 actualizarCapVit();
 actualizarPreciosPaquetes(); // inicializar precios según barra por defecto
 </script>
+
+<!-- ════════ BOTÓN HOME FLOTANTE ════════ -->
+<a href="index.html" class="home-float" title="Volver al inicio">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+  </svg>
+  <span class="home-float-label">Inicio</span>
+</a>
+<style>
+.home-float {
+  position: fixed;
+  bottom: 28px;
+  left: 28px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: rgba(26,59,255,0.92);
+  color: #fff;
+  text-decoration: none;
+  padding: 12px 18px 12px 14px;
+  border-radius: 50px;
+  box-shadow: 0 6px 28px rgba(26,59,255,0.45), 0 2px 8px rgba(0,0,0,.3);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .82rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  transition: all .25s ease;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(96,159,255,0.3);
+}
+.home-float:hover {
+  background: rgba(26,59,255,1);
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 10px 36px rgba(26,59,255,.65), 0 2px 10px rgba(0,0,0,.3);
+}
+.home-float-label { white-space: nowrap; }
+@media(max-width:480px){
+  .home-float { bottom: 18px; left: 18px; padding: 11px 14px 11px 12px; font-size:.76rem; }
+}
+</style>
 
 <!-- ════════ WHATSAPP FLOTANTE ════════ -->
 <a href="https://wa.me/525571901664?text=Hola,%20quiero%20cotizar%20el%20servicio%20de%20Bajón%20Lunar%20🌙"
