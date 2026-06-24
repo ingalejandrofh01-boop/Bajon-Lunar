@@ -1680,7 +1680,10 @@ console.log('🔥 Firebase Firestore conectado — Bajón Lunar Admin');
           </div>
           <div class="config-row">
             <div><div class="config-label">Limpiar datos de demo</div><div class="config-sub">Elimina cotizaciones de prueba</div></div>
-            <button class="ftab" style="color:var(--rojo);border-color:rgba(239,68,68,0.3);" onclick="limpiarDemo()">Limpiar</button>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="ftab" style="color:var(--amarillo);border-color:rgba(245,158,11,0.4);" onclick="mostrarConfirm('¿Eliminar canceladas?','Se borrarán todas las cotizaciones canceladas.','🗑 Eliminar canceladas','var(--amarillo)',limpiarCanceladas)">🗑 Canceladas</button>
+            <button class="ftab" style="color:var(--rojo);border-color:rgba(239,68,68,0.3);" onclick="limpiarDemo()">🗑 Borrar todo</button>
+          </div>
           </div>
         </div>
       </div>
@@ -2253,6 +2256,19 @@ console.log('🔥 Firebase Firestore conectado — Bajón Lunar Admin');
 
 <div class="toast" id="toast"></div>
 
+<!-- ════ CONFIRM MODAL ════ -->
+<div id="modal-confirm" style="position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.82);backdrop-filter:blur(14px);display:flex;align-items:flex-end;justify-content:center;padding:0;opacity:0;visibility:hidden;transition:all 0.25s;">
+  <div style="background:var(--gris);border:1px solid var(--borde2);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:28px 24px 48px;transform:translateY(20px);transition:transform 0.25s;" id="modal-confirm-card">
+    <div style="width:36px;height:4px;border-radius:4px;background:var(--borde2);margin:0 auto 20px;"></div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:4px;color:var(--blanco);margin-bottom:10px;" id="modal-confirm-title">Confirmar</div>
+    <div style="font-size:0.85rem;color:var(--dim);line-height:1.6;margin-bottom:24px;" id="modal-confirm-msg"></div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="cerrarConfirm()" style="flex:1;padding:14px;border-radius:12px;border:1px solid var(--borde2);background:transparent;color:var(--dim);font-family:'Space Grotesk',sans-serif;font-size:0.88rem;font-weight:600;cursor:pointer;">Cancelar</button>
+      <button id="modal-confirm-ok" style="flex:2;padding:14px;border-radius:12px;border:none;color:white;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:3px;cursor:pointer;" onclick="ejecutarConfirm()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ════ BOTTOM NAV (mobile) ════ -->
 <div id="bottom-nav">
   <div class="bnav-items">
@@ -2689,10 +2705,80 @@ window._fbRenderAll = function() {
 };
 
 function cargarDatos() {
-  // Firestore es la única fuente de verdad.
-  // El onSnapshot ya está escuchando y llenará window.cotizaciones.
-  // Solo renderizamos con lo que hay ahora.
   window._fbRenderAll();
+}
+
+// ════ FIREBASE MONITOR ════
+async function actualizarFbMonitor() {
+  if (!window._fbReady || !window._db) return;
+
+  const cotList = document.getElementById('fb-cot-list');
+  const resList = document.getElementById('fb-res-list');
+  const cotCount = document.getElementById('fb-cot-count');
+  const resCount = document.getElementById('fb-res-count');
+  const lastWrite = document.getElementById('fb-last-write');
+  if (!cotList) return;
+
+  // ── Cotizaciones ──
+  try {
+    const cotSnap = await window._fbGetDocs(window._fbCollection(window._db, 'cotizaciones'));
+    const docs = cotSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    cotCount.textContent = docs.length + ' docs';
+    cotCount.style.background = docs.length > 0 ? 'rgba(26,59,255,0.25)' : 'rgba(26,59,255,0.1)';
+
+    if (docs.length === 0) {
+      cotList.innerHTML = '<div style="padding:20px;text-align:center;color:var(--dim);font-size:0.78rem;">Sin documentos</div>';
+    } else {
+      const sorted = [...docs].sort((a,b) => (b._savedAt||'').localeCompare(a._savedAt||''));
+      cotList.innerHTML = sorted.map(d => {
+        const fecha = d._savedAt ? new Date(d._savedAt).toLocaleString('es-MX',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
+        const estadoColor = {pendiente:'#fbbf24',confirmado:'#4ade80',contrato_generado:'#60cfff',cancelado:'#f87171'}[d.estado] || 'var(--dim)';
+        return `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--borde);font-size:0.75rem;">
+          <span style="font-family:'Bebas Neue',sans-serif;color:var(--azul);letter-spacing:1px;min-width:70px;">${d.folio||d.id.slice(0,8)}</span>
+          <span style="flex:1;color:var(--blanco);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${d.nombre||'—'}</span>
+          <span style="color:${estadoColor};font-size:0.68rem;">${d.estado||'—'}</span>
+          <span style="color:var(--dim);font-size:0.65rem;">${fecha}</span>
+        </div>`;
+      }).join('');
+      // Update last write
+      if (lastWrite && sorted[0]) {
+        lastWrite.textContent = sorted[0].folio || sorted[0].id.slice(0,8);
+      }
+    }
+  } catch(e) {
+    cotList.innerHTML = `<div style="padding:20px;text-align:center;color:#f87171;font-size:0.75rem;">⚠ Error: ${e.message}</div>`;
+    cotCount.textContent = 'Error';
+  }
+
+  // ── Reseñas ──
+  try {
+    const resSnap = await window._fbGetDocs(window._fbCollection(window._db, 'resenas'));
+    const rDocs = resSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    resCount.textContent = rDocs.length + ' docs';
+    resCount.style.background = rDocs.length > 0 ? 'rgba(34,197,94,0.2)' : 'rgba(34,197,94,0.08)';
+
+    if (rDocs.length === 0) {
+      resList.innerHTML = '<div style="padding:20px;text-align:center;color:var(--dim);font-size:0.78rem;">Sin reseñas aún</div>';
+    } else {
+      resList.innerHTML = rDocs.slice(0,10).map(d => {
+        const estrellas = '⭐'.repeat(Math.min(5, parseInt(d.estrellas||d.rating||5)));
+        return `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--borde);font-size:0.75rem;">
+          <span style="flex:1;color:var(--blanco);">${d.nombre||d.cliente||'Anónimo'}</span>
+          <span style="font-size:0.65rem;">${estrellas}</span>
+          <span style="color:var(--dim);font-size:0.65rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${d.comentario||d.texto||'—'}</span>
+        </div>`;
+      }).join('');
+    }
+  } catch(e) {
+    resList.innerHTML = `<div style="padding:20px;text-align:center;color:#f87171;font-size:0.75rem;">⚠ Error: ${e.message}</div>`;
+  }
+
+  // Update actualizaciones counter
+  const updCount = document.getElementById('fb-updates-count');
+  if (updCount) {
+    const n = parseInt(updCount.textContent || '0') + 1;
+    updCount.textContent = n;
+  }
 }
 
 // ════ STATS ════
@@ -2894,13 +2980,19 @@ function renderAgenda() {
   const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   document.getElementById('agenda-mes-label').textContent = meses[month]+' '+year;
 
-  // Eventos del mes (excluir cancelados)
+  // Eventos del mes — CONFIRMADOS y CONTRATOS en el calendario
+  // Pendientes se muestran en lista pero marcados diferente
+  const ESTADOS_EVENTO = ['confirmado','contrato_generado'];
   const eventosDelMes = cotizaciones.filter(c=>{
-    if(!c.fecha||c.estado==='cancelado') return false;
+    if(!c.fecha || c.estado==='cancelado') return false;
     const d = new Date(c.fecha+'T12:00');
     return d.getFullYear()===year && d.getMonth()===month;
   });
-  document.getElementById('agenda-count').textContent=eventosDelMes.length+' evento'+(eventosDelMes.length!==1?'s':'');
+  const eventosConfirmados = eventosDelMes.filter(c=>ESTADOS_EVENTO.includes(c.estado));
+  document.getElementById('agenda-count').textContent=
+    eventosConfirmados.length+' evento'+(eventosConfirmados.length!==1?'s':'')+
+    (eventosDelMes.length > eventosConfirmados.length ?
+      ` · ${eventosDelMes.length - eventosConfirmados.length} pendiente(s)` : '');
 
   // Construir grid
   let startDow = firstDay.getDay();
@@ -2908,9 +3000,9 @@ function renderAgenda() {
   const totalCells = Math.ceil((startDow+lastDay.getDate())/7)*7;
   const grid = document.getElementById('agenda-grid');
 
-  // Agrupar por fecha
+  // Agrupar por fecha — solo confirmados en el grid del calendario
   const porFecha = {};
-  eventosDelMes.forEach(c=>{ (porFecha[c.fecha]=porFecha[c.fecha]||[]).push(c); });
+  eventosConfirmados.forEach(c=>{ (porFecha[c.fecha]=porFecha[c.fecha]||[]).push(c); });
 
   let html='';
   for(let i=0;i<totalCells;i++){
@@ -2938,8 +3030,9 @@ function renderAgenda() {
       <div class="agenda-day-num" style="${!esDiaServicio?'color:#252535;':hasConflicto?'color:#f87171;':isToday?'color:var(--plasma);':''}">${dayNum}</div>
       ${sortedDay.map(c=>{
         const hf=c.hora?_fmt12(c.hora):'s/h';
+        const dotColor = c.estado==='contrato_generado' ? 'var(--verde)' : 'var(--plasma)';
         return `<div class="agenda-event-dot" style="font-size:0.55rem;display:flex;flex-direction:column;gap:1px;padding:2px 4px;margin-bottom:2px;" title="${c.folio} · ${c.nombre} · ${hf}">
-          <span style="color:var(--plasma);font-weight:700;letter-spacing:0.5px;">${c.folio}</span>
+          <span style="color:${dotColor};font-weight:700;letter-spacing:0.5px;">${c.estado==='contrato_generado'?'📄':'✅'} ${c.folio}</span>
           <span style="color:var(--dim);font-size:0.5rem;">${hf}</span>
         </div>`;
       }).join('')}
@@ -2950,8 +3043,12 @@ function renderAgenda() {
 
   // ── Lista de eventos con timeline de bloques ──
   const evList = document.getElementById('agenda-events-list');
-  if(!eventosDelMes.length){ evList.innerHTML='<div style="color:var(--dim);font-size:0.78rem;padding:8px 0;">Sin eventos este mes — las cotizaciones aparecerán aquí</div>'; return; }
+  if(!eventosDelMes.length){ evList.innerHTML='<div style="color:var(--dim);font-size:0.78rem;padding:8px 0;">Sin eventos este mes</div>'; return; }
+  // Mostrar confirmados primero, luego pendientes
   const sorted = [...eventosDelMes].sort((a,b)=>{
+    const prioA = ESTADOS_EVENTO.includes(a.estado) ? 0 : 1;
+    const prioB = ESTADOS_EVENTO.includes(b.estado) ? 0 : 1;
+    if (prioA !== prioB) return prioA - prioB;
     const da=a.fecha+' '+(a.hora||'00:00');
     const db=b.fecha+' '+(b.hora||'00:00');
     return da.localeCompare(db);
@@ -3079,7 +3176,11 @@ function renderAgenda() {
         </div>
         <div style="text-align:right;flex-shrink:0;">
           <div style="font-family:'Bebas Neue',sans-serif;color:var(--verde);font-size:1.1rem;letter-spacing:1px;">$${parseFloat(c.total||0).toLocaleString('es-MX',{maximumFractionDigits:0})}</div>
-          <div style="font-size:0.65rem;color:var(--dim);">${c.estado==='confirmado'?'✅ Confirmado':c.estado==='pendiente'?'⏳ Pendiente':'📄 Contrato'}</div>
+          <div style="font-size:0.65rem;color:var(--dim);">${
+            c.estado==='confirmado'?'<span style="color:var(--verde)">✅ Evento confirmado</span>':
+            c.estado==='contrato_generado'?'<span style="color:#60cfff">📄 Contrato generado</span>':
+            '<span style="color:#fbbf24;font-size:0.6rem;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:4px;padding:1px 6px;">⏳ Cotización pendiente</span>'
+          }</div>
         </div>
       </div>
     </div>`;
@@ -3666,26 +3767,38 @@ function confirmarYContrato() {
   const idx = cotizaciones.indexOf(cotActual);
   const yaConfirmado = cotActual.estado === 'confirmado' || cotActual.estado === 'contrato_generado';
 
-  // 1. Confirmar estado
   if (!yaConfirmado) {
+    // Confirmar estado → Evento confirmado
     cotizaciones[idx].estado = 'confirmado';
     cotActual.estado = 'confirmado';
     _fbGuardarCot(cotizaciones[idx]);
     guardarCotizaciones();
-    toast('✅ Cotización confirmada', 'var(--verde)');
+    renderAgenda();
+    toast('✅ ¡Evento confirmado! Ya aparece en la agenda', 'var(--verde)');
+    // Enviar WA
+    if (cotActual.tel) setTimeout(() => enviarWAConfirmacion(cotActual), 500);
+    // Preguntar contrato con modal propio (iOS compatible)
+    setTimeout(() => {
+      mostrarConfirm(
+        '¿Generar contrato ahora?',
+        `<strong style="color:var(--azul)">${cotActual.folio}</strong> — ${cotActual.nombre}<br>
+         <span style="font-size:0.75rem;color:var(--dim)">Se abrirá el generador de <em>Contrato de Servicio de Barra</em></span>`,
+        '📄 Generar contrato',
+        'var(--azul)',
+        () => generarContrato()
+      );
+    }, 900);
+  } else {
+    // Ya estaba confirmado — ir directo al contrato
+    mostrarConfirm(
+      '¿Generar contrato?',
+      `<strong style="color:var(--azul)">${cotActual.folio}</strong> — ${cotActual.nombre}<br>
+       <span style="font-size:0.75rem;color:var(--dim)">Contrato de Servicio de Barra</span>`,
+      '📄 Generar contrato',
+      'var(--azul)',
+      () => generarContrato()
+    );
   }
-
-  // 2. Enviar WA de confirmación (si no estaba ya confirmado)
-  if (!yaConfirmado && cotActual.tel) {
-    setTimeout(() => enviarWAConfirmacion(cotActual), 350);
-  }
-
-  // 3. Preguntar si quiere generar contrato
-  setTimeout(() => {
-    if (confirm('¿Generar el contrato ahora?')) {
-      generarContrato();
-    }
-  }, yaConfirmado ? 0 : 700);
 }
 
 // ════ WA CONFIRMACIÓN DE EVENTO ════
@@ -3840,12 +3953,15 @@ function abrirWADireto(tel,nombre,folio) {
 }
 
 function eliminar(idx) {
-  if(!confirm('¿Eliminar esta cotización? Esta acción no se puede deshacer.')) return;
   const cot = cotizaciones[idx];
-  // Eliminar de Firestore primero
-  _fbEliminarCot(cot);
-  // El onSnapshot actualizará la lista automáticamente
-  toast('🗑 Cotización eliminada','var(--rojo)');
+  if (!cot) return;
+  mostrarConfirm(
+    '¿Eliminar cotización?',
+    `<strong style="color:var(--azul)">${cot.folio}</strong> — ${cot.nombre}<br><span style="font-size:0.75rem;color:var(--dim)">Esta acción no se puede deshacer</span>`,
+    '🗑 Eliminar',
+    'var(--rojo)',
+    () => { _fbEliminarCot(cot); toast('🗑 Cotización eliminada', 'var(--rojo)'); }
+  );
 }
 
 // ════ CONFIG ════
@@ -3892,6 +4008,20 @@ async function limpiarDemo() {
 
 // Alias para el botón del panel de Firestore
 window.fb_limpiarDemos = function() { limpiarDemo(); };
+
+async function limpiarCanceladas() {
+  const canceladas = (window.cotizaciones || []).filter(c => c.estado === 'cancelado');
+  if (!canceladas.length) { toast('No hay cotizaciones canceladas', 'var(--dim)'); return; }
+  if (window._fbReady && window._db) {
+    toast('⏳ Eliminando canceladas...', 'var(--dim)');
+    try {
+      const batch = window._fbWriteBatch(window._db);
+      canceladas.forEach(c => { if (c._docId) batch.delete(window._fbDoc(window._db, 'cotizaciones', c._docId)); });
+      await batch.commit();
+      toast(`🗑 ${canceladas.length} cancelada(s) eliminadas`, 'var(--amarillo)');
+    } catch(e) { toast('⚠️ Error: ' + e.message, 'var(--rojo)'); }
+  }
+}
 
 function cambiarPassword() {
   document.getElementById('modal-pwd').classList.add('show');
@@ -3996,6 +4126,7 @@ function showPage(name, btn) {
   if(name==='anticipos') renderAnticipos();
   if(name==='desempeno') renderDesempeno();
   if(name==='basedatos') renderBaseDatos();
+  if(name==='firebase') actualizarFbMonitor();
   // Close sidebar on tablet after nav
   if (window.innerWidth < 1024) closeSidebar();
   // Sync bottom nav active state

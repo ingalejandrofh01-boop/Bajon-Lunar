@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bajón Lunar — Generador de Contratos</title>
+<title>Bajón Lunar — Contrato de Servicio de Barra</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Playfair+Display:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
@@ -1262,7 +1262,7 @@ async function generarContrato() {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(13);
     doc.setTextColor(...C.blanco);
-    doc.text('CONTRATO DE PRESTACION DE SERVICIOS', W / 2, 53, { align: 'center' });
+    doc.text('CONTRATO DE SERVICIO DE BARRA', W / 2, 53, { align: 'center' });
 
     // Texto introductorio
     let y = 66;
@@ -1271,7 +1271,7 @@ async function generarContrato() {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(...C.dim);
-    const intro = `En ${firmaCiudad}, a ${formatFechaLarga(firmaFecha || hoyISO)}, los suscritos comparecen a celebrar el presente Contrato de Prestación de Servicios, de conformidad con lo establecido en el Código Civil aplicable, sujeto a las siguientes declaraciones y cláusulas:`;
+    const intro = `En ${firmaCiudad}, a ${formatFechaLarga(firmaFecha || hoyISO)}, los suscritos comparecen a celebrar el presente Contrato de Servicio de Barra, de conformidad con lo establecido en el Código Civil aplicable, sujeto a las siguientes declaraciones y cláusulas:`;
     const introLines = doc.splitTextToSize(intro, ancho - 12);
     doc.text(introLines, mg + 6, y + 8);
 
@@ -1388,7 +1388,7 @@ async function generarContrato() {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(7);
     doc.setTextColor(...C.blanco);
-    doc.text('BAJON LUNAR | CONTRATO DE PRESTACION DE SERVICIOS', mg, 10);
+    doc.text('BAJON LUNAR | CONTRATO DE SERVICIO DE BARRA', mg, 10);
     doc.setTextColor(180, 200, 255);
     doc.text(`${FOLIO}`, W - mg, 10, { align: 'right' });
 
