@@ -3364,6 +3364,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (mc) mc.addEventListener('click', (e) => { if (e.target === mc) cerrarConfirm(); });
 });
 
+// ── Limpiar log de Firebase Monitor ──
+function limpiarFbLog() {
+  const log = document.getElementById('fb-log');
+  if (log) log.innerHTML = '<div style="color:var(--dim);font-size:0.72rem;padding:8px 0;">Log limpiado.</div>';
+}
+
 // ── Guarda cotización en Firestore (upsert por _docId) ──
 async function _fbGuardarCot(cot) {
   if (!window._fbReady || !window._db) return;
