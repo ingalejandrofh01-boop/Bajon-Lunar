@@ -2914,9 +2914,10 @@ function renderIngresos() {
 }
 
 // ════ AGENDA — HELPERS DE TIEMPO ════
-function _horaAMin(h){ if(!h)return null; const [hh,mm]=h.split(':').map(Number); return hh*60+mm; }
+function _normHora(h){ if(!h && h!==0)return null; const s=String(h).trim(); if(s.includes(':')){ const p=s.split(':'); const hh=parseInt(p[0],10); const mm=parseInt(p[1],10)||0; if(isNaN(hh))return null; return `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`; } const n=parseInt(s,10); if(isNaN(n))return null; return `${String(n).padStart(2,'0')}:00`; }
+function _horaAMin(h){ const n=_normHora(h); if(!n)return null; const [hh,mm]=n.split(':').map(Number); return hh*60+mm; }
 function _minAHora(m){ const h=Math.floor(((m%1440)+1440)%1440/60),mn=((m%1440)+1440)%1440%60; return `${String(h).padStart(2,'0')}:${String(mn).padStart(2,'0')}`; }
-function _fmt12(h){ if(!h)return'—'; const [hh,mm]=h.split(':').map(Number),am=hh>=12?'PM':'AM',h12=hh%12||12; return `${h12}:${String(mm).padStart(2,'0')} ${am}`; }
+function _fmt12(h){ const n=_normHora(h); if(!n)return'—'; const [hh,mm]=n.split(':').map(Number),am=hh>=12?'PM':'AM',h12=hh%12||12; return `${h12}:${String(mm).padStart(2,'0')} ${am}`; }
 function _esPeriferia(dir){
   if(!dir)return false;
   const d=dir.toLowerCase();
@@ -4152,8 +4153,8 @@ function iniciarReloj() {
 
 // ── Helper: formatear hora 24h → "7:30 PM" ──
 function _fmt12modal(h24){
-  if(!h24) return '—';
-  const [hh,mm]=h24.split(':').map(Number);
+  const n=_normHora(h24); if(!n) return '—';
+  const [hh,mm]=n.split(':').map(Number);
   const ap=hh>=12?'PM':'AM', h12=hh%12||12;
   return `${h12}:${String(mm).padStart(2,'0')} ${ap}`;
 }
@@ -4185,7 +4186,8 @@ window.toggleEditHora = function(){
   box.style.display = isOpen?'none':'block';
   if(!isOpen && cotActual?.hora){
     // Pre-cargar la hora actual
-    const [hh,mm]=(cotActual.hora||'12:00').split(':').map(Number);
+    const horaStr = _normHora(cotActual.hora) || '12:00';
+    const [hh,mm]=horaStr.split(':').map(Number);
     _editAmPm = hh>=12?'PM':'AM';
     const h12=hh%12||12;
     document.getElementById('edit-h').value=String(h12);
