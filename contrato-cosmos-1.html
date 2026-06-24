@@ -850,6 +850,10 @@
           <span class="pval" id="prev-tipo">—</span>
         </div>
         <div class="preview-row">
+          <span class="plabel">Paquete / Barra</span>
+          <span class="pval" id="prev-paquete" style="font-size:0.75rem;">—</span>
+        </div>
+        <div class="preview-row">
           <span class="plabel">Fecha</span>
           <span class="pval" id="prev-fecha">—</span>
         </div>
@@ -1737,6 +1741,17 @@ function preLlenarDesdeCotizador() {
   set('ev-ciudad',   'Ciudad de México');
   set('ev-notas',    p.get('notas'));
 
+  // Duración del servicio
+  const durParam = p.get('duracion') || '';
+  if (durParam) {
+    const durEl = document.getElementById('ev-duracion');
+    if (durEl) {
+      for (let opt of durEl.options) {
+        if (opt.value === durParam || opt.text === durParam) { durEl.value = opt.value; break; }
+      }
+    }
+  }
+
   // Tipo de evento — match flexible
   const tipoEl = document.getElementById('ev-tipo');
   const tipoVal = (p.get('tipo') || '').toLowerCase();
@@ -1831,7 +1846,20 @@ function preLlenarDesdeCotizador() {
   const antFecha = p.get('ant_fecha') || '';
   if (antFecha) set('fin-fecha-anticipo', antFecha);
 
-  // Método de pago — no prellenar (lo decide el admin)
+  // Método de pago
+  const metodoParam = p.get('metodo_pago') || '';
+  if (metodoParam) {
+    const metodoEl = document.getElementById('fin-metodo');
+    if (metodoEl) {
+      for (let opt of metodoEl.options) {
+        if (opt.value === metodoParam || opt.text === metodoParam) { metodoEl.value = opt.value; break; }
+      }
+    }
+  }
+
+  // Cuenta / CLABE
+  const cuentaParam = p.get('cuenta') || '';
+  if (cuentaParam) set('fin-cuenta', cuentaParam);
 
   // ── 6. DATOS DE FIRMA ──
   const firmaFechaEl = document.getElementById('firma-fecha');
@@ -1844,11 +1872,20 @@ function preLlenarDesdeCotizador() {
   if (typeof updatePreview === 'function') updatePreview();
   if (typeof updateServicios === 'function') updateServicios();
 
+  // ── Preview paquete ──
+  const paqEl = document.getElementById('prev-paquete');
+  if (paqEl) {
+    const paq = p.get('paquete_nombre') || p.get('paquete') || '';
+    const barra = p.get('barra_texto') || p.get('barra') || '';
+    const parts = [paq, barra].filter(Boolean);
+    paqEl.textContent = parts.length ? parts.join(' · ') : '—';
+  }
+
   // ── HIGHLIGHT de campos auto-llenados ──
   setTimeout(() => {
     const autoFilled = ['cli-nombre','cli-tel','cli-email','cli-domicilio',
-      'ev-fecha','ev-hora','ev-personas','ev-dir','ev-tipo','ev-notas',
-      'fin-total','fin-anticipo','srv-desc','firma-fecha'];
+      'ev-fecha','ev-hora','ev-personas','ev-dir','ev-tipo','ev-notas','ev-duracion',
+      'fin-total','fin-anticipo','fin-metodo','fin-cuenta','srv-desc','firma-fecha'];
     autoFilled.forEach(id => {
       const el = document.getElementById(id);
       if (el && (el.value || (el.tagName==='SELECT' && el.value))) {
@@ -1862,8 +1899,7 @@ function preLlenarDesdeCotizador() {
   setTimeout(() => {
     const pendientes = [];
     if (!document.getElementById('cli-ine')?.value) pendientes.push('INE del cliente');
-    if (!document.getElementById('fin-metodo')?.value || document.getElementById('fin-metodo')?.value === '') pendientes.push('Método de pago');
-    if (!document.getElementById('fin-cuenta')?.value) pendientes.push('Cuenta/CLABE');
+    if (!document.getElementById('fin-cuenta')?.value) pendientes.push('Cuenta/CLABE (si aplica transferencia)');
     if (pendientes.length) {
       const infoBanner = document.createElement('div');
       infoBanner.style.cssText = 'position:fixed;bottom:30px;right:24px;z-index:9998;background:rgba(24,24,40,0.97);border:1px solid rgba(245,158,11,0.35);border-radius:12px;padding:14px 18px;max-width:280px;font-family:\'DM Sans\',sans-serif;font-size:0.75rem;color:#fbbf24;box-shadow:0 8px 32px rgba(0,0,0,0.5);';

@@ -1756,8 +1756,34 @@ console.log('🔥 Firebase Firestore conectado — Bajón Lunar Admin');
           </div>
         </div>
         <div class="mfield"><label>Personas</label><span id="md-personas">—</span></div>
+        <div class="mfield"><label>Duración del servicio</label>
+          <select id="md-duracion" style="background:var(--gris3);border:1px solid var(--borde2);border-radius:6px;padding:5px 8px;color:var(--blanco);font-size:0.8rem;cursor:pointer;width:100%;" onchange="md_guardarCampo('duracion',this.value)">
+            <option value="">— Seleccionar —</option>
+            <option value="2 horas">2 horas</option>
+            <option value="3 horas">3 horas</option>
+            <option value="4 horas">4 horas</option>
+            <option value="5 horas">5 horas</option>
+            <option value="6 horas">6 horas</option>
+            <option value="Toda la noche">Toda la noche</option>
+          </select>
+        </div>
         <div class="mfield" style="grid-column:1/-1;"><label>Dirección</label><span id="md-dir">—</span></div>
         <div class="mfield" style="grid-column:1/-1;"><label>Notas</label><span id="md-notas">—</span></div>
+        <div class="mfield"><label>Método de pago (anticipo)</label>
+          <select id="md-metodo-pago" style="background:var(--gris3);border:1px solid var(--borde2);border-radius:6px;padding:5px 8px;color:var(--blanco);font-size:0.8rem;cursor:pointer;width:100%;" onchange="md_guardarCampo('metodoPago',this.value)">
+            <option value="">— Seleccionar —</option>
+            <option value="Transferencia bancaria">Transferencia bancaria</option>
+            <option value="Efectivo">Efectivo</option>
+            <option value="Tarjeta (punto de venta)">Tarjeta (punto de venta)</option>
+            <option value="OXXO Pay">OXXO Pay</option>
+          </select>
+        </div>
+        <div class="mfield"><label>Cuenta / CLABE</label>
+          <input type="text" id="md-cuenta" placeholder="CLABE o número de cuenta"
+            style="background:var(--gris3);border:1px solid var(--borde2);border-radius:6px;padding:5px 8px;color:var(--blanco);font-size:0.8rem;width:100%;box-sizing:border-box;"
+            oninput="md_guardarCampo('cuenta',this.value)"
+            onfocus="this.style.borderColor='var(--azul)'" onblur="this.style.borderColor='var(--borde2)'">
+        </div>
       </div>
 
       <!-- PAQUETE + BARRA -->
@@ -2075,28 +2101,10 @@ window._fbRenderAll = function() {
 };
 
 function cargarDatos() {
-  // Si Firestore ya cargo datos, solo re-renderizar (no pisar con localStorage)
-  if (window._fbCotInicializado && window.cotizaciones.length > 0) {
-    window._fbRenderAll();
-    return;
-  }
-  // Fallback: localStorage mientras Firestore no ha respondido aun
-  try {
-    const local = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
-    if (local.length > 0) window.cotizaciones = local;
-  } catch(e) {}
-  if (window.cotizaciones.length === 0) cargarDemoData();
+  // Firestore es la única fuente de verdad.
+  // El onSnapshot ya está escuchando y llenará window.cotizaciones.
+  // Solo renderizamos con lo que hay ahora.
   window._fbRenderAll();
-}
-
-function cargarDemoData() {
-  cotizaciones = [
-    { folio:'BL-0003', timestamp:new Date(Date.now()-900000).toISOString(), estado:'pendiente', nombre:'Valeria Moreno', tel:'55 8821 4490', email:'vale@gmail.com', fecha:'2025-08-16', hora:'22:00', personas:'80', tipo:'XV Años', dir:'Salón Versalles, Polanco, CDMX', notas:'Sin gluten para 3 personas.', servicios:'Chilaquiles, Cantaritos, Vitrolero', vitrolero:'2x5L Jamaica', subtotal:'4850.00', servicio:'727.50', traslado:'200.00', total:'5777.50' },
-    { folio:'BL-0002', timestamp:new Date(Date.now()-10800000).toISOString(), estado:'confirmado', nombre:'Diego Hernández', tel:'55 3341 7729', email:'diego.h@outlook.com', fecha:'2025-08-10', hora:'23:30', personas:'40', tipo:'Fiesta / Reventón', dir:'Calle Amores 221, Del Valle, CDMX', notas:'', servicios:'Maruchan, Gomitas Locas', vitrolero:'1x5L Tamarindo', subtotal:'1280.00', servicio:'192.00', traslado:'200.00', total:'1672.00' },
-    { folio:'BL-0001', timestamp:new Date(Date.now()-86400000).toISOString(), estado:'contrato_generado', nombre:'Ana García Ruiz', tel:'55 1122 3344', email:'anagarcia@empresa.mx', fecha:'2025-08-05', hora:'21:00', personas:'120', tipo:'Boda', dir:'Hacienda San Antonio, Cuernavaca', notas:'Jardín descubierto.', servicios:'Chilaquiles, Maruchan, Cantaritos, Vitrolero', vitrolero:'3x10L Jamaica', subtotal:'12400.00', servicio:'1860.00', traslado:'200.00', total:'14460.00' },
-    { folio:'BL-0004', timestamp:new Date(Date.now()-172800000).toISOString(), estado:'cancelado', nombre:'Roberto Sánchez', tel:'55 9988 7766', email:'roberto@mail.com', fecha:'2025-08-20', hora:'20:00', personas:'30', tipo:'Cumpleaños', dir:'CDMX', notas:'', servicios:'Gomitas Locas', vitrolero:'1x5L Limón', subtotal:'600.00', servicio:'90.00', traslado:'200.00', total:'890.00' },
-  ];
-  localStorage.setItem(DB_KEY, JSON.stringify(cotizaciones));
 }
 
 // ════ STATS ════
@@ -2535,6 +2543,13 @@ function abrirModal(idx) {
   cargarAnticipoEnModal(c);
   document.getElementById('md-personas').textContent=c.personas?c.personas+' personas':'—';
   document.getElementById('md-dir').textContent=c.dir||'—';
+  // Duración, método de pago y cuenta
+  const mdDur = document.getElementById('md-duracion');
+  if (mdDur) mdDur.value = c.duracion || '';
+  const mdMetodo = document.getElementById('md-metodo-pago');
+  if (mdMetodo) mdMetodo.value = c.metodoPago || '';
+  const mdCuenta = document.getElementById('md-cuenta');
+  if (mdCuenta) mdCuenta.value = c.cuenta || '';
   document.getElementById('md-notas').textContent=c.notas||'Sin notas';
 
   // ── PAQUETE + BARRA ──
@@ -2621,9 +2636,53 @@ function cerrarModal(e) {
   document.getElementById('modal-overlay').classList.remove('show');
 }
 
+// ── Guarda cotización en Firestore (upsert por _docId) ──
+async function _fbGuardarCot(cot) {
+  if (!window._fbReady || !window._db) return;
+  try {
+    const { _docId, ...datos } = cot;
+    datos.timestamp = datos.timestamp || Date.now();
+    if (_docId) {
+      // Actualizar documento existente
+      await window._fbUpdateDoc(window._fbDoc(window._db, 'cotizaciones', _docId), datos);
+    } else {
+      // Crear documento nuevo
+      const ref = await window._fbAddDoc(window._fbCollection(window._db, 'cotizaciones'), datos);
+      cot._docId = ref.id;
+    }
+  } catch(e) {
+    console.error('Error guardando en Firestore:', e);
+    toast('⚠️ Error al guardar en Firestore','var(--rojo)');
+  }
+}
+
+// ── Elimina cotización de Firestore por _docId ──
+async function _fbEliminarCot(cot) {
+  if (!window._fbReady || !window._db || !cot._docId) return;
+  try {
+    await window._fbDeleteDoc(window._fbDoc(window._db, 'cotizaciones', cot._docId));
+  } catch(e) {
+    console.error('Error eliminando en Firestore:', e);
+  }
+}
+
 function guardarCotizaciones() {
-  localStorage.setItem(DB_KEY, JSON.stringify(cotizaciones));
-  cargarDatos();
+  // Ya NO usamos localStorage — Firestore es la única fuente de verdad.
+  // El onSnapshot actualizará window.cotizaciones automáticamente.
+  // Solo llamamos _fbRenderAll para que la UI se actualice de inmediato.
+  window._fbRenderAll();
+}
+
+// Guarda un campo editado directamente desde el modal
+function md_guardarCampo(campo, valor) {
+  if (!cotActual) return;
+  const idx = cotizaciones.indexOf(cotActual);
+  if (idx < 0) return;
+  cotizaciones[idx][campo] = valor;
+  cotActual[campo] = valor;
+  // Persistir en Firestore
+  _fbGuardarCot(cotizaciones[idx]);
+  window._fbRenderAll();
 }
 
 // ════ ANTICIPOS ════
@@ -2707,6 +2766,8 @@ window.ant_guardar = function() {
     cotActual.estado = 'confirmado';
   }
 
+  // Persistir en Firestore
+  _fbGuardarCot(cotizaciones[idx]);
   guardarCotizaciones();
   toast(`💵 Anticipo ${pct}% registrado${extra}`, _antRecibido ? 'var(--verde)' : 'var(--amarillo)');
 
@@ -2934,6 +2995,7 @@ function confirmarCotizacion() {
   if(!cotActual) return;
   const idx=cotizaciones.indexOf(cotActual);
   cotizaciones[idx].estado='confirmado';
+  _fbGuardarCot(cotizaciones[idx]);
   guardarCotizaciones();
   cerrarModal();
   toast('✅ Cotización confirmada','var(--verde)');
@@ -2943,6 +3005,7 @@ function cancelarCotizacion() {
   if(!cotActual) return;
   const idx=cotizaciones.indexOf(cotActual);
   cotizaciones[idx].estado='cancelado';
+  _fbGuardarCot(cotizaciones[idx]);
   guardarCotizaciones();
   cerrarModal();
   toast('❌ Cotización cancelada','var(--rojo)');
@@ -2963,6 +3026,7 @@ window.ant_saldar = function() {
   };
   cotizaciones[idx].anticipo = antData;
   cotActual.anticipo = antData;
+  _fbGuardarCot(cotizaciones[idx]);
   guardarCotizaciones();
   cargarAnticipoEnModal(cotActual);
   toast('🎉 Evento liquidado al 100%', 'var(--verde)');
@@ -3014,6 +3078,7 @@ function confirmarYContrato() {
   if (!yaConfirmado) {
     cotizaciones[idx].estado = 'confirmado';
     cotActual.estado = 'confirmado';
+    _fbGuardarCot(cotizaciones[idx]);
     guardarCotizaciones();
     toast('✅ Cotización confirmada', 'var(--verde)');
   }
@@ -3069,6 +3134,7 @@ function generarContrato() {
   if(!cotActual) return;
   const idx=cotizaciones.indexOf(cotActual);
   cotizaciones[idx].estado='contrato_generado';
+  _fbGuardarCot(cotizaciones[idx]);
   guardarCotizaciones();
   cerrarModal();
   toast('📄 Abriendo generador de contrato...','var(--verde)');
@@ -3160,6 +3226,11 @@ function generarContrato() {
     saldo:         String(antSaldo),
     ant_recibido:  antObj.recibido ? '1' : '0',
     ant_fecha:     antObj.fecha  || '',
+    // PAGO
+    metodo_pago:   c.metodoPago  || '',
+    cuenta:        c.cuenta      || '',
+    // DURACIÓN
+    duracion:      c.duracion    || '3 horas',
   });
 
   window.open('contrato-cosmos-1.html?' + p.toString(), '_blank');
@@ -3178,8 +3249,10 @@ function abrirWADireto(tel,nombre,folio) {
 
 function eliminar(idx) {
   if(!confirm('¿Eliminar esta cotización? Esta acción no se puede deshacer.')) return;
-  cotizaciones.splice(idx,1);
-  guardarCotizaciones();
+  const cot = cotizaciones[idx];
+  // Eliminar de Firestore primero
+  _fbEliminarCot(cot);
+  // El onSnapshot actualizará la lista automáticamente
   toast('🗑 Cotización eliminada','var(--rojo)');
 }
 
@@ -3201,12 +3274,32 @@ function exportarCSV() {
   toast('📊 CSV exportado','var(--verde)');
 }
 
-function limpiarDemo() {
-  if(!confirm('¿Eliminar todos los datos? Solo borra los datos de esta sesión del navegador.')) return;
+async function limpiarDemo() {
+  if(!confirm('¿Eliminar TODAS las cotizaciones de Firestore?\n\nEsto borra permanentemente todos los registros. Esta acción no se puede deshacer.')) return;
+  // Borrar de localStorage también
   localStorage.removeItem(DB_KEY);
-  cargarDatos();
-  toast('🗑 Datos limpiados','var(--amarillo)');
+  // Borrar TODOS los documentos de Firestore
+  if (window._fbReady && window._db) {
+    toast('⏳ Eliminando datos de Firestore...', 'var(--dim)');
+    try {
+      const snap = await window._fbGetDocs(window._fbCollection(window._db, 'cotizaciones'));
+      const batch = window._fbWriteBatch(window._db);
+      snap.docs.forEach(d => batch.delete(d.ref));
+      await batch.commit();
+      toast('🗑 Todos los datos eliminados de Firestore', 'var(--amarillo)');
+    } catch(e) {
+      console.error('Error al limpiar Firestore:', e);
+      toast('⚠️ Error al limpiar Firestore', 'var(--rojo)');
+    }
+  } else {
+    window.cotizaciones = [];
+    window._fbRenderAll();
+    toast('🗑 Datos locales limpiados', 'var(--amarillo)');
+  }
 }
+
+// Alias para el botón del panel de Firestore
+window.fb_limpiarDemos = function() { limpiarDemo(); };
 
 function cambiarPassword() {
   document.getElementById('modal-pwd').classList.add('show');
@@ -3383,6 +3476,7 @@ window.guardarHoraEdit = function(){
   const idx=cotizaciones.indexOf(cotActual);
   cotizaciones[idx].hora=newHora;
   cotActual.hora=newHora;
+  _fbGuardarCot(cotizaciones[idx]);
   guardarCotizaciones();
   // Actualizar display en modal
   document.getElementById('md-hora').textContent=_fmt12modal(newHora);
@@ -3453,6 +3547,7 @@ window.guardarFechaEdit = function(){
   const idx=cotizaciones.indexOf(cotActual);
   cotizaciones[idx].fecha=newFecha;
   cotActual.fecha=newFecha;
+  _fbGuardarCot(cotizaciones[idx]);
   guardarCotizaciones();
   // Actualizar display
   const fmtFecha=new Date(newFecha+'T12:00').toLocaleDateString('es-MX',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
