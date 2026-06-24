@@ -2893,48 +2893,6 @@ function validarHoraManual() {
   }
 }
 
-  // Validar según día seleccionado
-  const diaSemana = getDiaSemana(); // 0=dom,1=lun,...,5=vie,6=sab
-  let error = '';
-  if (diaSemana !== null) {
-    // Viernes: solo >= 20:00
-    if (diaSemana === 5 && h24 < 20) {
-      error = '⚠ Viernes: servicio a partir de las 8:00 PM';
-    }
-    // Lunes: no permitimos iniciar servicio el lunes (solo terminar antes de 4 AM)
-    if (diaSemana === 1) {
-      error = '⚠ Lunes no está disponible para inicio de servicio. El servicio de domingo puede extenderse hasta las 4:00 AM del lunes.';
-    }
-    // Martes, miércoles, jueves: no disponibles
-    if ([2,3,4].includes(diaSemana)) {
-      error = '⚠ Solo atendemos Viernes, Sábado y Domingo.';
-    }
-    // Domingo: cualquier hora está bien pero advertir que máx retiro 4 AM lunes
-    if (diaSemana === 0) {
-      // hora de fin = hora inicio + duración paquete
-      const duracion = paqActivo ? { nebula:2, cosmos:2, after:3, moonlight:3 }[paqActivo] || 2 : 2;
-      const finH24 = h24 + duracion;
-      if (finH24 > 28) { // 28 = 4 AM del lunes (24+4)
-        error = `⚠ Con ${duracion}h de servicio terminarías después de las 4:00 AM del lunes.`;
-      }
-    }
-  }
-
-  if (error) {
-    aviso.style.display = 'block';
-    aviso.style.background = 'rgba(239,68,68,.1)';
-    aviso.style.color = 'var(--rojo)';
-    aviso.style.border = '1px solid rgba(239,68,68,.25)';
-    aviso.textContent = error;
-    horaSeleccionada = '';
-    document.getElementById('cHora').value = '';
-  } else {
-    aviso.style.display = 'none';
-    horaSeleccionada = horaStr;
-    document.getElementById('cHora').value = horaStr;
-  }
-}
-
 function getDiaSemana() {
   if (!fechaInterna) return null;
   const d = new Date(fechaInterna + 'T12:00');
