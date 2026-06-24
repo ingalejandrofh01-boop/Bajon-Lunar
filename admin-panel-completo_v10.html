@@ -1913,10 +1913,12 @@ console.log('🔥 Firebase Firestore conectado — Bajón Lunar Admin');
         <div class="stat-trend">cotización más reciente</div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon" style="background:rgba(96,207,255,0.12);">🔄</div>
-        <div class="stat-label">Actualizaciones</div>
-        <div class="stat-value" id="fb-stat-updates" style="color:var(--plasma);">0</div>
-        <div class="stat-trend">en esta sesión</div>
+        <div class="stat-icon" style="background:rgba(96,207,255,0.12);">🔢</div>
+        <div class="stat-label">Folio actual</div>
+        <div class="stat-value" id="fb-folio-counter" style="color:var(--plasma);font-size:0.95rem;">—</div>
+        <div class="stat-trend" style="display:flex;flex-direction:column;gap:4px;margin-top:6px;">
+          <button onclick="resetearContadorFolios()" style="background:rgba(26,59,255,0.12);border:1px solid rgba(26,59,255,0.3);border-radius:6px;color:var(--azul);font-size:0.55rem;letter-spacing:1.5px;padding:4px 8px;cursor:pointer;font-family:'Bebas Neue',sans-serif;">🔄 RESETEAR A 0001</button>
+        </div>
       </div>
     </div>
 
@@ -2718,7 +2720,7 @@ async function actualizarFbMonitor() {
   const resList = document.getElementById('fb-res-list');
   const cotCount = document.getElementById('fb-cot-count');
   const resCount = document.getElementById('fb-res-count');
-  const lastWrite = document.getElementById('fb-last-write');
+  const lastWrite = document.getElementById('fb-stat-last');
   if (!cotList) return;
 
   // ── Cotizaciones ──
@@ -2777,12 +2779,13 @@ async function actualizarFbMonitor() {
     resList.innerHTML = `<div style="padding:20px;text-align:center;color:#f87171;font-size:0.75rem;">⚠ Error: ${e.message}</div>`;
   }
 
-  // Update actualizaciones counter
-  const updCount = document.getElementById('fb-updates-count');
-  if (updCount) {
-    const n = parseInt(updCount.textContent || '0') + 1;
-    updCount.textContent = n;
-  }
+  // ── Mostrar contador de folio actual ──
+  try {
+    const folioSnap = await window._fbGetDoc(window._fbDoc(window._db, 'config', 'folio_counter'));
+    const folioVal = folioSnap.exists() ? (folioSnap.data().value || 0) : 0;
+    const folioEl = document.getElementById('fb-folio-counter');
+    if (folioEl) folioEl.textContent = 'BL-' + String(folioVal).padStart(4,'0') + ' (último usado)';
+  } catch(e) { /* silencioso */ }
 }
 
 // ════ STATS ════
@@ -4072,7 +4075,7 @@ async function resetearContadorFolios() {
     async () => {
       if (!window._fbReady || !window._db) { toast('⚠️ Firebase no disponible', 'var(--rojo)'); return; }
       try {
-        await window._fbSetDoc(window._fbDoc(window._db, 'contadores', 'cotizaciones'), { valor: 0 });
+        await window._fbSetDoc(window._fbDoc(window._db, 'config', 'folio_counter'), { value: 0 }, { merge: true });
         toast('✅ Contador reseteado — próximo folio: BL-0001', 'var(--azul)');
       } catch(e) {
         toast('⚠️ Error: ' + e.message, 'var(--rojo)');
