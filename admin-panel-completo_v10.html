@@ -1684,6 +1684,7 @@ console.log('🔥 Firebase Firestore conectado — Bajón Lunar Admin');
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <button class="ftab" style="color:var(--amarillo);border-color:rgba(245,158,11,0.4);" onclick="mostrarConfirm('¿Eliminar canceladas?','Se borrarán todas las cotizaciones canceladas.','🗑 Eliminar canceladas','var(--amarillo)',limpiarCanceladas)">🗑 Canceladas</button>
             <button class="ftab" style="color:var(--rojo);border-color:rgba(239,68,68,0.3);" onclick="limpiarDemo()">🗑 Borrar todo</button>
+            <button class="ftab" style="color:var(--azul);border-color:rgba(26,59,255,0.3);" onclick="resetearContadorFolios()" title="Resetea el contador para que el próximo folio sea BL-0001">🔄 Resetear folio</button>
           </div>
           </div>
         </div>
@@ -3332,6 +3333,37 @@ function cerrarModal(e) {
   document.getElementById('modal-overlay').classList.remove('show');
 }
 
+// ── Modal de confirmación ──
+let _confirmCallback = null;
+function mostrarConfirm(titulo, mensaje, labelOk, colorOk, callback) {
+  document.getElementById('modal-confirm-title').textContent = titulo;
+  document.getElementById('modal-confirm-msg').innerHTML = mensaje;
+  const btnOk = document.getElementById('modal-confirm-ok');
+  btnOk.textContent = labelOk || 'Confirmar';
+  btnOk.style.background = colorOk || 'var(--azul)';
+  _confirmCallback = callback || null;
+  const el = document.getElementById('modal-confirm');
+  el.style.opacity = '1';
+  el.style.visibility = 'visible';
+  document.getElementById('modal-confirm-card').style.transform = 'translateY(0)';
+}
+function cerrarConfirm() {
+  const el = document.getElementById('modal-confirm');
+  el.style.opacity = '0';
+  el.style.visibility = 'hidden';
+  document.getElementById('modal-confirm-card').style.transform = 'translateY(20px)';
+  _confirmCallback = null;
+}
+function ejecutarConfirm() {
+  if (typeof _confirmCallback === 'function') _confirmCallback();
+  cerrarConfirm();
+}
+// Cerrar al tocar el fondo
+document.addEventListener('DOMContentLoaded', () => {
+  const mc = document.getElementById('modal-confirm');
+  if (mc) mc.addEventListener('click', (e) => { if (e.target === mc) cerrarConfirm(); });
+});
+
 // ── Guarda cotización en Firestore (upsert por _docId) ──
 async function _fbGuardarCot(cot) {
   if (!window._fbReady || !window._db) return;
@@ -3967,7 +3999,10 @@ function eliminar(idx) {
     `<strong style="color:var(--azul)">${cot.folio}</strong> — ${cot.nombre}<br><span style="font-size:0.75rem;color:var(--dim)">Esta acción no se puede deshacer</span>`,
     '🗑 Eliminar',
     'var(--rojo)',
-    () => { _fbEliminarCot(cot); toast('🗑 Cotización eliminada', 'var(--rojo)'); }
+    async () => {
+      await _fbEliminarCot(cot);
+      toast('🗑 Cotización eliminada', 'var(--rojo)');
+    }
   );
 }
 
@@ -3990,31 +4025,55 @@ function exportarCSV() {
 }
 
 async function limpiarDemo() {
-  if(!confirm('¿Eliminar TODAS las cotizaciones de Firestore?\n\nEsto borra permanentemente todos los registros. Esta acción no se puede deshacer.')) return;
-  // Borrar de localStorage también
-  localStorage.removeItem(DB_KEY);
-  // Borrar TODOS los documentos de Firestore
-  if (window._fbReady && window._db) {
-    toast('⏳ Eliminando datos de Firestore...', 'var(--dim)');
-    try {
-      const snap = await window._fbGetDocs(window._fbCollection(window._db, 'cotizaciones'));
-      const batch = window._fbWriteBatch(window._db);
-      snap.docs.forEach(d => batch.delete(d.ref));
-      await batch.commit();
-      toast('🗑 Todos los datos eliminados de Firestore', 'var(--amarillo)');
-    } catch(e) {
-      console.error('Error al limpiar Firestore:', e);
-      toast('⚠️ Error al limpiar Firestore', 'var(--rojo)');
+  mostrarConfirm(
+    '¿Borrar TODO?',
+    '⚠️ Se eliminarán <strong style="color:var(--rojo)">todas las cotizaciones</strong> de Firestore.<br><span style="font-size:0.75rem;color:var(--dim)">Esta acción no se puede deshacer.</span>',
+    '🗑 Sí, borrar todo',
+    'var(--rojo)',
+    async () => {
+      localStorage.removeItem(DB_KEY);
+      if (window._fbReady && window._db) {
+        toast('⏳ Eliminando datos de Firestore...', 'var(--dim)');
+        try {
+          const snap = await window._fbGetDocs(window._fbCollection(window._db, 'cotizaciones'));
+          const batch = window._fbWriteBatch(window._db);
+          snap.docs.forEach(d => batch.delete(d.ref));
+          await batch.commit();
+          toast('🗑 Todos los datos eliminados de Firestore', 'var(--amarillo)');
+        } catch(e) {
+          console.error('Error al limpiar Firestore:', e);
+          toast('⚠️ Error al limpiar Firestore', 'var(--rojo)');
+        }
+      } else {
+        window.cotizaciones = [];
+        window._fbRenderAll();
+        toast('🗑 Datos locales limpiados', 'var(--amarillo)');
+      }
     }
-  } else {
-    window.cotizaciones = [];
-    window._fbRenderAll();
-    toast('🗑 Datos locales limpiados', 'var(--amarillo)');
-  }
+  );
 }
 
 // Alias para el botón del panel de Firestore
 window.fb_limpiarDemos = function() { limpiarDemo(); };
+
+// ── Resetear contador de folios en Firestore ──
+async function resetearContadorFolios() {
+  mostrarConfirm(
+    '¿Resetear contador?',
+    'El próximo folio generado será <strong style="color:var(--azul)">BL-0001</strong>.<br><span style="font-size:0.75rem;color:var(--dim)">Esto solo afecta el contador, no borra cotizaciones.</span>',
+    '🔄 Resetear a 0001',
+    'var(--azul)',
+    async () => {
+      if (!window._fbReady || !window._db) { toast('⚠️ Firebase no disponible', 'var(--rojo)'); return; }
+      try {
+        await window._fbSetDoc(window._fbDoc(window._db, 'contadores', 'cotizaciones'), { valor: 0 });
+        toast('✅ Contador reseteado — próximo folio: BL-0001', 'var(--azul)');
+      } catch(e) {
+        toast('⚠️ Error: ' + e.message, 'var(--rojo)');
+      }
+    }
+  );
+}
 
 async function limpiarCanceladas() {
   const canceladas = (window.cotizaciones || []).filter(c => c.estado === 'cancelado');
