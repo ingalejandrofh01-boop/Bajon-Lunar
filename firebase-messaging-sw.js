@@ -1,10 +1,8 @@
 // ════════════════════════════════════════════════════════════
 //  firebase-messaging-sw.js  —  Bajón Lunar Admin
-//  Service Worker para notificaciones push vía Firebase FCM
-//  INSTRUCCIONES:
-//    1. Coloca este archivo en la RAÍZ de tu servidor (mismo
-//       nivel que tu HTML principal), no en una subcarpeta.
-//    2. Reemplaza los valores de firebaseConfig con los tuyos.
+//  COLOCA ESTE ARCHIVO EN LA RAÍZ DE TU REPO DE GITHUB
+//  (mismo nivel que index.html / admin-panel.html)
+//  URL: ingalejandrofh01-boop.github.io/Bajon-Lunar/
 // ════════════════════════════════════════════════════════════
 
 importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
@@ -35,7 +33,7 @@ messaging.onBackgroundMessage((payload) => {
      (data.total  ? ' · $' + parseFloat(data.total).toLocaleString('es-MX', { minimumFractionDigits: 2 }) : ''));
 
   // Ícono embebido del logo Bajón Lunar
-  const ICON = 'icon-192.png';
+  const ICON = 'https://ingalejandrofh01-boop.github.io/Bajon-Lunar/icon-192.png';
 
   return self.registration.showNotification(title, {
     body,
@@ -58,7 +56,7 @@ self.addEventListener('notificationclick', (event) => {
 
   if (event.action === 'ignorar') return;
 
-  const urlToOpen = event.notification.data?.url || '/';
+  const urlToOpen = event.notification.data?.url || 'https://ingalejandrofh01-boop.github.io/Bajon-Lunar/';
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
