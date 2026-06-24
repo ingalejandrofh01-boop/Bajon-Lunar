@@ -2048,22 +2048,74 @@ body:has([onclick]:hover) .cursor-core::before {
       <div class="card" style="margin-bottom:20px;">
         <div class="grid-2">
 
-          <!-- Nombre -->
+          <!-- Fila 1: Nombre + Teléfono -->
           <div class="field">
             <label>Nombre / Empresa</label>
             <input type="text" id="cNombre" placeholder="Ej. Juan García">
           </div>
+          <div class="field">
+            <label>Teléfono / WhatsApp</label>
+            <input type="tel" id="cTel" placeholder="55 1234 5678">
+          </div>
 
-          <!-- Teléfono + bloque horarios -->
-          <div class="field" style="display:flex;flex-direction:column;gap:10px;">
-            <div>
-              <label>Teléfono / WhatsApp</label>
-              <input type="tel" id="cTel" placeholder="55 1234 5678">
+          <!-- Fila 2: Correo + Tipo de evento -->
+          <div class="field">
+            <label>Correo electrónico</label>
+            <input type="email" id="cEmail" placeholder="correo@ejemplo.com">
+          </div>
+          <div class="field">
+            <label>Tipo de evento</label>
+            <select id="cTipo">
+              <option value="">Selecciona…</option>
+              <option>Boda</option>
+              <option>XV Años</option>
+              <option>Corporativo</option>
+              <option>Graduación</option>
+              <option>Cumpleaños</option>
+              <option>Reunión privada</option>
+              <option>Festival</option>
+              <option>Otro</option>
+            </select>
+          </div>
+
+          <!-- Fila 3 izq: Calendario -->
+          <div class="field">
+            <label>Fecha del evento</label>
+            <div id="cal-picker" style="background:rgba(10,10,28,0.95);border:1px solid rgba(26,59,255,0.3);border-radius:14px;overflow:hidden;user-select:none;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(26,59,255,0.15);">
+                <button onclick="calNav(-1)" style="background:rgba(26,59,255,0.1);border:1px solid rgba(26,59,255,0.25);border-radius:8px;color:var(--blanco);width:32px;height:32px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">‹</button>
+                <div id="cal-mes-label" style="font-family:'Bebas Neue',sans-serif;letter-spacing:4px;font-size:1rem;color:var(--blanco);"></div>
+                <button onclick="calNav(1)" style="background:rgba(26,59,255,0.1);border:1px solid rgba(26,59,255,0.25);border-radius:8px;color:var(--blanco);width:32px;height:32px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">›</button>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:8px 10px 4px;text-align:center;">
+                <div style="font-size:.52rem;letter-spacing:1px;color:var(--blanco-dim);padding:2px;">L</div>
+                <div style="font-size:.52rem;letter-spacing:1px;color:var(--blanco-dim);padding:2px;">M</div>
+                <div style="font-size:.52rem;letter-spacing:1px;color:var(--blanco-dim);padding:2px;">M</div>
+                <div style="font-size:.52rem;letter-spacing:1px;color:var(--blanco-dim);padding:2px;">J</div>
+                <div style="font-size:.55rem;letter-spacing:1px;color:#60cfff;font-weight:700;padding:2px;">V</div>
+                <div style="font-size:.55rem;letter-spacing:1px;color:#60cfff;font-weight:700;padding:2px;">S</div>
+                <div style="font-size:.55rem;letter-spacing:1px;color:#60cfff;font-weight:700;padding:2px;">D</div>
+              </div>
+              <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:4px 10px 12px;"></div>
+              <div style="display:flex;gap:12px;padding:8px 16px 12px;border-top:1px solid rgba(26,59,255,0.1);flex-wrap:wrap;">
+                <div style="display:flex;align-items:center;gap:5px;font-size:.58rem;color:var(--blanco-dim);"><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:rgba(26,59,255,0.35);border:1px solid rgba(96,207,255,0.5);"></span>Disponible</div>
+                <div style="display:flex;align-items:center;gap:5px;font-size:.58rem;color:var(--blanco-dim);"><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:rgba(239,68,68,0.25);border:1px solid rgba(239,68,68,0.4);"></span>Ocupado</div>
+                <div style="display:flex;align-items:center;gap:5px;font-size:.58rem;color:var(--blanco-dim);"><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:rgba(26,59,255,0.7);border:1px solid #60cfff;"></span>Seleccionado</div>
+              </div>
             </div>
-            <!-- Cuadro horarios de servicio -->
-            <div style="background:rgba(26,59,255,.08);border:1px solid rgba(26,59,255,.25);border-radius:10px;padding:12px 14px;">
-              <div style="font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--azul);font-weight:700;margin-bottom:8px;">🌙 Horarios de servicio</div>
-              <div style="display:flex;flex-direction:column;gap:5px;">
+            <select id="fecha-dia" style="display:none;" onchange="actualizarFecha()"><option value="">DD</option></select>
+            <select id="fecha-mes" style="display:none;" onchange="actualizarDiasFecha();actualizarFecha()"><option value="">— Mes —</option><option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option><option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option><option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option></select>
+            <select id="fecha-anio" style="display:none;" onchange="actualizarDiasFecha();actualizarFecha()"><option value="">AAAA</option></select>
+            <div style="margin-top:8px;font-size:.75rem;" id="fecha-preview">—</div>
+          </div>
+
+          <!-- Fila 3 der: Horarios + Hora + Personas -->
+          <div class="field" style="display:flex;flex-direction:column;gap:16px;">
+
+            <!-- Horarios de servicio -->
+            <div style="background:rgba(26,59,255,.08);border:1px solid rgba(26,59,255,.25);border-radius:10px;padding:14px 16px;">
+              <div style="font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--azul);font-weight:700;margin-bottom:10px;">🌙 Horarios de servicio</div>
+              <div style="display:flex;flex-direction:column;gap:7px;">
                 <div style="display:flex;align-items:baseline;gap:8px;font-size:.72rem;">
                   <span style="width:8px;height:8px;border-radius:50%;background:var(--azul);display:inline-block;flex-shrink:0;margin-bottom:-1px;"></span>
                   <span style="color:var(--blanco);font-weight:600;min-width:62px;">Viernes</span>
@@ -2081,118 +2133,50 @@ body:has([onclick]:hover) .cursor-core::before {
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Correo -->
-          <div class="field">
-            <label>Correo electrónico</label>
-            <input type="email" id="cEmail" placeholder="correo@ejemplo.com">
-          </div>
-
-          <!-- Vacío para mantener grid -->
-          <div class="field"></div>
-
-          <!-- Fecha -->
-          <div class="field">
-            <label>Fecha del evento</label>
-            <!-- CALENDARIO INLINE -->
-            <div id="cal-picker" style="background:rgba(10,10,28,0.95);border:1px solid rgba(26,59,255,0.3);border-radius:14px;overflow:hidden;user-select:none;">
-              <!-- Header mes/año -->
-              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(26,59,255,0.15);">
-                <button onclick="calNav(-1)" style="background:rgba(26,59,255,0.1);border:1px solid rgba(26,59,255,0.25);border-radius:8px;color:var(--blanco);width:32px;height:32px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">‹</button>
-                <div id="cal-mes-label" style="font-family:'Bebas Neue',sans-serif;letter-spacing:4px;font-size:1rem;color:var(--blanco);"></div>
-                <button onclick="calNav(1)" style="background:rgba(26,59,255,0.1);border:1px solid rgba(26,59,255,0.25);border-radius:8px;color:var(--blanco);width:32px;height:32px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">›</button>
+            <!-- Hora del servicio -->
+            <div>
+              <label style="display:block;margin-bottom:8px;">Hora del servicio <span style="color:var(--rojo);font-size:.65rem;letter-spacing:1px;">* OBLIGATORIA</span></label>
+              <div id="hora-row" style="display:flex;align-items:center;background:var(--negro);border:1px solid var(--gris-borde);border-radius:var(--r-sm);padding:6px 10px;gap:6px;flex-wrap:wrap;">
+                <input type="number" id="hora-hh" min="1" max="12" placeholder="HH"
+                  style="width:56px;background:rgba(26,59,255,.08);border:1px solid rgba(26,59,255,.25);border-radius:6px;color:var(--blanco);font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;text-align:center;padding:6px 4px;outline:none;"
+                  oninput="validarHoraManual()">
+                <span style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--blanco-dim);">:</span>
+                <input type="number" id="hora-mm" min="0" max="59" placeholder="MM" value="00"
+                  style="width:56px;background:rgba(26,59,255,.08);border:1px solid rgba(26,59,255,.25);border-radius:6px;color:var(--blanco);font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;text-align:center;padding:6px 4px;outline:none;"
+                  oninput="validarHoraManual()">
+                <div style="display:flex;border-radius:6px;overflow:hidden;border:1px solid rgba(26,59,255,.3);margin-left:4px;">
+                  <button id="btn-am" onclick="setAmPm('AM')" style="padding:8px 14px;background:var(--azul);border:none;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:1px;cursor:pointer;transition:background .15s;">AM</button>
+                  <button id="btn-pm" onclick="setAmPm('PM')" style="padding:8px 14px;background:transparent;border:none;color:var(--blanco-dim);font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:1px;cursor:pointer;transition:background .15s;">PM</button>
+                </div>
+                <div id="hora-aviso" style="width:100%;font-size:.65rem;margin-top:4px;padding:5px 8px;border-radius:5px;display:none;"></div>
               </div>
-              <!-- Leyenda días semana -->
-              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:8px 10px 4px;text-align:center;">
-                <div style="font-size:.52rem;letter-spacing:1px;color:var(--blanco-dim);padding:2px;">L</div>
-                <div style="font-size:.52rem;letter-spacing:1px;color:var(--blanco-dim);padding:2px;">M</div>
-                <div style="font-size:.52rem;letter-spacing:1px;color:var(--blanco-dim);padding:2px;">M</div>
-                <div style="font-size:.52rem;letter-spacing:1px;color:var(--blanco-dim);padding:2px;">J</div>
-                <div style="font-size:.55rem;letter-spacing:1px;color:#60cfff;font-weight:700;padding:2px;">V</div>
-                <div style="font-size:.55rem;letter-spacing:1px;color:#60cfff;font-weight:700;padding:2px;">S</div>
-                <div style="font-size:.55rem;letter-spacing:1px;color:#60cfff;font-weight:700;padding:2px;">D</div>
-              </div>
-              <!-- Grid días -->
-              <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:4px 10px 12px;"></div>
-              <!-- Leyenda -->
-              <div style="display:flex;gap:12px;padding:8px 16px 12px;border-top:1px solid rgba(26,59,255,0.1);flex-wrap:wrap;">
-                <div style="display:flex;align-items:center;gap:5px;font-size:.58rem;color:var(--blanco-dim);"><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:rgba(26,59,255,0.35);border:1px solid rgba(96,207,255,0.5);"></span>Disponible</div>
-                <div style="display:flex;align-items:center;gap:5px;font-size:.58rem;color:var(--blanco-dim);"><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:rgba(239,68,68,0.25);border:1px solid rgba(239,68,68,0.4);"></span>Ocupado</div>
-                <div style="display:flex;align-items:center;gap:5px;font-size:.58rem;color:var(--blanco-dim);"><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:rgba(26,59,255,0.7);border:1px solid #60cfff;"></span>Seleccionado</div>
-              </div>
+              <input type="hidden" id="cHora">
             </div>
-            <!-- Inputs ocultos para compatibilidad -->
-            <select id="fecha-dia" style="display:none;" onchange="actualizarFecha()"><option value="">DD</option></select>
-            <select id="fecha-mes" style="display:none;" onchange="actualizarDiasFecha();actualizarFecha()"><option value="">— Mes —</option><option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option><option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option><option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option></select>
-            <select id="fecha-anio" style="display:none;" onchange="actualizarDiasFecha();actualizarFecha()"><option value="">AAAA</option></select>
-            <div style="margin-top:8px;font-size:.75rem;" id="fecha-preview">—</div>
-          </div>
 
-          <!-- Hora del servicio -->
-          <div class="field">
-            <label>Hora del servicio <span style="color:var(--rojo);font-size:.65rem;letter-spacing:1px;">* OBLIGATORIA</span></label>
-            <div id="hora-row" style="display:flex;align-items:center;gap:0;background:var(--negro);border:1px solid var(--gris-borde);border-radius:var(--r-sm);overflow:hidden;padding:6px 10px;gap:6px;flex-wrap:wrap;">
-              <!-- HH input -->
-              <input type="number" id="hora-hh" min="1" max="12" placeholder="HH"
-                style="width:56px;background:rgba(26,59,255,.08);border:1px solid rgba(26,59,255,.25);border-radius:6px;color:var(--blanco);font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;text-align:center;padding:6px 4px;outline:none;"
-                oninput="validarHoraManual()">
-              <span style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--blanco-dim);">:</span>
-              <!-- MM input -->
-              <input type="number" id="hora-mm" min="0" max="59" placeholder="MM" value="00"
-                style="width:56px;background:rgba(26,59,255,.08);border:1px solid rgba(26,59,255,.25);border-radius:6px;color:var(--blanco);font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;text-align:center;padding:6px 4px;outline:none;"
-                oninput="validarHoraManual()">
-              <!-- AM/PM toggle -->
-              <div style="display:flex;border-radius:6px;overflow:hidden;border:1px solid rgba(26,59,255,.3);margin-left:4px;">
-                <button id="btn-am" onclick="setAmPm('AM')"
-                  style="padding:8px 14px;background:var(--azul);border:none;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:1px;cursor:pointer;transition:background .15s;">AM</button>
-                <button id="btn-pm" onclick="setAmPm('PM')"
-                  style="padding:8px 14px;background:transparent;border:none;color:var(--blanco-dim);font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:1px;cursor:pointer;transition:background .15s;">PM</button>
-              </div>
-              <!-- Aviso de horario -->
-              <div id="hora-aviso" style="width:100%;font-size:.65rem;margin-top:4px;padding:5px 8px;border-radius:5px;display:none;"></div>
+            <!-- Número de personas -->
+            <div>
+              <label style="display:block;margin-bottom:8px;">Número de personas</label>
+              <input type="number" id="paq-personas-datos" placeholder="Ej. 70"
+                style="width:100%;"
+                oninput="document.getElementById('paq-personas').value=this.value;validarPersonas();">
             </div>
-            <input type="hidden" id="cHora">
+
           </div>
 
-          <!-- Número de personas -->
-          <div class="field">
-            <label>Número de personas</label>
-            <input type="number" id="paq-personas-datos" placeholder="Ej. 70"
-              style="width:100%;"
-              oninput="document.getElementById('paq-personas').value=this.value;validarPersonas();">
-          </div>
-
-          <!-- Tipo de evento -->
-          <div class="field">
-            <label>Tipo de evento</label>
-            <select id="cTipo">
-              <option value="">Selecciona…</option>
-              <option>Boda</option>
-              <option>XV Años</option>
-              <option>Corporativo</option>
-              <option>Graduación</option>
-              <option>Cumpleaños</option>
-              <option>Reunión privada</option>
-              <option>Festival</option>
-              <option>Otro</option>
-            </select>
-          </div>
-
-          <!-- Dirección -->
+          <!-- Dirección full width -->
           <div class="field full">
             <label>Dirección del evento</label>
             <input type="text" id="cDir" placeholder="Calle, colonia, alcaldía…">
           </div>
 
-          <!-- Notas -->
+          <!-- Notas full width -->
           <div class="field full">
             <label>Notas especiales</label>
             <textarea id="cNotas" placeholder="Alergias, preferencias, detalles del servicio…"></textarea>
           </div>
 
         </div>
-
         </div>
       </div>
 
