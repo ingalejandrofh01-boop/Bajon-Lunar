@@ -9,12 +9,12 @@ importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js
 importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js');
 
 firebase.initializeApp({
-  apiKey:            "AIzaSyCIeNPEDzpMLb1iLNqAcqJwaeST01xLftk",
-  authDomain:        "bajon-lunar-240d5.firebaseapp.com",
-  projectId:         "bajon-lunar-240d5",
-  storageBucket:     "bajon-lunar-240d5.firebasestorage.app",
-  messagingSenderId: "557896881017",
-  appId:             "1:557896881017:web:e61ee3cda3095340b395a8"
+  apiKey:            "AIzaSyAuGEQjkloYkS3bG8vrW16Rkx719L3ow8o",
+  authDomain:        "bajon-lunar.firebaseapp.com",
+  projectId:         "bajon-lunar",
+  storageBucket:     "bajon-lunar.firebasestorage.app",
+  messagingSenderId: "796358723768",
+  appId:             "1:796358723768:web:cb7d12026b9399a8878c4d"
 });
 
 const messaging = firebase.messaging();
