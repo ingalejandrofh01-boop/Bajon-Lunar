@@ -1731,15 +1731,38 @@ function preLlenarDesdeCotizador() {
   set('cli-tel',       p.get('tel'));
   set('cli-email',     p.get('email'));
   set('cli-domicilio', p.get('dir') || p.get('domicilio'));
-  // cli-ine y cli-rfc quedan vacíos (son datos privados que solo el cliente llena)
+  // RFC — se llena solo si el cliente pidió factura en el cotizador
+  if (p.get('requiere_factura') === '1') set('cli-rfc', p.get('rfc'));
+  // cli-ine queda vacío (es un dato privado que solo el cliente llena)
 
   // ── 3. DATOS DEL EVENTO ──
   set('ev-fecha',    p.get('fecha'));
   set('ev-hora',     p.get('hora'));
   set('ev-personas', p.get('personas'));
   set('ev-dir',      p.get('dir') || p.get('dir_evento'));
-  set('ev-ciudad',   'Ciudad de México');
-  set('ev-notas',    p.get('notas'));
+  // Ciudad real del evento (CDMX o Estado de México), no siempre CDMX
+  const estadoUbic = p.get('estado_ubicacion') || 'Ciudad de México';
+  set('ev-ciudad',   estadoUbic);
+
+  // Notas del evento: las del cliente + condiciones del lugar reportadas en el cotizador
+  const notasCliente = p.get('notas') || '';
+  const condicionesLugar = [];
+  if (p.get('espacio'))         condicionesLugar.push(`Espacio: ${p.get('espacio')}`);
+  if (p.get('estacionamiento')) condicionesLugar.push(`Estacionamiento: ${p.get('estacionamiento')}`);
+  if (p.get('acceso')) {
+    let accesoTxt = `Acceso: ${p.get('acceso')}`;
+    if (p.get('acceso') === 'Escaleras' && p.get('elevador')) accesoTxt += ` (elevador: ${p.get('elevador')})`;
+    condicionesLugar.push(accesoTxt);
+  }
+  if (p.get('electricidad')) condicionesLugar.push(`Electricidad disponible: ${p.get('electricidad')}`);
+  if (p.get('agua'))         condicionesLugar.push(`Agua disponible: ${p.get('agua')}`);
+  if (p.get('maps_url'))     condicionesLugar.push(`Ubicación en mapa: ${p.get('maps_url')}`);
+  if (p.get('requiere_factura') === '1') {
+    condicionesLugar.push(`Requiere factura — Razón social: ${p.get('razon_social') || '—'} · Uso CFDI: ${p.get('uso_cfdi') || '—'}`);
+  }
+
+  const notasCompletas = [notasCliente, condicionesLugar.length ? condicionesLugar.join(' · ') : ''].filter(Boolean).join('\n');
+  set('ev-notas', notasCompletas);
 
   // Duración del servicio
   const durParam = p.get('duracion') || '';
@@ -1866,7 +1889,7 @@ function preLlenarDesdeCotizador() {
   if (firmaFechaEl && !firmaFechaEl.value) {
     firmaFechaEl.value = new Date().toISOString().split('T')[0];
   }
-  set('firma-ciudad', 'Ciudad de México');
+  set('firma-ciudad', estadoUbic);
 
   // ── ACTUALIZAR PREVIEWS ──
   if (typeof updatePreview === 'function') updatePreview();

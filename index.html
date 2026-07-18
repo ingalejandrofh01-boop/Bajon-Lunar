@@ -805,6 +805,74 @@ section {
   gap: 16px;
   align-items: start;
 }
+
+/* ══ GALERÍA ══ */
+.galeria-section {
+  padding: 80px 48px 120px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.galeria-filtros {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 32px 0 40px;
+}
+.galeria-filtro-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.15);
+  color: var(--dim);
+  border-radius: 100px;
+  padding: 9px 20px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.galeria-filtro-btn:hover {
+  border-color: var(--azul);
+  color: var(--blanco);
+}
+.galeria-filtro-btn.activo {
+  background: var(--azul);
+  border-color: var(--azul);
+  color: #fff;
+}
+.galeria-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.galeria-item {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 4/5;
+  background: var(--gris);
+  cursor: pointer;
+  transition: transform .25s ease;
+}
+.galeria-item:hover { transform: scale(1.02); }
+.galeria-item img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.galeria-item-overlay {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(0deg, rgba(0,0,0,.85), transparent);
+  padding: 24px 16px 14px;
+  font-size: 11px; letter-spacing: 1px; color: var(--blanco);
+  text-transform: uppercase;
+}
+.galeria-item.oculto { display: none; }
+@media (max-width: 900px) {
+  .galeria-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .galeria-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .galeria-section { padding: 60px 20px 80px; }
+}
 .paq-card {
   position: relative;
   background: var(--gris);
@@ -2049,6 +2117,7 @@ footer {
     <li><a href="#inicio" class="active">Inicio</a></li>
     <li><a href="#herramientas">Servicios</a></li>
     <li><a href="#paquetes">Paquetes</a></li>
+    <li><a href="#galeria">Galería</a></li>
     <li><a href="#nosotros">Nosotros</a></li>
     <li><a href="#resenas">Reseñas</a></li>
     <li><a href="#contacto">Contacto</a></li>
@@ -2069,6 +2138,7 @@ footer {
   <a href="#inicio" onclick="closeMobile()">Inicio</a>
   <a href="#herramientas" onclick="closeMobile()">Servicios</a>
   <a href="#paquetes" onclick="closeMobile()">Paquetes</a>
+  <a href="#galeria" onclick="closeMobile()">Galería</a>
   <a href="#nosotros" onclick="closeMobile()">Nosotros</a>
   <a href="#contacto" onclick="closeMobile()">Contacto</a>
   <div class="mobile-ctas">
@@ -2304,6 +2374,71 @@ footer {
   </div>
 </section>
 
+<!-- ══ GALERÍA DE EVENTOS ══ -->
+<section id="galeria">
+  <div class="galeria-section">
+    <div class="paquetes-header reveal">
+      <div class="section-label">Galería</div>
+      <h2 class="paquetes-title">Eventos<br><em>reales.</em></h2>
+      <p class="paquetes-sub">Así se ve un Bajón Lunar en vivo — filtra por el paquete que más te llame.</p>
+    </div>
+
+    <div class="galeria-filtros reveal">
+      <button class="galeria-filtro-btn activo" onclick="filtrarGaleria('todos', this)">Todos</button>
+      <button class="galeria-filtro-btn" onclick="filtrarGaleria('nebula', this)">Nebula Mix</button>
+      <button class="galeria-filtro-btn" onclick="filtrarGaleria('cosmos', this)">Cosmos Pack</button>
+      <button class="galeria-filtro-btn" onclick="filtrarGaleria('after', this)">After Moon</button>
+      <button class="galeria-filtro-btn" onclick="filtrarGaleria('moonlight', this)">Moonlight</button>
+    </div>
+
+    <!--
+      ══ CÓMO AGREGAR TUS FOTOS REALES ══
+      1. Sube tus fotos a una carpeta junto a este archivo (ej. una carpeta "fotos/") o a donde
+         alojes tus imágenes (Google Drive público, Imgur, etc. — cualquier URL directa a la imagen sirve).
+      2. Reemplaza el "src" de cada <img> de abajo por la ruta o URL de tu foto real.
+      3. El atributo data-paquete controla en qué filtro aparece cada foto: nebula, cosmos, after o moonlight.
+      4. Copia/pega un bloque .galeria-item completo por cada foto nueva que quieras agregar — no hay límite.
+    -->
+    <div class="galeria-grid" id="galeria-grid">
+      <div class="galeria-item reveal" data-paquete="nebula">
+        <img src="fotos/nebula-1.jpg" alt="Evento Nebula Mix" loading="lazy" onerror="this.closest('.galeria-item').style.display='none'">
+        <div class="galeria-item-overlay">Nebula Mix</div>
+      </div>
+      <div class="galeria-item reveal" data-paquete="cosmos">
+        <img src="fotos/cosmos-1.jpg" alt="Evento Cosmos Pack" loading="lazy" onerror="this.closest('.galeria-item').style.display='none'">
+        <div class="galeria-item-overlay">Cosmos Pack</div>
+      </div>
+      <div class="galeria-item reveal" data-paquete="after">
+        <img src="fotos/after-1.jpg" alt="Evento After Moon" loading="lazy" onerror="this.closest('.galeria-item').style.display='none'">
+        <div class="galeria-item-overlay">After Moon</div>
+      </div>
+      <div class="galeria-item reveal" data-paquete="moonlight">
+        <img src="fotos/moonlight-1.jpg" alt="Evento Moonlight" loading="lazy" onerror="this.closest('.galeria-item').style.display='none'">
+        <div class="galeria-item-overlay">Moonlight</div>
+      </div>
+      <div class="galeria-item reveal" data-paquete="cosmos">
+        <img src="fotos/cosmos-2.jpg" alt="Evento Cosmos Pack" loading="lazy" onerror="this.closest('.galeria-item').style.display='none'">
+        <div class="galeria-item-overlay">Cosmos Pack</div>
+      </div>
+      <div class="galeria-item reveal" data-paquete="nebula">
+        <img src="fotos/nebula-2.jpg" alt="Evento Nebula Mix" loading="lazy" onerror="this.closest('.galeria-item').style.display='none'">
+        <div class="galeria-item-overlay">Nebula Mix</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+function filtrarGaleria(paquete, btn) {
+  document.querySelectorAll('.galeria-filtro-btn').forEach(b => b.classList.remove('activo'));
+  btn.classList.add('activo');
+  document.querySelectorAll('.galeria-item').forEach(item => {
+    const coincide = paquete === 'todos' || item.dataset.paquete === paquete;
+    item.classList.toggle('oculto', !coincide);
+  });
+}
+</script>
+
 <!-- ══ ABOUT ══ -->
 <section id="nosotros">
   <div class="about-section">
@@ -2535,6 +2670,13 @@ footer {
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
       </a>
     </div>
+  </div>
+  <div class="footer-legal-row" style="text-align:center;margin-top:16px;font-size:11px;">
+    <a href="aviso-privacidad.html" style="color:var(--dim);text-decoration:none;margin:0 10px;">Aviso de Privacidad</a>
+    <span style="color:var(--dim);">·</span>
+    <a href="terminos-condiciones.html" style="color:var(--dim);text-decoration:none;margin:0 10px;">Términos y Condiciones</a>
+    <span style="color:var(--dim);">·</span>
+    <a href="rastreo.html" style="color:var(--dim);text-decoration:none;margin:0 10px;">Rastrea tu cotización</a>
   </div>
 </footer>
 

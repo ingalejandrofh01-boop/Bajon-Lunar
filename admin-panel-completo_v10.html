@@ -1261,6 +1261,11 @@ window._iniciarListenersFirestore = function() {
     window.cotizaciones = nuevas;
     window._fbCotInicializado = true;
 
+    // Mantener sincronizado el espejo público de disponibilidad (fechas ocupadas,
+    // sin datos sensibles) — se reconstruye completo cada vez que hay un cambio,
+    // así se autocorrige solo (nuevas cotizaciones, cancelaciones, cambios de fecha/hora).
+    sincronizarDisponibilidadPublicaCompleta(nuevas);
+
     if (window.usuarioActual && typeof window._fbRenderAll === 'function') {
       window._fbRenderAll();
     }
@@ -2110,7 +2115,8 @@ console.log('🔥 Firebase Firestore conectado — Bajón Lunar Admin');
             <option value="Toda la noche">Toda la noche</option>
           </select>
         </div>
-        <div class="mfield" style="grid-column:1/-1;"><label>Dirección</label><span id="md-dir">—</span></div>
+        <div class="mfield" style="grid-column:1/-1;"><label>Dirección</label><span id="md-dir">—</span> <a id="md-dir-maps" href="#" target="_blank" style="display:none;color:var(--azul);font-size:0.75rem;margin-left:8px;">📍 Ver en mapa</a></div>
+        <div class="mfield" style="grid-column:1/-1;" id="md-factura-wrap"><label>Facturación</label><span id="md-factura">—</span></div>
         <div class="mfield" style="grid-column:1/-1;"><label>Notas</label><span id="md-notas">—</span></div>
         <div class="mfield"><label>Método de pago (anticipo)</label>
           <select id="md-metodo-pago" style="background:var(--gris3);border:1px solid var(--borde2);border-radius:6px;padding:5px 8px;color:var(--blanco);font-size:0.8rem;cursor:pointer;width:100%;" onchange="md_guardarCampo('metodoPago',this.value)">
@@ -3299,6 +3305,17 @@ function abrirModal(idx) {
   cargarAnticipoEnModal(c);
   document.getElementById('md-personas').textContent=c.personas?c.personas+' personas':'—';
   document.getElementById('md-dir').textContent=c.dir||'—';
+  const mdDirMaps = document.getElementById('md-dir-maps');
+  if (mdDirMaps) {
+    if (c.dirMapsUrl) { mdDirMaps.href = c.dirMapsUrl; mdDirMaps.style.display = 'inline'; }
+    else { mdDirMaps.style.display = 'none'; }
+  }
+  const mdFactura = document.getElementById('md-factura');
+  if (mdFactura) {
+    mdFactura.textContent = c.requiereFactura
+      ? `✅ Sí — RFC: ${c.rfc || '—'} · Razón social: ${c.razonSocial || '—'} · Uso: ${c.usoCFDI || '—'}`
+      : 'No requiere';
+  }
   // Duración, método de pago y cuenta
   const mdDur = document.getElementById('md-duracion');
   if (mdDur) mdDur.value = c.duracion || '';
@@ -3429,6 +3446,26 @@ function limpiarFbLog() {
   if (log) log.innerHTML = '<div style="color:var(--dim);font-size:0.72rem;padding:8px 0;">Log limpiado.</div>';
 }
 
+// ── Reconstruye el espejo público de disponibilidad (solo fecha/hora/paquete, sin
+// datos sensibles del cliente) a partir de las cotizaciones que ya tiene el admin
+// en memoria. No bloquea nada si falla — es best-effort.
+let _dispPublicaUltimoHash = '';
+async function sincronizarDisponibilidadPublicaCompleta(cots) {
+  try {
+    if (!window._db) return;
+    const eventos = (cots || [])
+      .filter(c => c.estado !== 'cancelado' && c.fecha)
+      .map(c => ({ folio: c.folio || '', fecha: c.fecha, hora: c.hora || '', paquete: c.paquete || '' }));
+    const hash = JSON.stringify(eventos);
+    if (hash === _dispPublicaUltimoHash) return; // sin cambios reales, no reescribir
+    _dispPublicaUltimoHash = hash;
+    const ref = window._fbDoc(window._db, 'disponibilidad_publica', 'ocupadas');
+    await window._fbSetDoc(ref, { eventos });
+  } catch(e) {
+    console.warn('No se pudo sincronizar disponibilidad pública:', e);
+  }
+}
+
 // ── Guarda cotización en Firestore (upsert por _docId) ──
 async function _fbGuardarCot(cot) {
   if (!window._fbReady || !window._db) return;
@@ -3442,6 +3479,28 @@ async function _fbGuardarCot(cot) {
       // Crear documento nuevo
       const ref = await window._fbAddDoc(window._fbCollection(window._db, 'cotizaciones'), datos);
       cot._docId = ref.id;
+    }
+    // Mantener sincronizado el registro público de rastreo (para que el cliente
+    // vea el estado actualizado si consulta su folio)
+    if (cot.folio) {
+      try {
+        const antObj = cot.anticipo || {};
+        await window._fbSetDoc(window._fbDoc(window._db, 'seguimiento_publico', cot.folio), {
+          folio: cot.folio,
+          nombre: (cot.nombre || '').split(' ')[0] || 'Cliente',
+          fecha: cot.fecha || '',
+          hora: cot.hora || '',
+          paqueteNombre: cot.paqueteNombre || '',
+          barraTexto: cot.barraTexto || '',
+          total: cot.total || '0',
+          estado: cot.estado || 'pendiente',
+          anticipoMonto: antObj.monto || 0,
+          anticipoPct: antObj.pct || 50,
+          anticipoRecibido: !!antObj.recibido,
+        }, { merge: true });
+      } catch(e2) {
+        console.warn('No se pudo sincronizar el rastreo público:', e2);
+      }
     }
   } catch(e) {
     console.error('Error guardando en Firestore:', e);
@@ -3973,7 +4032,7 @@ function generarContrato() {
   const venueStr = [
     v.espacio && `Espacio:${v.espacio}`,
     v.estacionamiento && `Est.:${v.estacionamiento}`,
-    v.acceso && `Acceso:${v.acceso}`,
+    v.acceso && `Acceso:${v.acceso}${v.acceso==='Escaleras' && v.elevador ? ' (elevador:'+v.elevador+')' : ''}`,
     v.electricidad && `Luz:${v.electricidad}`,
     v.agua && `Agua:${v.agua}`,
   ].filter(Boolean).join(' | ');
@@ -3994,6 +4053,12 @@ function generarContrato() {
     personas:      String(c.personas || ''),
     tipo:          c.tipo       || '',
     dir_evento:    c.dir        || '',
+    maps_url:      c.dirMapsUrl || '',
+    estado_ubicacion: c.estadoUbicacion || '',
+    requiere_factura: c.requiereFactura ? '1' : '0',
+    rfc:           c.rfc        || '',
+    razon_social:  c.razonSocial || '',
+    uso_cfdi:      c.usoCFDI    || '',
     // PAQUETE + BARRA
     paquete:       c.paquete    || '',
     paquete_nombre: paqNombre,
@@ -4018,6 +4083,7 @@ function generarContrato() {
     espacio:       v.espacio    || '',
     estacionamiento: v.estacionamiento || '',
     acceso:        v.acceso     || '',
+    elevador:      v.elevador   || '',
     electricidad:  v.electricidad || '',
     agua:          v.agua       || '',
     // SERVICIOS

@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bajón Lunar — Cotizador de Paquetes</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 
 <!-- ════ FIREBASE SDK ════ -->
 <script type="module">
@@ -675,6 +677,14 @@ header{
   padding:6px 14px;font-size:.75rem;color:var(--blanco-dim);cursor:pointer;
   transition:all .18s;font-family:'DM Sans',sans-serif;
 }
+.dir-ubicacion-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(26,59,255,.12);border:1px solid rgba(26,59,255,.4);border-radius:100px;
+  padding:8px 16px;font-size:.78rem;color:var(--azul);cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-weight:500;transition:all .18s;
+}
+.dir-ubicacion-btn:hover{background:rgba(26,59,255,.22);border-color:var(--azul);}
+.dir-ubicacion-btn:active{transform:scale(.97);}
 .toggle-btn:hover{border-color:rgba(26,59,255,.4);color:var(--blanco);}
 .toggle-btn.active{border-color:var(--azul);background:rgba(26,59,255,.15);color:var(--blanco);}
 
@@ -2080,6 +2090,34 @@ body:has([onclick]:hover) .cursor-core::before {
             </select>
           </div>
 
+          <!-- Facturación -->
+          <div class="field full" style="margin-top:4px;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+              <input type="checkbox" id="cRequiereFactura" onchange="toggleFacturaCampos()" style="width:auto;">
+              <span>Necesito factura (CFDI) para este servicio</span>
+            </label>
+            <div id="factura-campos" style="display:none;margin-top:12px;" class="grid-2">
+              <div class="field">
+                <label>RFC</label>
+                <input type="text" id="cRFC" placeholder="XAXX010101000" style="text-transform:uppercase;">
+              </div>
+              <div class="field">
+                <label>Razón social</label>
+                <input type="text" id="cRazonSocial" placeholder="Nombre o empresa como aparece en tu RFC">
+              </div>
+              <div class="field full">
+                <label>Uso de CFDI</label>
+                <select id="cUsoCFDI">
+                  <option value="G03">G03 — Gastos en general</option>
+                  <option value="P01">P01 — Por definir</option>
+                </select>
+              </div>
+              <div class="field full" style="font-size:0.72rem;color:var(--blanco-dim);">
+                Con estos datos generamos tu factura una vez confirmado el anticipo. Si no tienes RFC a la mano ahora, puedes mandarlo después por WhatsApp.
+              </div>
+            </div>
+          </div>
+
           <!-- Fila 3 izq: Calendario -->
           <div class="field">
             <label>Fecha del evento</label>
@@ -2156,20 +2194,36 @@ body:has([onclick]:hover) .cursor-core::before {
               <input type="hidden" id="cHora">
             </div>
 
-            <!-- Número de personas -->
+            <!-- Número de personas (ya se eligió arriba con el selector −/+; aquí solo se confirma) -->
             <div>
               <label style="display:block;margin-bottom:8px;">Número de personas</label>
-              <input type="number" id="paq-personas-datos" placeholder="Ej. 70"
-                style="width:100%;"
-                oninput="document.getElementById('paq-personas').value=this.value;validarPersonas();">
+              <div id="paq-personas-confirm" style="width:100%;padding:12px 14px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--blanco-dim);font-size:.95rem;">—</div>
             </div>
 
           </div>
 
-          <!-- Dirección full width -->
+          <!-- Dirección full width — mapa interactivo -->
           <div class="field full">
             <label>Dirección del evento</label>
-            <input type="text" id="cDir" placeholder="Calle, colonia, alcaldía…">
+            <div style="font-size:0.72rem;color:var(--blanco-dim);margin:-4px 0 10px;">
+              📍 Solo damos servicio dentro de <strong style="color:var(--blanco);">Ciudad de México</strong> y <strong style="color:var(--blanco);">Estado de México</strong>. Busca la dirección, arrastra el pin, o da clic en el mapa.
+            </div>
+
+            <div style="position:relative;margin-bottom:10px;">
+              <input type="text" id="dirBuscador" placeholder="🔎 Busca tu calle, colonia o lugar…" autocomplete="off"
+                oninput="dirBuscarInput()" style="width:100%;">
+              <div id="dirResultados" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:500;background:#12131c;border:1px solid rgba(255,255,255,.12);border-radius:10px;margin-top:6px;max-height:220px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.4);"></div>
+            </div>
+
+            <div id="dirMapa" style="width:100%;height:260px;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.1);"></div>
+
+            <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap;">
+              <button type="button" class="dir-ubicacion-btn" onclick="dirUsarMiUbicacion()">📡 Usar mi ubicación actual</button>
+              <span id="dirZonaAviso" style="display:none;font-size:0.72rem;padding:6px 12px;border-radius:100px;"></span>
+            </div>
+
+            <label style="display:block;margin-top:14px;margin-bottom:6px;font-size:0.78rem;opacity:0.75;">Dirección exacta (puedes editarla si el mapa no la escribió tal cual)</label>
+            <input type="text" id="cDir" placeholder="Calle, colonia, alcaldía/municipio…">
           </div>
 
           <!-- Notas full width -->
@@ -2212,9 +2266,19 @@ body:has([onclick]:hover) .cursor-core::before {
           <div class="toggle-group">
             <span class="toggle-label">Acceso al lugar</span>
             <div class="toggle-opts" style="flex-wrap:wrap;">
-              <button class="toggle-btn active" data-val="Fácil" onclick="setVenue(this,'acceso')">🟢 Fácil</button>
-              <button class="toggle-btn" data-val="Escaleras" onclick="setVenue(this,'acceso')">🪜 Escaleras</button>
-              <button class="toggle-btn" data-val="Restringido" onclick="setVenue(this,'acceso')">🔒 Restringido</button>
+              <button class="toggle-btn active" data-val="Fácil" onclick="setVenue(this,'acceso')" title="Entrada a nivel de calle o patio, sin escalones, se puede acercar el equipo caminando directo">🟢 Fácil</button>
+              <button class="toggle-btn" data-val="Escaleras" onclick="setVenue(this,'acceso')" title="Hay que subir o bajar escalones para llegar al área del evento (con o sin elevador)">🪜 Escaleras</button>
+              <button class="toggle-btn" data-val="Restringido" onclick="setVenue(this,'acceso')" title="Acceso complicado: pasillos muy angostos, mucha distancia caminando, control de acceso/seguridad, permisos especiales, etc.">🔒 Restringido</button>
+            </div>
+            <div style="font-size:0.72rem;opacity:0.55;margin-top:6px;line-height:1.4;">
+              🟢 Fácil = sin escalones, entrada directa &nbsp;·&nbsp; 🪜 Escaleras = hay que subir/bajar escalones &nbsp;·&nbsp; 🔒 Restringido = pasillos angostos, mucha distancia a pie, o control de acceso
+            </div>
+            <div id="acceso-elevador-wrap" style="display:none;margin-top:10px;">
+              <span class="toggle-label" style="font-size:0.78rem;">¿Hay elevador disponible?</span>
+              <div class="toggle-opts" style="flex-wrap:wrap;">
+                <button class="toggle-btn" data-val="Sí" onclick="setVenue(this,'elevador')">🛗 Sí</button>
+                <button class="toggle-btn active" data-val="No" onclick="setVenue(this,'elevador')">🚫 No</button>
+              </div>
             </div>
           </div>
 
@@ -2412,10 +2476,21 @@ body:has([onclick]:hover) .cursor-core::before {
           <button onclick="nuevaCot()" style="display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:var(--r-sm);border:none;background:linear-gradient(135deg,var(--azul),#0A22CC);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:3px;cursor:pointer;box-shadow:0 4px 20px rgba(26,59,255,.4);transition:opacity .2s;">✨ Nueva Cotización</button>
           <a href="https://wa.me/525571901664?text=Hola,%20tengo%20una%20duda%20sobre%20mi%20cotización%20🌙" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:var(--r-sm);border:1px solid rgba(74,222,128,.4);background:rgba(74,222,128,.08);color:#4ade80;font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:3px;text-decoration:none;transition:opacity .2s;">💬 Contáctanos</a>
         </div>
+        <div style="margin-bottom:14px;">
+          <a id="btn-rastrear" href="rastreo.html" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:var(--r-sm);border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.03);color:var(--blanco-dim);font-family:'DM Sans',sans-serif;font-size:.78rem;text-decoration:none;">🔎 Guarda este link para rastrear tu cotización cuando quieras</a>
+        </div>
 
         <!-- Tagline -->
         <div style="font-family:'Playfair Display',serif;font-style:italic;font-size:.82rem;color:var(--blanco-dim);">¡Gracias por elegirnos! Pronto estaremos en contacto. 🤝</div>
 
+      </div>
+
+      <!-- Aceptación legal -->
+      <div class="field full" style="margin-top:10px;">
+        <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-size:0.78rem;color:var(--blanco-dim);">
+          <input type="checkbox" id="cAceptaLegal" style="width:auto;margin-top:2px;">
+          <span>He leído y acepto el <a href="aviso-privacidad.html" target="_blank" style="color:var(--azul);">Aviso de Privacidad</a> y los <a href="terminos-condiciones.html" target="_blank" style="color:var(--azul);">Términos y Condiciones</a> del servicio.</span>
+        </label>
       </div>
 
       <!-- ACCIONES -->
@@ -2455,6 +2530,10 @@ body:has([onclick]:hover) .cursor-core::before {
 
 <footer>
   <p>© 2026 Bajón Lunar — Todos los derechos reservados</p>
+  <p style="margin-top:6px;font-size:11px;">
+    <a href="aviso-privacidad.html" style="color:inherit;opacity:.7;text-decoration:none;">Aviso de Privacidad</a> ·
+    <a href="terminos-condiciones.html" style="color:inherit;opacity:.7;text-decoration:none;">Términos y Condiciones</a>
+  </p>
 </footer>
 
 <!-- ═══════════════════════════════════════════════
@@ -2479,7 +2558,7 @@ let vitIncluido = true;
 let vitCantidad = 1;
 let vitSabores = ['Jamaica'];
 const VIT_SABORES = [{val:'Jamaica',emoji:'🌺'},{val:'Limón',emoji:'🍋'},{val:'Horchata',emoji:'🥛'}];
-const venueState = { espacio:'Aire libre', estacionamiento:'Sí hay', acceso:'Fácil', electricidad:'Sí', agua:'Sí', capacidad:'30-100' };
+const venueState = { espacio:'Aire libre', estacionamiento:'Sí hay', acceso:'Fácil', elevador:'No', electricidad:'Sí', agua:'Sí', capacidad:'30-100' };
 let horaSeleccionada = '';
 
 // Fecha interna
@@ -2676,6 +2755,8 @@ function elegirPaquete(id) {
   // Mostrar configurador
   document.getElementById('cfg').style.display = 'block';
   setPaso(id === 'moonlight' ? 2 : 2);
+  // Inicializar el mapa de dirección la primera vez que el configurador es visible
+  setTimeout(initDirMapa, 150);
   // Ajustar texto del botón PDF
   const _btnPdf = document.getElementById('btn-pdf');
   if (_btnPdf) _btnPdf.innerHTML = id === 'moonlight' ? '👑 &nbsp;Generar Cotización Moonlight' : '🌙 &nbsp;Generar Cotización PDF';
@@ -2702,8 +2783,8 @@ function cambiarPaquete() {
 function cambiarPersonas(d) {
   const el = document.getElementById('paq-personas');
   el.value = Math.max(1, (parseInt(el.value) || 0) + d);
-  const datosEl = document.getElementById('paq-personas-datos');
-  if (datosEl) datosEl.value = el.value;
+  const confirmEl = document.getElementById('paq-personas-confirm');
+  if (confirmEl) confirmEl.textContent = el.value + ' personas';
   validarPersonas(); calcularTotal();
 }
 
@@ -2737,6 +2818,8 @@ function validarPersonas() {
   const def = paqActivo ? PAQ[paqActivo] : null;
   if (!def) return;
   const v = parseInt(document.getElementById('paq-personas').value) || 0;
+  const confirmEl = document.getElementById('paq-personas-confirm');
+  if (confirmEl) confirmEl.textContent = v + ' personas';
   const ok = v >= def.minPax && (def.maxPax === 9999 || v <= def.maxPax);
   const el = document.getElementById('rango-aviso');
   el.className = 'rango-aviso ' + (ok ? 'rango-ok' : 'rango-err');
@@ -2918,6 +3001,171 @@ function setVenue(btn, key) {
   btn.closest('.toggle-opts').querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   venueState[key] = btn.dataset.val;
+
+  // La pregunta de elevador solo aplica si el acceso es por escaleras
+  if (key === 'acceso') {
+    const wrap = document.getElementById('acceso-elevador-wrap');
+    if (wrap) wrap.style.display = (btn.dataset.val === 'Escaleras') ? 'block' : 'none';
+    if (btn.dataset.val !== 'Escaleras') venueState.elevador = 'No';
+  }
+}
+
+// ════════ MAPA DE DIRECCIÓN (Leaflet + OpenStreetMap, sin API key) ════════
+// Zona de servicio aproximada: Ciudad de México + Estado de México
+const ZONA_SERVICIO = { latMin: 18.30, latMax: 20.30, lonMin: -100.60, lonMax: -98.60 };
+const CDMX_CENTRO = { lat: 19.4326, lon: -99.1332 };
+
+let _dirMapa = null;
+let _dirMarker = null;
+let _dirBuscarTimeout = null;
+let _dirLat = null;
+let _dirLon = null;
+let _dirEstado = null; // "Ciudad de México" o "México" (Estado de México), según lo que detecte Nominatim
+
+function dirEnZonaServicio(lat, lon) {
+  return lat >= ZONA_SERVICIO.latMin && lat <= ZONA_SERVICIO.latMax &&
+         lon >= ZONA_SERVICIO.lonMin && lon <= ZONA_SERVICIO.lonMax;
+}
+
+function dirMostrarZonaAviso(lat, lon) {
+  const el = document.getElementById('dirZonaAviso');
+  if (!el) return;
+  const dentro = dirEnZonaServicio(lat, lon);
+  el.style.display = 'inline-block';
+  if (dentro) {
+    el.textContent = '✅ Dentro de nuestra zona de servicio';
+    el.style.background = 'rgba(34,197,94,.12)';
+    el.style.color = '#4ade80';
+    el.style.border = '1px solid rgba(34,197,94,.3)';
+  } else {
+    el.textContent = '⚠️ Fuera de CDMX / Estado de México — contáctanos antes de cotizar';
+    el.style.background = 'rgba(239,68,68,.12)';
+    el.style.color = '#f87171';
+    el.style.border = '1px solid rgba(239,68,68,.3)';
+  }
+}
+
+function initDirMapa() {
+  if (_dirMapa || typeof L === 'undefined') return; // ya inicializado, o Leaflet no cargó
+  const cont = document.getElementById('dirMapa');
+  if (!cont) return;
+
+  _dirMapa = L.map('dirMapa', { attributionControl: true }).setView([CDMX_CENTRO.lat, CDMX_CENTRO.lon], 10);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap'
+  }).addTo(_dirMapa);
+
+  _dirMarker = L.marker([CDMX_CENTRO.lat, CDMX_CENTRO.lon], { draggable: true }).addTo(_dirMapa);
+
+  _dirMarker.on('dragend', () => {
+    const p = _dirMarker.getLatLng();
+    dirGeocodeInverso(p.lat, p.lng);
+  });
+
+  _dirMapa.on('click', (e) => {
+    _dirMarker.setLatLng(e.latlng);
+    dirGeocodeInverso(e.latlng.lat, e.latlng.lng);
+  });
+
+  // Asegurar que el mapa mida bien su contenedor (por si estaba oculto al crearse)
+  setTimeout(() => _dirMapa && _dirMapa.invalidateSize(), 200);
+}
+
+// ── Geocodificación inversa (coordenadas → dirección) usando Nominatim (OSM, gratis) ──
+async function dirGeocodeInverso(lat, lon) {
+  dirMostrarZonaAviso(lat, lon);
+  _dirLat = lat; _dirLon = lon;
+  try {
+    const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1&accept-language=es`);
+    const data = await resp.json();
+    if (data && data.display_name) {
+      document.getElementById('cDir').value = data.display_name;
+      _dirEstado = (data.address && data.address.state) || null;
+    }
+  } catch (e) {
+    console.warn('No se pudo obtener la dirección desde el mapa:', e);
+  }
+}
+
+// ── Buscador de direcciones (texto → coordenadas), sesgado a CDMX/Edomex ──
+function dirBuscarInput() {
+  clearTimeout(_dirBuscarTimeout);
+  const q = document.getElementById('dirBuscador').value.trim();
+  const resultsEl = document.getElementById('dirResultados');
+  if (q.length < 3) { resultsEl.style.display = 'none'; return; }
+  _dirBuscarTimeout = setTimeout(async () => {
+    try {
+      const viewbox = `${ZONA_SERVICIO.lonMin},${ZONA_SERVICIO.latMax},${ZONA_SERVICIO.lonMax},${ZONA_SERVICIO.latMin}`;
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&countrycodes=mx&viewbox=${viewbox}&bounded=0&limit=6&addressdetails=1&accept-language=es`;
+      const resp = await fetch(url);
+      const data = await resp.json();
+      if (!data || !data.length) {
+        resultsEl.innerHTML = '<div style="padding:10px 14px;opacity:0.6;font-size:0.8rem;">Sin resultados. Intenta con más detalle o escribe la dirección abajo.</div>';
+        resultsEl.style.display = 'block';
+        return;
+      }
+      resultsEl.innerHTML = data.map((r, i) => `
+        <div class="dir-result-item" data-i="${i}" style="padding:10px 14px;font-size:0.8rem;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.06);" onmouseover="this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.background='transparent'">
+          ${r.display_name}
+        </div>
+      `).join('');
+      resultsEl.style.display = 'block';
+      resultsEl.querySelectorAll('.dir-result-item').forEach((el, i) => {
+        el.onclick = () => dirSeleccionarResultado(data[i]);
+      });
+    } catch (e) {
+      console.warn('Error buscando dirección:', e);
+    }
+  }, 500); // debounce para no saturar Nominatim
+}
+
+function dirSeleccionarResultado(r) {
+  const lat = parseFloat(r.lat), lon = parseFloat(r.lon);
+  _dirLat = lat; _dirLon = lon;
+  _dirEstado = (r.address && r.address.state) || null;
+  document.getElementById('cDir').value = r.display_name;
+  document.getElementById('dirBuscador').value = '';
+  document.getElementById('dirResultados').style.display = 'none';
+  if (_dirMapa && _dirMarker) {
+    _dirMapa.setView([lat, lon], 15);
+    _dirMarker.setLatLng([lat, lon]);
+  }
+  dirMostrarZonaAviso(lat, lon);
+}
+
+function dirUsarMiUbicacion() {
+  if (!navigator.geolocation) {
+    toast && toast('Tu navegador no permite obtener tu ubicación', 'var(--rojo)');
+    return;
+  }
+  navigator.geolocation.getCurrentPosition((pos) => {
+    const { latitude, longitude } = pos.coords;
+    if (_dirMapa && _dirMarker) {
+      _dirMapa.setView([latitude, longitude], 16);
+      _dirMarker.setLatLng([latitude, longitude]);
+    }
+    dirGeocodeInverso(latitude, longitude);
+  }, (err) => {
+    console.warn('Geolocalización falló:', err);
+    if (typeof toast === 'function') toast('No se pudo obtener tu ubicación. Búscala o escríbela manualmente.', 'var(--rojo)');
+  }, { timeout: 8000 });
+}
+
+// Cerrar resultados de búsqueda al hacer clic fuera
+document.addEventListener('click', (e) => {
+  const box = document.getElementById('dirResultados');
+  const input = document.getElementById('dirBuscador');
+  if (box && input && !box.contains(e.target) && e.target !== input) {
+    box.style.display = 'none';
+  }
+});
+
+// ════════ FACTURACIÓN ════════
+function toggleFacturaCampos() {
+  const check = document.getElementById('cRequiereFactura');
+  const campos = document.getElementById('factura-campos');
+  campos.style.display = check.checked ? 'block' : 'none';
 }
 
 // ════════ VITROLERO ════════
@@ -3749,15 +3997,21 @@ let agAño = new Date().getFullYear();
 const BL_EVENTOS_KEY = 'bl_eventos_v2';
 let _agEventos = [];
 
+// Duración por paquete (horas) — usado para calcular el bloque de tiempo ocupado
+const DURACION_PAQUETE = { nebula: 2, cosmos: 2, after: 3, moonlight: 3 };
+// Colchón de montaje/desmontaje/traslado antes y después de cada evento
+const BUFFER_HORAS = 2;
+
 async function cargarEventos() {
   try {
     if (window._fbReady && window._db) {
-      const snap = await window._fbGetDocs(
-        window._fbQuery(window._fbCollection(window._db, 'cotizaciones'), window._fbOrderBy('fecha'))
-      );
-      _agEventos = snap.docs
-        .map(d => d.data())
-        .filter(c => c.estado !== 'cancelado' && c.fecha);
+      // IMPORTANTE: NO leemos la colección 'cotizaciones' directo (las reglas de
+      // Firestore la protegen y solo un admin logueado puede leerla). En vez de
+      // eso leemos un espejo público y seguro que solo trae fecha/hora/duración
+      // (sin nombre, teléfono, dirección ni nada sensible del cliente).
+      const ref = window._fbDoc(window._db, 'disponibilidad_publica', 'ocupadas');
+      const snap = await window._fbGetDoc(ref);
+      _agEventos = (snap.exists() ? snap.data().eventos : []) || [];
     } else {
       throw new Error('Firebase no disponible');
     }
@@ -3765,6 +4019,23 @@ async function cargarEventos() {
     try {
       _agEventos = JSON.parse(localStorage.getItem(BL_EVENTOS_KEY) || '[]');
     } catch(e2) { _agEventos = []; }
+  }
+}
+
+// Agrega el evento reción guardado al espejo público de disponibilidad (best-effort:
+// si falla, no bloquea la cotización — el admin lo corrige de todos modos la próxima
+// vez que abra su panel, porque el admin reconstruye este espejo completo cada vez
+// que hay cambios).
+async function sincronizarDisponibilidadPublica(nuevoEvento) {
+  try {
+    if (!window._fbReady || !window._db) return;
+    const ref = window._fbDoc(window._db, 'disponibilidad_publica', 'ocupadas');
+    const snap = await window._fbGetDoc(ref);
+    const actuales = (snap.exists() ? snap.data().eventos : []) || [];
+    actuales.push(nuevoEvento);
+    await window._fbSetDoc(ref, { eventos: actuales });
+  } catch(e) {
+    console.warn('No se pudo sincronizar disponibilidad pública (no es crítico):', e);
   }
 }
 
@@ -3862,16 +4133,50 @@ function verificarConflicto(fecha, hora) {
   if (!_agEventos || !fecha || !hora) return false;
   const [hh, mm] = hora.replace(/[AP]M/,'').trim().split(':').map(Number);
   const baseMin = hh * 60 + (mm || 0);
+  const miDuracionH = paqActivo ? (DURACION_PAQUETE[paqActivo] || 2) : 2;
+  // Mi propio evento ocuparía: [inicio - buffer, inicio + duración + buffer]
+  const miInicio = baseMin - BUFFER_HORAS * 60;
+  const miFin     = baseMin + miDuracionH * 60 + BUFFER_HORAS * 60;
+
   return _agEventos.some(ev => {
     if (ev.fecha !== fecha) return false;
     if (!ev.hora) return false;
     const [eh, em] = ev.hora.replace(/[AP]M/,'').trim().split(':').map(Number);
     const evMin = eh * 60 + (em || 0);
-    return Math.abs(baseMin - evMin) < 180; // 3h buffer
+    const evDuracionH = DURACION_PAQUETE[ev.paquete] || ev.duracionHoras || 2;
+    // Ese evento ya existente ocupa: [su inicio - buffer, su inicio + su duración + buffer]
+    const evInicio = evMin - BUFFER_HORAS * 60;
+    const evFin     = evMin + evDuracionH * 60 + BUFFER_HORAS * 60;
+    // ¿Se traslapan los dos rangos?
+    return miInicio < evFin && miFin > evInicio;
   });
 }
 
-// ════════ FOLIO — generado con contador atómico en Firestore ════════
+// Crea el documento público de rastreo (el cliente podrá buscar su folio en rastreo.html)
+async function crearRastreoPublico(data) {
+  try {
+    if (!window._fbReady || !window._db || !data.folio) return;
+    const ref = window._fbDoc(window._db, 'seguimiento_publico', data.folio);
+    await window._fbSetDoc(ref, {
+      folio: data.folio,
+      nombre: (data.nombre || '').split(' ')[0] || 'Cliente', // solo primer nombre, por privacidad
+      fecha: data.fecha || '',
+      hora: data.hora || '',
+      paqueteNombre: data.paqueteNombre || '',
+      barraTexto: data.barraTexto || '',
+      total: data.costoTotal || data.total || '0',
+      estado: 'pendiente',
+      anticipoMonto: data.anticipo ? data.anticipo.monto : 0,
+      anticipoPct: data.anticipo ? data.anticipo.pct : 50,
+      anticipoRecibido: false,
+      creadoEn: new Date().toISOString(),
+    });
+  } catch(e) {
+    console.warn('No se pudo crear el registro de rastreo (no es crítico):', e);
+  }
+}
+
+
 async function obtenerFolioFirebase() {
   try {
     const counterRef = window._fbDoc(window._db, 'config', 'folio_counter');
@@ -3905,6 +4210,10 @@ async function guardarCot(data) {
       const docData = { ...data, _savedAt: window._fbServerTimestamp() };
       await window._fbAddDoc(window._fbCollection(window._db, 'cotizaciones'), docData);
       console.log('✅ Cotización guardada en Firebase:', data.folio);
+      // Actualizar el espejo público de disponibilidad (fecha/hora ocupada), sin datos sensibles
+      sincronizarDisponibilidadPublica({ folio: data.folio, fecha: data.fecha, hora: data.hora, paquete: data.paquete });
+      // Crear el registro público de rastreo (para que el cliente consulte su folio después)
+      crearRastreoPublico(data);
     } else {
       throw new Error('Firebase no disponible');
     }
@@ -3954,6 +4263,25 @@ async function generarPDF() {
     return;
   }
   mostrarConflicto(false);
+
+  if (!document.getElementById('cAceptaLegal').checked) {
+    toast && toast('⚠ Debes aceptar el Aviso de Privacidad y los Términos y Condiciones', 'var(--rojo)');
+    document.getElementById('cAceptaLegal').closest('label').style.outline = '2px solid var(--rojo)';
+    document.getElementById('cAceptaLegal').scrollIntoView({ behavior:'smooth', block:'center' });
+    setTimeout(() => { document.getElementById('cAceptaLegal').closest('label').style.outline = ''; }, 2500);
+    return;
+  }
+
+  const requiereFactura = document.getElementById('cRequiereFactura').checked;
+  if (requiereFactura) {
+    const rfc = document.getElementById('cRFC').value.trim();
+    const razonSocial = document.getElementById('cRazonSocial').value.trim();
+    if (!rfc || !razonSocial) {
+      toast && toast('⚠ Completa el RFC y la razón social para poder facturar', 'var(--rojo)');
+      document.getElementById('factura-campos').scrollIntoView({ behavior:'smooth', block:'center' });
+      return;
+    }
+  }
 
   const datos = calcularTotal();
   if (!datos) return;
@@ -4062,7 +4390,7 @@ async function generarPDF() {
     ['Personas:', `${datos.personas} personas`],
     ['Espacio:', venueState.espacio],
     ['Estacionamiento:', venueState.estacionamiento],
-    ['Acceso:', venueState.acceso],
+    ['Acceso:', venueState.acceso + (venueState.acceso === 'Escaleras' ? ` (elevador: ${venueState.elevador})` : '')],
     ['Electricidad:', venueState.electricidad],
     ['Agua:', venueState.agua],
     ['Capacidad aprox.:', venueState.capacidad],
@@ -4220,6 +4548,27 @@ async function generarPDF() {
   document.getElementById('btn-pdf').innerHTML = '🔄 &nbsp;Regenerar Cotización';
   document.getElementById('cot-enviada').scrollIntoView({ behavior:'smooth', block:'center' });
 
+  // Precargar el folio en el link de rastreo
+  const btnRastrear = document.getElementById('btn-rastrear');
+  if (btnRastrear) btnRastrear.href = `rastreo.html?folio=${encodeURIComponent(folio)}`;
+
+  // Intentar abrir el panel nativo de "compartir" del celular (WhatsApp, correo, etc.)
+  // con el PDF ya adjunto, para que el cliente lo mande con un solo toque.
+  // Si el navegador no lo soporta, no pasa nada — ya se descargó normal arriba.
+  try {
+    const pdfBlob = doc.output('blob');
+    const pdfFile = new File([pdfBlob], `BajonLunar_${folio}.pdf`, { type: 'application/pdf' });
+    if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+      navigator.share({
+        files: [pdfFile],
+        title: `Cotización ${folio} — Bajón Lunar`,
+        text: `Aquí está tu cotización ${folio} de Bajón Lunar 🌙`,
+      }).catch(() => {}); // si el cliente cancela el share, no es un error
+    }
+  } catch (e) {
+    console.warn('Compartir automático no disponible en este navegador:', e);
+  }
+
   // ── Construir campo "servicios" legible ──
   const barraTextoMap = {chilaquiles:'Chilaquiles', maruchan:'Maruchan', gomitas:'Gomitas Locas', cantaritos:'Cantaritos'};
   const serviciosStr = [
@@ -4296,6 +4645,14 @@ async function generarPDF() {
     folio, timestamp: new Date().toISOString(), estado:'pendiente',
     // CLIENTE
     nombre, tel, email, tipo, dir, notas,
+    dirLat: _dirLat, dirLon: _dirLon,
+    estadoUbicacion: _dirEstado || '',
+    dirMapsUrl: (_dirLat && _dirLon) ? `https://www.google.com/maps?q=${_dirLat},${_dirLon}` : '',
+    // FACTURACIÓN
+    requiereFactura: document.getElementById('cRequiereFactura').checked,
+    rfc: document.getElementById('cRFC').value.trim().toUpperCase(),
+    razonSocial: document.getElementById('cRazonSocial').value.trim(),
+    usoCFDI: document.getElementById('cUsoCFDI').value,
     // EVENTO
     fecha: fechaInterna, hora: horaSeleccionada, personas: datos.personas,
     // PAQUETE + BARRA
@@ -4348,6 +4705,12 @@ function nuevaCot() {
   cambiarPaquete();
   barraActiva = 'chilaquiles';
   nivelActivo = [];
+  // Reset facturación y aceptación legal
+  const cFactura = document.getElementById('cRequiereFactura');
+  if (cFactura) { cFactura.checked = false; toggleFacturaCampos(); }
+  const cRFC = document.getElementById('cRFC'); if (cRFC) cRFC.value = '';
+  const cRazon = document.getElementById('cRazonSocial'); if (cRazon) cRazon.value = '';
+  const cLegal = document.getElementById('cAceptaLegal'); if (cLegal) cLegal.checked = false;
   // Reset niveles UI
   for (let i = 1; i <= 3; i++) {
     const el = document.getElementById('nv-' + i);
@@ -4378,6 +4741,17 @@ function nuevaCot() {
   document.getElementById('cEmail').value = '';
   document.getElementById('cTipo').value = '';
   document.getElementById('cDir').value = '';
+  const dirBuscadorEl = document.getElementById('dirBuscador');
+  if (dirBuscadorEl) dirBuscadorEl.value = '';
+  const dirResultadosEl = document.getElementById('dirResultados');
+  if (dirResultadosEl) dirResultadosEl.style.display = 'none';
+  const dirZonaEl = document.getElementById('dirZonaAviso');
+  if (dirZonaEl) dirZonaEl.style.display = 'none';
+  if (_dirMapa && _dirMarker) {
+    _dirMapa.setView([CDMX_CENTRO.lat, CDMX_CENTRO.lon], 10);
+    _dirMarker.setLatLng([CDMX_CENTRO.lat, CDMX_CENTRO.lon]);
+  }
+  _dirLat = null; _dirLon = null; _dirEstado = null;
   document.getElementById('cNotas').value = '';
   document.getElementById('fecha-dia').value = '';
   document.getElementById('fecha-mes').value = '';
@@ -4395,7 +4769,7 @@ function nuevaCot() {
     setAmPm('AM');
     document.getElementById('hora-aviso').style.display = 'none';
   }
-  if (document.getElementById('paq-personas-datos')) document.getElementById('paq-personas-datos').value = '';
+  if (document.getElementById('paq-personas-confirm')) document.getElementById('paq-personas-confirm').textContent = '—';
   document.getElementById('cot-enviada').style.display = 'none';
   document.getElementById('btn-pdf').innerHTML = '🌙 &nbsp;Generar Cotización PDF';
   mostrarConflicto(false);
