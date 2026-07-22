@@ -1762,6 +1762,14 @@ function preLlenarDesdeCotizador() {
   if (p.get('requiere_factura') === '1') {
     condicionesLugar.push(`Requiere factura — Razón social: ${p.get('razon_social') || '—'} · Uso CFDI: ${p.get('uso_cfdi') || '—'}`);
   }
+  const barrasExtraParam = p.get('barras_extra') || '';
+  if (barrasExtraParam) {
+    const NOMBRES = {chilaquiles:'Chilaquiles', maruchan:'Maruchan', gomitas:'Gomitas Locas', cantaritos:'Cantaritos'};
+    barrasExtraParam.split(';;').filter(Boolean).forEach(par => {
+      const [tipo, resumen] = par.split('|');
+      condicionesLugar.push(`Barra extra — ${NOMBRES[tipo] || tipo} (+$500): ${resumen || ''}`);
+    });
+  }
 
   const notasCompletas = [notasCliente, condicionesLugar.length ? condicionesLugar.join(' · ') : ''].filter(Boolean).join('\n');
   set('ev-notas', notasCompletas);

@@ -2162,6 +2162,7 @@ console.log('🔥 Firebase Firestore conectado — Bajón Lunar Admin');
         </div>
         <div class="mfield" style="grid-column:1/-1;"><label>Dirección</label><span id="md-dir">—</span> <a id="md-dir-maps" href="#" target="_blank" style="display:none;color:var(--azul);font-size:0.75rem;margin-left:8px;">📍 Ver en mapa</a></div>
         <div class="mfield" style="grid-column:1/-1;" id="md-factura-wrap"><label>Facturación</label><span id="md-factura">—</span></div>
+        <div class="mfield" style="grid-column:1/-1;" id="md-barras-extra-wrap"><label>Barra(s) extra</label><span id="md-barras-extra">—</span></div>
         <div class="mfield" style="grid-column:1/-1;"><label>Notas</label><span id="md-notas">—</span></div>
         <div class="mfield"><label>Método de pago (anticipo)</label>
           <select id="md-metodo-pago" style="background:var(--gris3);border:1px solid var(--borde2);border-radius:6px;padding:5px 8px;color:var(--blanco);font-size:0.8rem;cursor:pointer;width:100%;" onchange="md_guardarCampo('metodoPago',this.value)">
@@ -3361,6 +3362,14 @@ function abrirModal(idx) {
       ? `✅ Sí — RFC: ${c.rfc || '—'} · Razón social: ${c.razonSocial || '—'} · Uso: ${c.usoCFDI || '—'}`
       : 'No requiere';
   }
+  const mdBarrasExtra = document.getElementById('md-barras-extra');
+  if (mdBarrasExtra) {
+    const detalle = c.barrasExtraDetalle || [];
+    const NOMBRES = {chilaquiles:'Chilaquiles', maruchan:'Maruchan', gomitas:'Gomitas Locas', cantaritos:'Cantaritos'};
+    mdBarrasExtra.innerHTML = detalle.length
+      ? detalle.map(b => `<div style="margin-bottom:4px;"><strong>${NOMBRES[b.tipo]||b.tipo}</strong> (+$500) — <span style="opacity:.8;">${b.resumen||''}</span></div>`).join('')
+      : 'Ninguna';
+  }
   // Duración, método de pago y cuenta
   const mdDur = document.getElementById('md-duracion');
   if (mdDur) mdDur.value = c.duracion || '';
@@ -4106,6 +4115,7 @@ function generarContrato() {
     rfc:           c.rfc        || '',
     razon_social:  c.razonSocial || '',
     uso_cfdi:      c.usoCFDI    || '',
+    barras_extra:  (c.barrasExtraDetalle || []).map(b => `${b.tipo}|${b.resumen}`).join(';;'),
     // PAQUETE + BARRA
     paquete:       c.paquete    || '',
     paquete_nombre: paqNombre,

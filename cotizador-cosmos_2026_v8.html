@@ -1761,6 +1761,11 @@ body:has([onclick]:hover) .cursor-core::before {
             <label class="chip" data-barra="cantaritos" onclick="toggleBarraExtra(this,'cantaritos')">🍊 Cantaritos</label>
           </div>
           <div style="font-size:.68rem;color:var(--blanco-dim);margin-top:8px;">La barra que ya elegiste arriba no aparece aquí — solo puedes agregar las otras.</div>
+
+          <!-- Pestañas de las barras extra ya agregadas -->
+          <div id="extra-barra-tabs" style="display:none;flex-wrap:wrap;gap:8px;margin-top:16px;"></div>
+          <!-- Configuración de la barra extra actualmente en edición -->
+          <div id="extra-barra-config" style="display:none;margin-top:14px;padding:16px;border-radius:10px;background:rgba(26,59,255,.05);border:1px solid rgba(26,59,255,.2);"></div>
         </div>
 
         <!-- OPCIONES DINÁMICAS DE BARRA -->
@@ -2888,8 +2893,22 @@ function elegirBarra(tipo) {
   calcularTotal();
 }
 
-// ════════ BARRA(S) ADICIONAL(ES) — +$500 c/u ════════
+// ════════ BARRA(S) ADICIONAL(ES) — +$500 c/u, con su propia configuración ════════
 const PRECIO_BARRA_EXTRA = 500;
+const NOMBRES_BARRA_EXTRA = {chilaquiles:'Chilaquiles', maruchan:'Maruchan', gomitas:'Gomitas Locas', cantaritos:'Cantaritos'};
+const EMOJI_BARRA_EXTRA = {chilaquiles:'🌮', maruchan:'🍜', gomitas:'🍬', cantaritos:'🍊'};
+
+// barrasExtra: [{ tipo, config }]  ·  extrasBarras (array de tipos) se mantiene por compatibilidad con el resto del código
+let barrasExtra = [];
+let barraExtraActivaIdx = null;
+
+function _defaultConfigBarraExtra(tipo) {
+  if (tipo === 'chilaquiles') return { salsas: ['Verde'], nivel: 'Suave', proteina: 'Sin' };
+  if (tipo === 'maruchan')    return { sabores: ['Camarón'], toppings: [] };
+  if (tipo === 'gomitas')     return { chile: 'Miguelito', extras: ['Limón','Tamarindo'] };
+  if (tipo === 'cantaritos')  return { estilo: 'Tradicional (tequila)' };
+  return {};
+}
 
 function actualizarExtrasBarraDisponibles() {
   // La barra ya elegida como principal no puede agregarse también como "extra"
@@ -2900,24 +2919,142 @@ function actualizarExtrasBarraDisponibles() {
     if (tipo === barraActiva) {
       chip.style.display = 'none';
       // Si estaba seleccionada como extra y ahora es la principal, se quita de extras
-      const idx = extrasBarras.indexOf(tipo);
-      if (idx > -1) { extrasBarras.splice(idx, 1); chip.classList.remove('active'); }
+      const idx = barrasExtra.findIndex(b => b.tipo === tipo);
+      if (idx > -1) { barrasExtra.splice(idx, 1); chip.classList.remove('active'); }
     } else {
       chip.style.display = '';
     }
   });
+  extrasBarras = barrasExtra.map(b => b.tipo);
+  renderExtraBarraTabs();
 }
 
 function toggleBarraExtra(chip, tipo) {
-  const idx = extrasBarras.indexOf(tipo);
+  const idx = barrasExtra.findIndex(b => b.tipo === tipo);
   if (idx > -1) {
-    extrasBarras.splice(idx, 1);
+    // Quitarla
+    barrasExtra.splice(idx, 1);
     chip.classList.remove('active');
+    if (barraExtraActivaIdx === idx) barraExtraActivaIdx = null;
+    else if (barraExtraActivaIdx > idx) barraExtraActivaIdx--;
   } else {
-    extrasBarras.push(tipo);
+    // Agregarla y ponerla en edición de inmediato
+    barrasExtra.push({ tipo, config: _defaultConfigBarraExtra(tipo) });
     chip.classList.add('active');
+    barraExtraActivaIdx = barrasExtra.length - 1;
   }
+  extrasBarras = barrasExtra.map(b => b.tipo);
+  renderExtraBarraTabs();
+  renderExtraBarraConfig();
   calcularTotal();
+}
+
+function renderExtraBarraTabs() {
+  const tabs = document.getElementById('extra-barra-tabs');
+  if (!tabs) return;
+  if (!barrasExtra.length) { tabs.style.display = 'none'; tabs.innerHTML = ''; return; }
+  tabs.style.display = 'flex';
+  tabs.innerHTML = barrasExtra.map((b, i) => `
+    <button type="button" onclick="seleccionarBarraExtraEditar(${i})"
+      style="padding:6px 14px;border-radius:100px;font-size:.72rem;cursor:pointer;
+      border:1px solid ${i === barraExtraActivaIdx ? 'var(--azul)' : 'var(--gris-borde)'};
+      background:${i === barraExtraActivaIdx ? 'rgba(26,59,255,.15)' : 'var(--negro)'};
+      color:${i === barraExtraActivaIdx ? 'var(--blanco)' : 'var(--blanco-dim)'};">
+      ${EMOJI_BARRA_EXTRA[b.tipo]} Configurar ${NOMBRES_BARRA_EXTRA[b.tipo]}
+    </button>
+  `).join('');
+}
+
+function seleccionarBarraExtraEditar(idx) {
+  barraExtraActivaIdx = idx;
+  renderExtraBarraTabs();
+  renderExtraBarraConfig();
+}
+
+function renderExtraBarraConfig() {
+  const cont = document.getElementById('extra-barra-config');
+  if (!cont) return;
+  if (barraExtraActivaIdx === null || !barrasExtra[barraExtraActivaIdx]) {
+    cont.style.display = 'none';
+    cont.innerHTML = '';
+    return;
+  }
+  cont.style.display = 'block';
+  const { tipo, config } = barrasExtra[barraExtraActivaIdx];
+  const idx = barraExtraActivaIdx;
+  let html = `<div style="font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--azul);font-weight:600;margin-bottom:12px;">${EMOJI_BARRA_EXTRA[tipo]} Configurando: ${NOMBRES_BARRA_EXTRA[tipo]} (barra extra)</div>`;
+
+  if (tipo === 'chilaquiles') {
+    const salsasOpts = ['Verde','Roja','Mole'];
+    html += `<div style="font-size:.68rem;color:var(--blanco-dim);margin-bottom:6px;">Salsas (puedes elegir más de una)</div>
+      <div class="chips-row" style="margin-bottom:14px;">
+        ${salsasOpts.map(s => `<div class="chip${config.salsas.includes(s)?' active':''}" onclick="extraBarraToggleMulti(${idx},'salsas','${s}')">${s}</div>`).join('')}
+      </div>
+      <div style="font-size:.68rem;color:var(--blanco-dim);margin-bottom:6px;">Proteína (incluida, sin costo extra)</div>
+      <div class="chips-row" style="margin-bottom:14px;">
+        ${['Sin','Pollo','Bistec','Pastor'].map(p => `<div class="chip${config.proteina===p?' active':''}" onclick="extraBarraSetUnico(${idx},'proteina','${p}')">${p==='Sin'?'🌿 Sin proteína':p}</div>`).join('')}
+      </div>
+      <div style="font-size:.68rem;color:var(--blanco-dim);margin-bottom:6px;">Nivel de bajón</div>
+      <div class="chips-row">
+        ${['Suave','Clásico','Fuerte'].map(n => `<div class="chip${config.nivel===n?' active':''}" onclick="extraBarraSetUnico(${idx},'nivel','${n}')">${n}</div>`).join('')}
+      </div>`;
+  } else if (tipo === 'maruchan') {
+    const sab = ['Camarón','Pollo','Res','Habanero'];
+    const top = ['Papas','Ruffles','Doritos','Takis'];
+    html += `<div style="font-size:.68rem;color:var(--blanco-dim);margin-bottom:6px;">Sabor (elige hasta 2)</div>
+      <div class="chips-row" style="margin-bottom:14px;">
+        ${sab.map(s => `<div class="chip${config.sabores.includes(s)?' active':''}" onclick="extraBarraToggleMulti(${idx},'sabores','${s}',2)">${s}</div>`).join('')}
+      </div>
+      <div style="font-size:.68rem;color:var(--blanco-dim);margin-bottom:6px;">Toppings extra (limón y salsa siempre incluidos)</div>
+      <div class="chips-row">
+        ${top.map(t => `<div class="chip${config.toppings.includes(t)?' active':''}" onclick="extraBarraToggleMulti(${idx},'toppings','${t}')">${t}</div>`).join('')}
+      </div>`;
+  } else if (tipo === 'gomitas') {
+    html += `<div style="font-size:.68rem;color:var(--blanco-dim);margin-bottom:6px;">Tipo de chile</div>
+      <div class="chips-row" style="margin-bottom:14px;">
+        ${['Miguelito','Tajín','Chamoy'].map(c => `<div class="chip${config.chile===c?' active':''}" onclick="extraBarraSetUnico(${idx},'chile','${c}')">${c}</div>`).join('')}
+      </div>
+      <div style="font-size:.68rem;color:var(--blanco-dim);margin-bottom:6px;">Extras</div>
+      <div class="chips-row">
+        ${['Limón','Tamarindo','Chocolate'].map(e => `<div class="chip${config.extras.includes(e)?' active':''}" onclick="extraBarraToggleMulti(${idx},'extras','${e}')">${e}</div>`).join('')}
+      </div>`;
+  } else if (tipo === 'cantaritos') {
+    html += `<div style="font-size:.68rem;color:var(--blanco-dim);margin-bottom:6px;">Estilo</div>
+      <div class="chips-row">
+        ${['Tradicional (tequila)','Mezcal','Sin alcohol'].map(e => `<div class="chip${config.estilo===e?' active':''}" onclick="extraBarraSetUnico(${idx},'estilo','${e}')">${e}</div>`).join('')}
+      </div>`;
+  }
+
+  cont.innerHTML = html;
+}
+
+function extraBarraToggleMulti(idx, campo, valor, maxSel) {
+  const arr = barrasExtra[idx].config[campo];
+  const i = arr.indexOf(valor);
+  if (i > -1) {
+    arr.splice(i, 1);
+  } else {
+    if (maxSel && arr.length >= maxSel) return; // respeta el límite si aplica
+    arr.push(valor);
+  }
+  renderExtraBarraConfig();
+  calcularTotal();
+}
+
+function extraBarraSetUnico(idx, campo, valor) {
+  barrasExtra[idx].config[campo] = valor;
+  renderExtraBarraConfig();
+  calcularTotal();
+}
+
+// Arma un texto corto y legible de la configuración de una barra extra (para resumen/PDF/admin)
+function textoConfigBarraExtra(b) {
+  const c = b.config;
+  if (b.tipo === 'chilaquiles') return `Salsas: ${c.salsas.join(', ')} · Proteína: ${c.proteina} · Nivel: ${c.nivel}`;
+  if (b.tipo === 'maruchan')    return `Sabor: ${c.sabores.join(', ')}${c.toppings.length ? ' · Toppings: '+c.toppings.join(', ') : ''}`;
+  if (b.tipo === 'gomitas')     return `Chile: ${c.chile} · Extras: ${c.extras.join(', ') || 'Ninguno'}`;
+  if (b.tipo === 'cantaritos')  return `Estilo: ${c.estilo}`;
+  return '';
 }
 
 function selNivel(n) {
@@ -3794,23 +3931,16 @@ function calcularTotal() {
     }
   }
 
-  // Mostrar/ocultar fila de barra(s) adicional(es)
-  let resExtrasRow = document.getElementById('res-extras-barra-row');
-  if (costoExtrasBarras > 0) {
-    if (!resExtrasRow) {
-      const trasladoRow = document.getElementById('res-traslado').closest('.res-row');
-      resExtrasRow = document.createElement('div');
-      resExtrasRow.className = 'res-row';
-      resExtrasRow.id = 'res-extras-barra-row';
-      resExtrasRow.innerHTML = '<span class="res-label" id="res-extras-barra-label">➕ Barra(s) extra</span><span class="res-val" id="res-extras-barra-val">—</span>';
-      trasladoRow.parentNode.insertBefore(resExtrasRow, trasladoRow);
-    }
-    const NOMBRES_BARRA = {chilaquiles:'Chilaquiles', maruchan:'Maruchan', gomitas:'Gomitas Locas', cantaritos:'Cantaritos'};
-    resExtrasRow.style.display = '';
-    document.getElementById('res-extras-barra-label').textContent = `➕ Barra extra: ${extrasBarras.map(b => NOMBRES_BARRA[b]).join(', ')}`;
-    document.getElementById('res-extras-barra-val').textContent = '+$' + costoExtrasBarras.toLocaleString('es-MX', {minimumFractionDigits:2});
-  } else if (resExtrasRow) {
-    resExtrasRow.style.display = 'none';
+  // Mostrar/ocultar fila(s) de barra(s) adicional(es), una fila por cada barra extra con su detalle
+  document.querySelectorAll('.res-extra-barra-detalle-row').forEach(el => el.remove());
+  if (barrasExtra.length > 0) {
+    const trasladoRow = document.getElementById('res-traslado').closest('.res-row');
+    barrasExtra.forEach(b => {
+      const row = document.createElement('div');
+      row.className = 'res-row res-extra-barra-detalle-row';
+      row.innerHTML = `<span class="res-label">${EMOJI_BARRA_EXTRA[b.tipo]} Barra extra: ${NOMBRES_BARRA_EXTRA[b.tipo]}<br><span style="font-size:.62rem;opacity:.65;font-weight:400;">${textoConfigBarraExtra(b)}</span></span><span class="res-val">+$${PRECIO_BARRA_EXTRA.toLocaleString('es-MX',{minimumFractionDigits:2})}</span>`;
+      trasladoRow.parentNode.insertBefore(row, trasladoRow);
+    });
   }
 
   // Mostrar/ocultar fila de descuento
@@ -4415,7 +4545,7 @@ async function generarPDF() {
   bloque('SERVICIO CONTRATADO', [
     ['Paquete:', def.nombre],
     ['Tipo de barra:', barraTexto],
-    ['Barra(s) extra (+$500 c/u):', extrasBarras.length ? extrasBarras.map(b => ({chilaquiles:'Chilaquiles',maruchan:'Maruchan',gomitas:'Gomitas Locas',cantaritos:'Cantaritos'}[b])).join(', ') : 'Ninguna'],
+    ...(barrasExtra.length ? barrasExtra.map(b => [`Barra extra — ${NOMBRES_BARRA_EXTRA[b.tipo]} (+$500):`, textoConfigBarraExtra(b)]) : [['Barra(s) extra:', 'Ninguna']]),
     ['Proteína:', barraActiva === 'chilaquiles' && proteinaLabel2 ? `${proteinaLabel2} (+$${datos.costoProteina.toLocaleString('es-MX')})` : 'Sin proteína'],
     ['Nivel de bajón:', nivelTexto],
     ...(barraActiva === 'maruchan' ? [
@@ -4661,6 +4791,7 @@ async function generarPDF() {
     barra: barraActiva,
     barraTexto: {chilaquiles:'Barra de Chilaquiles',maruchan:'Barra de Maruchan',gomitas:'Gomitas Locas',cantaritos:'Cantaritos'}[barraActiva]||barraActiva,
     extrasBarras: extrasBarras.slice(),
+    barrasExtraDetalle: barrasExtra.map(b => ({ tipo: b.tipo, config: b.config, resumen: textoConfigBarraExtra(b) })),
     costoExtrasBarras: datos.costoExtrasBarras || 0,
     // DETALLES DE BARRA
     nivel: nivelTextoSave,
@@ -4714,7 +4845,11 @@ function nuevaCot() {
   nivelActivo = [];
   // Reset barra(s) extra
   extrasBarras = [];
+  barrasExtra = [];
+  barraExtraActivaIdx = null;
   document.querySelectorAll('#extras-barra-row .chip').forEach(chip => chip.classList.remove('active'));
+  renderExtraBarraTabs();
+  renderExtraBarraConfig();
   // Reset código promocional
   promoAplicado = null;
   const cPromoEl = document.getElementById('cPromo'); if (cPromoEl) cPromoEl.value = '';
