@@ -2219,12 +2219,6 @@ body:has([onclick]:hover) .cursor-core::before {
             <input type="hidden" id="cDir" value="">
           </div>
 
-          <!-- Notas full width -->
-          <div class="field full">
-            <label>Notas especiales</label>
-            <textarea id="cNotas" placeholder="Alergias, preferencias, detalles del servicio…"></textarea>
-          </div>
-
         </div>
         </div>
       </div>
@@ -4151,7 +4145,6 @@ async function generarPDF() {
   const email  = document.getElementById('cEmail').value || '';
   const tipo   = document.getElementById('cTipo').value || '';
   const dir    = document.getElementById('cDir').value || '';
-  const notas  = document.getElementById('cNotas').value || '';
   const notasLugar = document.getElementById('cNotasLugar')?.value || '';
   const barraTexto = {chilaquiles:'Barra de Chilaquiles',maruchan:'Barra de Maruchan',gomitas:'Gomitas Locas',cantaritos:'Cantaritos'}[barraActiva] || '';
   const vitTexto = vitIncluido ? `${vitCantidad} vitrolero${vitCantidad>1?'s':''} — ${vitSabores.join(', ')}` : 'No incluido';
@@ -4335,20 +4328,6 @@ async function generarPDF() {
   doc.text(`Saldo restante: $${datos.saldo.toLocaleString('es-MX',{minimumFractionDigits:2})}`, 123, y + 13);
   y += 20;
 
-  // Notas del evento
-  if (notas) {
-    doc.setFillColor(24, 24, 40);
-    doc.roundedRect(14, y, 100, 20, 2, 2, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7);
-    doc.setTextColor(100, 130, 255);
-    doc.text('NOTAS DEL EVENTO:', 17, y + 7);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(180, 180, 200);
-    const lines = doc.splitTextToSize(notas, 90);
-    doc.text(lines, 17, y + 13);
-    y += 22;
-  }
   // Notas del lugar
   if (notasLugar) {
     doc.setFillColor(24, 24, 40);
@@ -4496,7 +4475,7 @@ async function generarPDF() {
   await guardarCot({
     folio, timestamp: new Date().toISOString(), estado:'pendiente',
     // CLIENTE
-    nombre, tel, email, tipo, dir, notas,
+    nombre, tel, email, tipo, dir,
     dirLat: _dirLat, dirLon: _dirLon,
     estadoUbicacion: _dirEstado || '',
     dirMapsUrl: (_dirLat && _dirLon) ? `https://www.google.com/maps?q=${_dirLat},${_dirLon}` : '',
@@ -4598,7 +4577,8 @@ function nuevaCot() {
   document.querySelectorAll('#cfg .toggle-opts .toggle-btn[data-val="Ciudad de México"], #cfg .toggle-opts .toggle-btn[data-val="México"]').forEach(b => {
     b.classList.toggle('active', b.dataset.val === 'Ciudad de México');
   });
-  document.getElementById('cNotas').value = '';
+  const cNotasLugarEl = document.getElementById('cNotasLugar');
+  if (cNotasLugarEl) cNotasLugarEl.value = '';
   document.getElementById('fecha-dia').value = '';
   document.getElementById('fecha-mes').value = '';
   document.getElementById('fecha-anio').value = '';
