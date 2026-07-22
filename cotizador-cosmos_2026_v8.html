@@ -1749,32 +1749,6 @@ body:has([onclick]:hover) .cursor-core::before {
           </div>
         </div>
 
-        <!-- BARRA(S) ADICIONAL(ES) -->
-        <div style="margin-top:18px;padding:16px;border-radius:12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.08);">
-          <div style="font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--blanco-dim);font-weight:600;margin-bottom:10px;">
-            ➕ ¿Quieres agregar otra barra? <span style="opacity:.6;font-weight:400;text-transform:none;letter-spacing:0;">+$500 c/u</span>
-          </div>
-          <div class="chips-row" id="extras-barra-row" style="flex-wrap:wrap;gap:10px;">
-            <label class="chip" data-barra="chilaquiles" onclick="toggleBarraExtra(this,'chilaquiles')">🌮 Chilaquiles</label>
-            <label class="chip" data-barra="maruchan" onclick="toggleBarraExtra(this,'maruchan')">🍜 Maruchan</label>
-            <label class="chip" data-barra="gomitas" onclick="toggleBarraExtra(this,'gomitas')">🍬 Gomitas Locas</label>
-            <label class="chip" data-barra="cantaritos" onclick="toggleBarraExtra(this,'cantaritos')">🍊 Cantaritos</label>
-          </div>
-          <div style="font-size:.68rem;color:var(--blanco-dim);margin-top:8px;">La barra que ya elegiste arriba no aparece aquí — solo puedes agregar las otras.</div>
-
-          <!-- Pestañas de las barras extra ya agregadas -->
-          <div id="extra-barra-tabs" style="display:none;flex-wrap:wrap;gap:8px;margin-top:16px;"></div>
-          <!-- Configuración de la barra extra actualmente en edición -->
-          <div id="extra-barra-config" style="display:none;margin-top:14px;padding:16px;border-radius:10px;background:rgba(26,59,255,.05);border:1px solid rgba(26,59,255,.2);"></div>
-        </div>
-
-        <!-- Separador claro: de aquí en adelante es la configuración de la BARRA PRINCIPAL -->
-        <div style="margin:26px 0 18px;display:flex;align-items:center;gap:12px;">
-          <div style="flex:1;height:1px;background:rgba(255,255,255,.1);"></div>
-          <div style="font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--blanco-dim);white-space:nowrap;">🍸 Configuración de tu barra principal</div>
-          <div style="flex:1;height:1px;background:rgba(255,255,255,.1);"></div>
-        </div>
-
         <!-- OPCIONES DINÁMICAS DE BARRA -->
         <!-- Chilaquiles options -->
         <div class="barra-opts" id="opts-chilaquiles">
@@ -2028,6 +2002,24 @@ body:has([onclick]:hover) .cursor-core::before {
         </div>
 
       </div><!-- /card barra -->
+
+      <!-- BARRA(S) ADICIONAL(ES) — misma capacidad y especificaciones que la principal -->
+      <p class="sec-title">➕ ¿Quieres agregar otra barra?</p>
+      <div class="card" style="margin-bottom:20px;">
+        <div style="font-size:.68rem;color:var(--blanco-dim);margin-bottom:12px;">Puedes agregar hasta las 3 barras restantes, cada una con sus propias opciones — igual que la principal. Se cobra el consumo real (mismo precio del paquete, mismo descuento) <strong style="color:var(--blanco);">+ $500 fijos por barra</strong>.</div>
+        <div class="chips-row" id="extras-barra-row" style="flex-wrap:wrap;gap:10px;">
+          <label class="chip" data-barra="chilaquiles" onclick="toggleBarraExtra(this,'chilaquiles')">🌮 Chilaquiles</label>
+          <label class="chip" data-barra="maruchan" onclick="toggleBarraExtra(this,'maruchan')">🍜 Maruchan</label>
+          <label class="chip" data-barra="gomitas" onclick="toggleBarraExtra(this,'gomitas')">🍬 Gomitas Locas</label>
+          <label class="chip" data-barra="cantaritos" onclick="toggleBarraExtra(this,'cantaritos')">🍊 Cantaritos</label>
+        </div>
+        <div style="font-size:.68rem;color:var(--blanco-dim);margin-top:8px;">La barra que ya elegiste arriba no aparece aquí — solo puedes agregar las otras.</div>
+
+        <!-- Pestañas de las barras extra ya agregadas -->
+        <div id="extra-barra-tabs" style="display:none;flex-wrap:wrap;gap:8px;margin-top:16px;"></div>
+        <!-- Configuración completa de la barra extra actualmente en edición -->
+        <div id="extra-barra-config" style="display:none;margin-top:14px;padding:16px;border-radius:10px;background:rgba(26,59,255,.05);border:1px solid rgba(26,59,255,.2);"></div>
+      </div>
 
       <!-- EXPERIENCIA LUNAR (para cosmos y after) -->
       <div id="exp-lunar-wrap" style="display:none;">
@@ -2430,7 +2422,7 @@ body:has([onclick]:hover) .cursor-core::before {
         <!-- Código promocional -->
         <div style="padding:12px 0;border-top:1px dashed rgba(255,255,255,.1);margin-top:6px;">
           <div style="display:flex;gap:8px;">
-            <input type="text" id="cPromo" placeholder="¿Tienes un código promocional?" style="flex:1;text-transform:uppercase;font-size:.8rem;padding:11px 15px;background:var(--negro);border:1px solid var(--gris-borde);border-radius:8px;color:var(--blanco);font-family:'DM Sans',sans-serif;-webkit-appearance:none;">
+            <input type="text" id="cPromo" placeholder="¿Tienes un código promocional?" style="flex:1;min-width:0;text-transform:uppercase;font-size:.8rem;padding:11px 15px;background:var(--negro);border:1px solid var(--gris-borde);border-radius:8px;color:var(--blanco);font-family:'DM Sans',sans-serif;-webkit-appearance:none;">
             <button type="button" onclick="aplicarPromo()" style="padding:9px 16px;border-radius:8px;border:1px solid rgba(26,59,255,.4);background:rgba(26,59,255,.1);color:var(--azul);font-size:.78rem;white-space:nowrap;cursor:pointer;">Aplicar</button>
           </div>
           <div id="promo-msg" style="font-size:.72rem;margin-top:6px;display:none;"></div>
@@ -2900,20 +2892,22 @@ function elegirBarra(tipo) {
   calcularTotal();
 }
 
-// ════════ BARRA(S) ADICIONAL(ES) — +$500 c/u, con su propia configuración ════════
-const PRECIO_BARRA_EXTRA = 500;
+// ════════ BARRA(S) ADICIONAL(ES) — misma capacidad y especificaciones que la principal ════════
 const NOMBRES_BARRA_EXTRA = {chilaquiles:'Chilaquiles', maruchan:'Maruchan', gomitas:'Gomitas Locas', cantaritos:'Cantaritos'};
 const EMOJI_BARRA_EXTRA = {chilaquiles:'🌮', maruchan:'🍜', gomitas:'🍬', cantaritos:'🍊'};
+const PRECIO_BARRA_EXTRA_FIJO = 500; // chilaquiles / maruchan / gomitas — precio fijo por barra extra
+// Cantaritos extra NO es precio fijo: se cobra igual que la principal (botellas × precio del tequila elegido),
+// porque llevar botellas reales sí tiene un costo real por unidad, igual que en la barra principal.
 
 // barrasExtra: [{ tipo, config }]  ·  extrasBarras (array de tipos) se mantiene por compatibilidad con el resto del código
 let barrasExtra = [];
 let barraExtraActivaIdx = null;
 
 function _defaultConfigBarraExtra(tipo) {
-  if (tipo === 'chilaquiles') return { salsas: ['Verde'], nivel: 'Suave', proteina: 'Sin' };
-  if (tipo === 'maruchan')    return { sabores: ['Camarón'], toppings: [] };
+  if (tipo === 'chilaquiles') return { salsas: ['Verde'], proteina: 'Sin', proteinaCantidad: 0, niveles: ['Suave'] };
+  if (tipo === 'maruchan')    return { sabores: ['Camarón'], toppings: [], toppingCustom: '' };
   if (tipo === 'gomitas')     return { chile: 'Miguelito', extras: ['Limón','Tamarindo'] };
-  if (tipo === 'cantaritos')  return { estilo: 'Tradicional (tequila)' };
+  if (tipo === 'cantaritos')  return { tequilaId: 'tradicional', botellas: 4 };
   return {};
 }
 
@@ -2925,7 +2919,6 @@ function actualizarExtrasBarraDisponibles() {
     const tipo = chip.dataset.barra;
     if (tipo === barraActiva) {
       chip.style.display = 'none';
-      // Si estaba seleccionada como extra y ahora es la principal, se quita de extras
       const idx = barrasExtra.findIndex(b => b.tipo === tipo);
       if (idx > -1) { barrasExtra.splice(idx, 1); chip.classList.remove('active'); }
     } else {
@@ -2939,13 +2932,11 @@ function actualizarExtrasBarraDisponibles() {
 function toggleBarraExtra(chip, tipo) {
   const idx = barrasExtra.findIndex(b => b.tipo === tipo);
   if (idx > -1) {
-    // Quitarla
     barrasExtra.splice(idx, 1);
     chip.classList.remove('active');
     if (barraExtraActivaIdx === idx) barraExtraActivaIdx = null;
-    else if (barraExtraActivaIdx > idx) barraExtraActivaIdx--;
+    else if (barraExtraActivaIdx !== null && barraExtraActivaIdx > idx) barraExtraActivaIdx--;
   } else {
-    // Agregarla y ponerla en edición de inmediato
     barrasExtra.push({ tipo, config: _defaultConfigBarraExtra(tipo) });
     chip.classList.add('active');
     barraExtraActivaIdx = barrasExtra.length - 1;
@@ -2967,7 +2958,7 @@ function renderExtraBarraTabs() {
       border:1px solid ${i === barraExtraActivaIdx ? 'var(--azul)' : 'var(--gris-borde)'};
       background:${i === barraExtraActivaIdx ? 'rgba(26,59,255,.15)' : 'var(--negro)'};
       color:${i === barraExtraActivaIdx ? 'var(--blanco)' : 'var(--blanco-dim)'};">
-      ${EMOJI_BARRA_EXTRA[b.tipo]} Configurar ${NOMBRES_BARRA_EXTRA[b.tipo]}
+      ${EMOJI_BARRA_EXTRA[b.tipo]} Editar ${NOMBRES_BARRA_EXTRA[b.tipo]}
     </button>
   `).join('');
 }
@@ -2989,46 +2980,117 @@ function renderExtraBarraConfig() {
   cont.style.display = 'block';
   const { tipo, config } = barrasExtra[barraExtraActivaIdx];
   const idx = barraExtraActivaIdx;
-  let html = `<div style="font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--azul);font-weight:600;margin-bottom:12px;">${EMOJI_BARRA_EXTRA[tipo]} Configurando: ${NOMBRES_BARRA_EXTRA[tipo]} (barra extra)</div>`;
+  let html = `<div style="font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--azul);font-weight:600;margin-bottom:14px;">${EMOJI_BARRA_EXTRA[tipo]} Configurando: ${NOMBRES_BARRA_EXTRA[tipo]} (barra extra)</div>`;
 
   if (tipo === 'chilaquiles') {
-    const salsasOpts = ['Verde','Roja','Mole'];
-    html += `<div style="font-size:.68rem;color:var(--blanco-dim);margin-bottom:6px;">Salsas (puedes elegir más de una)</div>
-      <div class="chips-row" style="margin-bottom:14px;">
-        ${salsasOpts.map(s => `<div class="chip${config.salsas.includes(s)?' active':''}" onclick="extraBarraToggleMulti(${idx},'salsas','${s}')">${s}</div>`).join('')}
+    html += `
+      <div class="opts-title">🟢 Elige tus salsas <span style="opacity:.6;font-size:.58rem;">(puedes elegir más de una)</span></div>
+      <div class="chips-row" style="margin-bottom:16px;">
+        <div class="chip${config.salsas.includes('Verde')?' active':''}" onclick="extraBarraToggleMulti(${idx},'salsas','Verde')">🟢 Verde</div>
+        <div class="chip${config.salsas.includes('Roja')?' active':''}" onclick="extraBarraToggleMulti(${idx},'salsas','Roja')">🔴 Roja</div>
+        <div class="chip${config.salsas.includes('Mole')?' active':''}" onclick="extraBarraToggleMulti(${idx},'salsas','Mole')">🤎 Mole</div>
       </div>
-      <div style="font-size:.68rem;color:var(--blanco-dim);margin-bottom:6px;">Proteína (incluida, sin costo extra)</div>
-      <div class="chips-row" style="margin-bottom:14px;">
-        ${['Sin','Pollo','Bistec','Pastor'].map(p => `<div class="chip${config.proteina===p?' active':''}" onclick="extraBarraSetUnico(${idx},'proteina','${p}')">${p==='Sin'?'🌿 Sin proteína':p}</div>`).join('')}
+      <div style="margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span style="font-size:.58rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--blanco-dim);font-weight:600;">Incluye siempre:</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.25);border-radius:100px;padding:3px 10px;font-size:.68rem;color:var(--verde);">🧀 Queso</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.25);border-radius:100px;padding:3px 10px;font-size:.68rem;color:var(--verde);">🥛 Crema</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.25);border-radius:100px;padding:3px 10px;font-size:.68rem;color:var(--verde);">🧅 Cebolla</span>
       </div>
-      <div style="font-size:.68rem;color:var(--blanco-dim);margin-bottom:6px;">Nivel de bajón</div>
+      <div class="opts-title" style="margin-top:16px;">🍗 Proteína <span style="opacity:.6;font-size:.58rem;">(con proteína: +$25/porción, igual que en la barra principal)</span></div>
+      <div class="chips-row" style="margin-bottom:16px;">
+        <div class="chip${config.proteina==='Sin'?' active':''}" onclick="extraBarraSetUnico(${idx},'proteina','Sin')">🌿 Sin proteína</div>
+        <div class="chip${config.proteina==='Pollo'?' active':''}" onclick="extraBarraSetUnico(${idx},'proteina','Pollo')">🍗 Pollo</div>
+        <div class="chip${config.proteina==='Bistec'?' active':''}" onclick="extraBarraSetUnico(${idx},'proteina','Bistec')">🥩 Bistec</div>
+        <div class="chip${config.proteina==='Pastor'?' active':''}" onclick="extraBarraSetUnico(${idx},'proteina','Pastor')">🌮 Pastor</div>
+      </div>
+      <div class="opts-title">🌶️ Nivel de Bajón <span style="opacity:.6;font-size:.58rem;">— elige hasta 2 niveles</span></div>
       <div class="chips-row">
-        ${['Suave','Clásico','Fuerte'].map(n => `<div class="chip${config.nivel===n?' active':''}" onclick="extraBarraSetUnico(${idx},'nivel','${n}')">${n}</div>`).join('')}
+        <div class="chip${config.niveles.includes('Suave')?' active':''}" onclick="extraBarraToggleMulti(${idx},'niveles','Suave',2)">🌿 Suave Lunar</div>
+        <div class="chip${config.niveles.includes('Clásico')?' active':''}" onclick="extraBarraToggleMulti(${idx},'niveles','Clásico',2)">🔥 El Bajón Clásico</div>
+        <div class="chip${config.niveles.includes('Fuerte')?' active':''}" onclick="extraBarraToggleMulti(${idx},'niveles','Fuerte',2)">💀 Lunar Fuerte</div>
       </div>`;
   } else if (tipo === 'maruchan') {
-    const sab = ['Camarón','Pollo','Res','Habanero'];
-    const top = ['Papas','Ruffles','Doritos','Takis'];
-    html += `<div style="font-size:.68rem;color:var(--blanco-dim);margin-bottom:6px;">Sabor (elige hasta 2)</div>
-      <div class="chips-row" style="margin-bottom:14px;">
-        ${sab.map(s => `<div class="chip${config.sabores.includes(s)?' active':''}" onclick="extraBarraToggleMulti(${idx},'sabores','${s}',2)">${s}</div>`).join('')}
+    html += `
+      <div class="opts-title">🦐 Sabor de Maruchan <span style="opacity:.6;font-size:.58rem;">— elige hasta 2 sabores</span></div>
+      <div class="chips-row" style="margin-bottom:16px;">
+        <div class="chip${config.sabores.includes('Camarón')?' active':''}" onclick="extraBarraToggleMulti(${idx},'sabores','Camarón',2)">🦐 Camarón</div>
+        <div class="chip${config.sabores.includes('Pollo')?' active':''}" onclick="extraBarraToggleMulti(${idx},'sabores','Pollo',2)">🍗 Pollo</div>
+        <div class="chip${config.sabores.includes('Res')?' active':''}" onclick="extraBarraToggleMulti(${idx},'sabores','Res',2)">🥩 Res</div>
+        <div class="chip${config.sabores.includes('Habanero')?' active':''}" onclick="extraBarraToggleMulti(${idx},'sabores','Habanero',2)">🌶️🔥 Habanero</div>
       </div>
-      <div style="font-size:.68rem;color:var(--blanco-dim);margin-bottom:6px;">Toppings extra (limón y salsa siempre incluidos)</div>
-      <div class="chips-row">
-        ${top.map(t => `<div class="chip${config.toppings.includes(t)?' active':''}" onclick="extraBarraToggleMulti(${idx},'toppings','${t}')">${t}</div>`).join('')}
+      <div class="opts-title">🧂 Toppings</div>
+      <div style="font-size:.62rem;letter-spacing:1.3px;text-transform:uppercase;color:var(--verde);margin-bottom:6px;margin-top:4px;">✓ Incluidos siempre</div>
+      <div class="chips-row" style="margin-bottom:12px;">
+        <span class="chip active" style="opacity:.7;cursor:default;pointer-events:none;">🍋 Limón</span>
+        <span class="chip active" style="opacity:.7;cursor:default;pointer-events:none;">🌶️ Salsa</span>
+      </div>
+      <div style="font-size:.62rem;letter-spacing:1.3px;text-transform:uppercase;color:var(--azul);margin-bottom:8px;">+ Extras <span style="color:var(--blanco-dim);text-transform:none;letter-spacing:0;">elige hasta 2</span></div>
+      <div class="chips-row" style="align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+        <div class="chip${config.toppings.includes('Papas')?' active':''}" onclick="extraBarraToggleMulti(${idx},'toppings','Papas',2)">🥔 Papas</div>
+        <div class="chip${config.toppings.includes('Ruffles')?' active':''}" onclick="extraBarraToggleMulti(${idx},'toppings','Ruffles',2)">🥨 Ruffles</div>
+        <div class="chip${config.toppings.includes('Doritos')?' active':''}" onclick="extraBarraToggleMulti(${idx},'toppings','Doritos',2)">🧀 Doritos</div>
+        <div class="chip${config.toppings.includes('Takis')?' active':''}" onclick="extraBarraToggleMulti(${idx},'toppings','Takis',2)">🌀 Takis</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <input type="text" value="${config.toppingCustom||''}" placeholder="✏️ Otro topping..." maxlength="40"
+          oninput="extraBarraSetUnico(${idx},'toppingCustom',this.value)"
+          style="background:rgba(255,255,255,0.06);border:1px solid var(--gris-borde);border-radius:20px;padding:6px 14px;font-size:.72rem;color:var(--blanco);outline:none;width:170px;">
       </div>`;
   } else if (tipo === 'gomitas') {
-    html += `<div style="font-size:.68rem;color:var(--blanco-dim);margin-bottom:6px;">Tipo de chile</div>
-      <div class="chips-row" style="margin-bottom:14px;">
-        ${['Miguelito','Tajín','Chamoy'].map(c => `<div class="chip${config.chile===c?' active':''}" onclick="extraBarraSetUnico(${idx},'chile','${c}')">${c}</div>`).join('')}
+    html += `
+      <div class="opts-title">🌶️ Tipo de chile</div>
+      <div class="chips-row" style="margin-bottom:16px;">
+        <div class="chip${config.chile==='Miguelito'?' active':''}" onclick="extraBarraSetUnico(${idx},'chile','Miguelito')">🌶️ Miguelito</div>
+        <div class="chip${config.chile==='Tajín'?' active':''}" onclick="extraBarraSetUnico(${idx},'chile','Tajín')">🧂 Tajín</div>
+        <div class="chip${config.chile==='Chamoy'?' active':''}" onclick="extraBarraSetUnico(${idx},'chile','Chamoy')">🫙 Chamoy</div>
       </div>
-      <div style="font-size:.68rem;color:var(--blanco-dim);margin-bottom:6px;">Extras</div>
+      <div class="opts-title">🍬 Extras</div>
       <div class="chips-row">
-        ${['Limón','Tamarindo','Chocolate'].map(e => `<div class="chip${config.extras.includes(e)?' active':''}" onclick="extraBarraToggleMulti(${idx},'extras','${e}')">${e}</div>`).join('')}
+        <div class="chip${config.extras.includes('Limón')?' active':''}" onclick="extraBarraToggleMulti(${idx},'extras','Limón')">🍋 Limón</div>
+        <div class="chip${config.extras.includes('Tamarindo')?' active':''}" onclick="extraBarraToggleMulti(${idx},'extras','Tamarindo')">🍫 Tamarindo</div>
+        <div class="chip${config.extras.includes('Chocolate')?' active':''}" onclick="extraBarraToggleMulti(${idx},'extras','Chocolate')">🍫 Chocolate</div>
       </div>`;
   } else if (tipo === 'cantaritos') {
-    html += `<div style="font-size:.68rem;color:var(--blanco-dim);margin-bottom:6px;">Estilo</div>
-      <div class="chips-row">
-        ${['Tradicional (tequila)','Mezcal','Sin alcohol'].map(e => `<div class="chip${config.estilo===e?' active':''}" onclick="extraBarraSetUnico(${idx},'estilo','${e}')">${e}</div>`).join('')}
+    html += `
+      <div class="opts-title">🥃 Elige tu tequila</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+        ${TEQUILAS.map(t => `
+          <div onclick="extraBarraSetUnico(${idx},'tequilaId','${t.id}')" style="cursor:pointer;padding:12px 14px;border-radius:10px;border:1px solid ${config.tequilaId===t.id?'var(--azul)':'var(--gris-borde)'};background:${config.tequilaId===t.id?'rgba(26,59,255,.1)':'transparent'};display:flex;justify-content:space-between;align-items:center;gap:10px;">
+            <div><div style="font-size:.82rem;color:var(--blanco);font-weight:600;">🥃 ${t.nombre}</div><div style="font-size:.66rem;color:var(--blanco-dim);">${t.desc}</div></div>
+            <div style="font-size:.78rem;color:var(--azul);white-space:nowrap;">${t.custom ? 'A convenir' : '$'+t.precio+'/bot'}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div style="background:rgba(26,59,255,.08);border:1px solid rgba(26,59,255,.22);border-radius:12px;padding:14px 16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+          <div style="font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--blanco-dim);">Botellas a contratar</div>
+          <div class="vit-cant">
+            <button onclick="extraBarraCambiarBotellas(${idx},-1)">&#8722;</button>
+            <span>${config.botellas}</span>
+            <button onclick="extraBarraCambiarBotellas(${idx},1)">+</button>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  // Vista previa de costo — igual para las 4, según la fórmula real (consumo + descuento del paquete + $500)
+  if (paqActivo) {
+    const defP = PAQ[paqActivo];
+    const personasP = parseInt(document.getElementById('paq-personas')?.value) || defP.minPax;
+    const totalPorcionesP = personasP * getPorciones();
+    let descPctP = ({nebula:0,cosmos:0.05,after:0.10,moonlight:0})[paqActivo] || 0;
+    if (paqActivo === 'moonlight' && personasP >= 110) descPctP = 0.20;
+    if (personasP >= 250) descPctP = 0.30;
+    const costo = calcularCostoBarraExtra(barrasExtra[idx], defP, totalPorcionesP, descPctP);
+    html += `
+      <div style="margin-top:16px;background:rgba(255,255,255,.04);border-radius:10px;padding:12px 14px;">
+        <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--blanco-dim);margin-bottom:4px;"><span>Consumo (igual que la principal)</span><span>$${costo.consumo.toLocaleString('es-MX',{minimumFractionDigits:2})}</span></div>
+        ${costo.descuento > 0 ? `<div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--verde);margin-bottom:4px;"><span>Descuento del paquete</span><span>−$${costo.descuento.toLocaleString('es-MX',{minimumFractionDigits:2})}</span></div>` : ''}
+        <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--blanco-dim);margin-bottom:8px;"><span>+ Servicio de barra extra</span><span>+$${PRECIO_BARRA_EXTRA_FIJO.toLocaleString('es-MX',{minimumFractionDigits:2})}</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,.08);padding-top:8px;">
+          <span style="font-size:.72rem;color:var(--blanco-dim);">Total de esta barra extra</span>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;color:var(--azul);">$${costo.total.toLocaleString('es-MX',{minimumFractionDigits:2})}</span>
+        </div>
       </div>`;
   }
 
@@ -3041,7 +3103,7 @@ function extraBarraToggleMulti(idx, campo, valor, maxSel) {
   if (i > -1) {
     arr.splice(i, 1);
   } else {
-    if (maxSel && arr.length >= maxSel) return; // respeta el límite si aplica
+    if (maxSel && arr.length >= maxSel) return;
     arr.push(valor);
   }
   renderExtraBarraConfig();
@@ -3054,13 +3116,54 @@ function extraBarraSetUnico(idx, campo, valor) {
   calcularTotal();
 }
 
+function extraBarraCambiarBotellas(idx, delta) {
+  const c = barrasExtra[idx].config;
+  c.botellas = Math.max(4, c.botellas + delta);
+  renderExtraBarraConfig();
+  calcularTotal();
+}
+
+// Calcula el costo de UNA barra extra: consumo real (igual que si fuera la barra principal,
+// mismo precio por porción/botella del paquete, mismas personas) + el mismo % de descuento
+// del paquete + $500 fijos de servicio por tener una barra adicional operando.
+function calcularCostoBarraExtra(b, def, totalPorciones, descPct) {
+  let consumo;
+  if (b.tipo === 'cantaritos') {
+    const tq = TEQUILAS.find(t => t.id === b.config.tequilaId) || TEQUILAS[0];
+    const extraPax = Math.max(0, totalPorciones - def.minPax);
+    const base = def.base + extraPax * def.ppPax;
+    const costoBotellas = tq.custom ? 0 : b.config.botellas * tq.precio;
+    consumo = base + costoBotellas;
+  } else {
+    const ppPax = BARRA_PRECIOS[b.tipo]?.precio || 90;
+    // Proteína extra (solo chilaquiles): mismo diferencial $115 vs $90 por porción, aplicado a toda la barra
+    const costoProteinaExtra = (b.tipo === 'chilaquiles' && b.config.proteina !== 'Sin') ? totalPorciones * 25 : 0;
+    consumo = totalPorciones * ppPax + costoProteinaExtra;
+  }
+  const descuento = consumo * descPct;
+  const total = consumo - descuento + PRECIO_BARRA_EXTRA_FIJO;
+  return { consumo, descuento, total };
+}
+
+// Costo total de todas las barras extra ya con consumo real + descuento + $500 c/u
+function costoTotalBarrasExtra(def, totalPorciones, descPct) {
+  let total = 0;
+  barrasExtra.forEach(b => {
+    total += calcularCostoBarraExtra(b, def, totalPorciones, descPct).total;
+  });
+  return total;
+}
+
 // Arma un texto corto y legible de la configuración de una barra extra (para resumen/PDF/admin)
 function textoConfigBarraExtra(b) {
   const c = b.config;
-  if (b.tipo === 'chilaquiles') return `Salsas: ${c.salsas.join(', ')} · Proteína: ${c.proteina} · Nivel: ${c.nivel}`;
-  if (b.tipo === 'maruchan')    return `Sabor: ${c.sabores.join(', ')}${c.toppings.length ? ' · Toppings: '+c.toppings.join(', ') : ''}`;
+  if (b.tipo === 'chilaquiles') return `Salsas: ${c.salsas.join(', ')} · Proteína: ${c.proteina} · Nivel(es): ${c.niveles.join(', ')}`;
+  if (b.tipo === 'maruchan')    return `Sabor: ${c.sabores.join(', ')}${c.toppings.length ? ' · Toppings: '+c.toppings.join(', ') : ''}${c.toppingCustom ? ' · '+c.toppingCustom : ''}`;
   if (b.tipo === 'gomitas')     return `Chile: ${c.chile} · Extras: ${c.extras.join(', ') || 'Ninguno'}`;
-  if (b.tipo === 'cantaritos')  return `Estilo: ${c.estilo}`;
+  if (b.tipo === 'cantaritos')  {
+    const tq = TEQUILAS.find(t => t.id === c.tequilaId) || TEQUILAS[0];
+    return `${tq.nombre} · ${c.botellas} botellas`;
+  }
   return '';
 }
 
@@ -3918,7 +4021,7 @@ function calcularTotal() {
 
   const subtotal = precioPaq + costoProteina + costoCantaritos;
   const descuento = subtotal * descPct;
-  const costoExtrasBarras = extrasBarras.length * PRECIO_BARRA_EXTRA;
+  const costoExtrasBarras = costoTotalBarrasExtra(def, totalPorciones, descPct);
   const baseConExtras = subtotal - descuento + costoExtrasBarras;
   const promoDescPct = promoAplicado ? promoAplicado.descPct : 0;
   const promoDescuento = baseConExtras * promoDescPct;
@@ -3943,9 +4046,10 @@ function calcularTotal() {
   if (barrasExtra.length > 0) {
     const trasladoRow = document.getElementById('res-traslado').closest('.res-row');
     barrasExtra.forEach(b => {
+      const costo = calcularCostoBarraExtra(b, def, totalPorciones, descPct);
       const row = document.createElement('div');
       row.className = 'res-row res-extra-barra-detalle-row';
-      row.innerHTML = `<span class="res-label">${EMOJI_BARRA_EXTRA[b.tipo]} Barra extra: ${NOMBRES_BARRA_EXTRA[b.tipo]}<br><span style="font-size:.62rem;opacity:.65;font-weight:400;">${textoConfigBarraExtra(b)}</span></span><span class="res-val">+$${PRECIO_BARRA_EXTRA.toLocaleString('es-MX',{minimumFractionDigits:2})}</span>`;
+      row.innerHTML = `<span class="res-label" style="flex:1;min-width:0;padding-right:10px;">${EMOJI_BARRA_EXTRA[b.tipo]} Barra extra: ${NOMBRES_BARRA_EXTRA[b.tipo]}<br><span style="font-size:.62rem;opacity:.65;font-weight:400;">${textoConfigBarraExtra(b)}</span></span><span class="res-val" style="white-space:nowrap;">+$${costo.total.toLocaleString('es-MX',{minimumFractionDigits:2})}</span>`;
       trasladoRow.parentNode.insertBefore(row, trasladoRow);
     });
   }
@@ -4552,7 +4656,10 @@ async function generarPDF() {
   bloque('SERVICIO CONTRATADO', [
     ['Paquete:', def.nombre],
     ['Tipo de barra:', barraTexto],
-    ...(barrasExtra.length ? barrasExtra.map(b => [`Barra extra — ${NOMBRES_BARRA_EXTRA[b.tipo]} (+$500):`, textoConfigBarraExtra(b)]) : [['Barra(s) extra:', 'Ninguna']]),
+    ...(barrasExtra.length ? barrasExtra.map(b => {
+      const costoB = calcularCostoBarraExtra(b, def, datos.totalPorciones, datos.descPct);
+      return [`Barra extra — ${NOMBRES_BARRA_EXTRA[b.tipo]} (+$${costoB.total.toLocaleString('es-MX',{minimumFractionDigits:2})}):`, textoConfigBarraExtra(b)];
+    }) : [['Barra(s) extra:', 'Ninguna']]),
     ['Proteína:', barraActiva === 'chilaquiles' && proteinaLabel2 ? `${proteinaLabel2} (+$${datos.costoProteina.toLocaleString('es-MX')})` : 'Sin proteína'],
     ['Nivel de bajón:', nivelTexto],
     ...(barraActiva === 'maruchan' ? [
@@ -4798,7 +4905,7 @@ async function generarPDF() {
     barra: barraActiva,
     barraTexto: {chilaquiles:'Barra de Chilaquiles',maruchan:'Barra de Maruchan',gomitas:'Gomitas Locas',cantaritos:'Cantaritos'}[barraActiva]||barraActiva,
     extrasBarras: extrasBarras.slice(),
-    barrasExtraDetalle: barrasExtra.map(b => ({ tipo: b.tipo, config: b.config, resumen: textoConfigBarraExtra(b) })),
+    barrasExtraDetalle: barrasExtra.map(b => ({ tipo: b.tipo, config: b.config, resumen: textoConfigBarraExtra(b), costo: calcularCostoBarraExtra(b, def, datos.totalPorciones, datos.descPct).total.toFixed(2) })),
     costoExtrasBarras: datos.costoExtrasBarras || 0,
     // DETALLES DE BARRA
     nivel: nivelTextoSave,

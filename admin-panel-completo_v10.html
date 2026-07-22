@@ -3367,7 +3367,7 @@ function abrirModal(idx) {
     const detalle = c.barrasExtraDetalle || [];
     const NOMBRES = {chilaquiles:'Chilaquiles', maruchan:'Maruchan', gomitas:'Gomitas Locas', cantaritos:'Cantaritos'};
     mdBarrasExtra.innerHTML = detalle.length
-      ? detalle.map(b => `<div style="margin-bottom:4px;"><strong>${NOMBRES[b.tipo]||b.tipo}</strong> (+$500) — <span style="opacity:.8;">${b.resumen||''}</span></div>`).join('')
+      ? detalle.map(b => `<div style="margin-bottom:4px;"><strong>${NOMBRES[b.tipo]||b.tipo}</strong> (+$${parseFloat(b.costo||500).toLocaleString('es-MX',{minimumFractionDigits:2})}) — <span style="opacity:.8;">${b.resumen||''}</span></div>`).join('')
       : 'Ninguna';
   }
   // Duración, método de pago y cuenta
@@ -4115,7 +4115,7 @@ function generarContrato() {
     rfc:           c.rfc        || '',
     razon_social:  c.razonSocial || '',
     uso_cfdi:      c.usoCFDI    || '',
-    barras_extra:  (c.barrasExtraDetalle || []).map(b => `${b.tipo}|${b.resumen}`).join(';;'),
+    barras_extra:  (c.barrasExtraDetalle || []).map(b => `${b.tipo}|${b.resumen}|${b.costo||500}`).join(';;'),
     // PAQUETE + BARRA
     paquete:       c.paquete    || '',
     paquete_nombre: paqNombre,

@@ -1766,8 +1766,9 @@ function preLlenarDesdeCotizador() {
   if (barrasExtraParam) {
     const NOMBRES = {chilaquiles:'Chilaquiles', maruchan:'Maruchan', gomitas:'Gomitas Locas', cantaritos:'Cantaritos'};
     barrasExtraParam.split(';;').filter(Boolean).forEach(par => {
-      const [tipo, resumen] = par.split('|');
-      condicionesLugar.push(`Barra extra — ${NOMBRES[tipo] || tipo} (+$500): ${resumen || ''}`);
+      const [tipo, resumen, costo] = par.split('|');
+      const costoNum = parseFloat(costo) || 500;
+      condicionesLugar.push(`Barra extra — ${NOMBRES[tipo] || tipo} (+$${costoNum.toLocaleString('es-MX',{minimumFractionDigits:2})}): ${resumen || ''}`);
     });
   }
 
