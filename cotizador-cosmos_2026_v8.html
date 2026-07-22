@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bajón Lunar — Cotizador de Paquetes</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 
 <!-- ════ FIREBASE SDK ════ -->
 <script type="module">
@@ -2208,28 +2206,17 @@ body:has([onclick]:hover) .cursor-core::before {
 
           </div>
 
-          <!-- Dirección full width — mapa interactivo -->
+          <!-- Zona del evento — sin comprometer la dirección exacta todavía -->
           <div class="field full">
-            <label>Dirección del evento</label>
+            <label>¿En qué zona sería tu evento?</label>
             <div style="font-size:0.72rem;color:var(--blanco-dim);margin:-4px 0 10px;">
-              📍 Solo damos servicio dentro de <strong style="color:var(--blanco);">Ciudad de México</strong> y <strong style="color:var(--blanco);">Estado de México</strong>. Busca la dirección, arrastra el pin, o da clic en el mapa.
+              📍 Solo damos servicio dentro de Ciudad de México y Estado de México. La dirección exacta la pedimos después, ya con tu evento confirmado — por tu seguridad y privacidad.
             </div>
-
-            <div style="position:relative;margin-bottom:10px;">
-              <input type="text" id="dirBuscador" placeholder="🔎 Busca tu calle, colonia o lugar…" autocomplete="off"
-                oninput="dirBuscarInput()" style="width:100%;">
-              <div id="dirResultados" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:500;background:#12131c;border:1px solid rgba(255,255,255,.12);border-radius:10px;margin-top:6px;max-height:220px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.4);"></div>
+            <div class="toggle-opts" style="flex-wrap:wrap;">
+              <button type="button" class="toggle-btn active" data-val="Ciudad de México" onclick="setZonaEvento(this)">🏙️ Ciudad de México</button>
+              <button type="button" class="toggle-btn" data-val="México" onclick="setZonaEvento(this)">🌆 Estado de México</button>
             </div>
-
-            <div id="dirMapa" style="width:100%;height:260px;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.1);"></div>
-
-            <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap;">
-              <button type="button" class="dir-ubicacion-btn" onclick="dirUsarMiUbicacion()">📡 Usar mi ubicación actual</button>
-              <span id="dirZonaAviso" style="display:none;font-size:0.72rem;padding:6px 12px;border-radius:100px;"></span>
-            </div>
-
-            <label style="display:block;margin-top:14px;margin-bottom:6px;font-size:0.78rem;opacity:0.75;">Dirección exacta (puedes editarla si el mapa no la escribió tal cual)</label>
-            <input type="text" id="cDir" placeholder="Calle, colonia, alcaldía/municipio…">
+            <input type="hidden" id="cDir" value="">
           </div>
 
           <!-- Notas full width -->
@@ -2761,8 +2748,6 @@ function elegirPaquete(id) {
   // Mostrar configurador
   document.getElementById('cfg').style.display = 'block';
   setPaso(id === 'moonlight' ? 2 : 2);
-  // Inicializar el mapa de dirección la primera vez que el configurador es visible
-  setTimeout(initDirMapa, 150);
   // Ajustar texto del botón PDF
   const _btnPdf = document.getElementById('btn-pdf');
   if (_btnPdf) _btnPdf.innerHTML = id === 'moonlight' ? '👑 &nbsp;Generar Cotización Moonlight' : '🌙 &nbsp;Generar Cotización PDF';
@@ -3016,156 +3001,17 @@ function setVenue(btn, key) {
   }
 }
 
-// ════════ MAPA DE DIRECCIÓN (Leaflet + OpenStreetMap, sin API key) ════════
-// Zona de servicio aproximada: Ciudad de México + Estado de México
-const ZONA_SERVICIO = { latMin: 18.30, latMax: 20.30, lonMin: -100.60, lonMax: -98.60 };
-const CDMX_CENTRO = { lat: 19.4326, lon: -99.1332 };
 
-let _dirMapa = null;
-let _dirMarker = null;
-let _dirBuscarTimeout = null;
-let _dirLat = null;
+// ════════ ZONA DEL EVENTO (simple, sin mapa — la dirección exacta se pide después) ════════
+let _dirEstado = 'Ciudad de México'; // valor por defecto, coincide con el botón activo por defecto
+let _dirLat = null;   // se llenará después, cuando el cliente confirme su dirección exacta
 let _dirLon = null;
-let _dirEstado = null; // "Ciudad de México" o "México" (Estado de México), según lo que detecte Nominatim
 
-function dirEnZonaServicio(lat, lon) {
-  return lat >= ZONA_SERVICIO.latMin && lat <= ZONA_SERVICIO.latMax &&
-         lon >= ZONA_SERVICIO.lonMin && lon <= ZONA_SERVICIO.lonMax;
+function setZonaEvento(btn) {
+  btn.closest('.toggle-opts').querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  _dirEstado = btn.dataset.val;
 }
-
-function dirMostrarZonaAviso(lat, lon) {
-  const el = document.getElementById('dirZonaAviso');
-  if (!el) return;
-  const dentro = dirEnZonaServicio(lat, lon);
-  el.style.display = 'inline-block';
-  if (dentro) {
-    el.textContent = '✅ Dentro de nuestra zona de servicio';
-    el.style.background = 'rgba(34,197,94,.12)';
-    el.style.color = '#4ade80';
-    el.style.border = '1px solid rgba(34,197,94,.3)';
-  } else {
-    el.textContent = '⚠️ Fuera de CDMX / Estado de México — contáctanos antes de cotizar';
-    el.style.background = 'rgba(239,68,68,.12)';
-    el.style.color = '#f87171';
-    el.style.border = '1px solid rgba(239,68,68,.3)';
-  }
-}
-
-function initDirMapa() {
-  if (_dirMapa || typeof L === 'undefined') return; // ya inicializado, o Leaflet no cargó
-  const cont = document.getElementById('dirMapa');
-  if (!cont) return;
-
-  _dirMapa = L.map('dirMapa', { attributionControl: true }).setView([CDMX_CENTRO.lat, CDMX_CENTRO.lon], 10);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '© OpenStreetMap'
-  }).addTo(_dirMapa);
-
-  _dirMarker = L.marker([CDMX_CENTRO.lat, CDMX_CENTRO.lon], { draggable: true }).addTo(_dirMapa);
-
-  _dirMarker.on('dragend', () => {
-    const p = _dirMarker.getLatLng();
-    dirGeocodeInverso(p.lat, p.lng);
-  });
-
-  _dirMapa.on('click', (e) => {
-    _dirMarker.setLatLng(e.latlng);
-    dirGeocodeInverso(e.latlng.lat, e.latlng.lng);
-  });
-
-  // Asegurar que el mapa mida bien su contenedor (por si estaba oculto al crearse)
-  setTimeout(() => _dirMapa && _dirMapa.invalidateSize(), 200);
-}
-
-// ── Geocodificación inversa (coordenadas → dirección) usando Nominatim (OSM, gratis) ──
-async function dirGeocodeInverso(lat, lon) {
-  dirMostrarZonaAviso(lat, lon);
-  _dirLat = lat; _dirLon = lon;
-  try {
-    const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1&accept-language=es`);
-    const data = await resp.json();
-    if (data && data.display_name) {
-      document.getElementById('cDir').value = data.display_name;
-      _dirEstado = (data.address && data.address.state) || null;
-    }
-  } catch (e) {
-    console.warn('No se pudo obtener la dirección desde el mapa:', e);
-  }
-}
-
-// ── Buscador de direcciones (texto → coordenadas), sesgado a CDMX/Edomex ──
-function dirBuscarInput() {
-  clearTimeout(_dirBuscarTimeout);
-  const q = document.getElementById('dirBuscador').value.trim();
-  const resultsEl = document.getElementById('dirResultados');
-  if (q.length < 3) { resultsEl.style.display = 'none'; return; }
-  _dirBuscarTimeout = setTimeout(async () => {
-    try {
-      const viewbox = `${ZONA_SERVICIO.lonMin},${ZONA_SERVICIO.latMax},${ZONA_SERVICIO.lonMax},${ZONA_SERVICIO.latMin}`;
-      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&countrycodes=mx&viewbox=${viewbox}&bounded=0&limit=6&addressdetails=1&accept-language=es`;
-      const resp = await fetch(url);
-      const data = await resp.json();
-      if (!data || !data.length) {
-        resultsEl.innerHTML = '<div style="padding:10px 14px;opacity:0.6;font-size:0.8rem;">Sin resultados. Intenta con más detalle o escribe la dirección abajo.</div>';
-        resultsEl.style.display = 'block';
-        return;
-      }
-      resultsEl.innerHTML = data.map((r, i) => `
-        <div class="dir-result-item" data-i="${i}" style="padding:10px 14px;font-size:0.8rem;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.06);" onmouseover="this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.background='transparent'">
-          ${r.display_name}
-        </div>
-      `).join('');
-      resultsEl.style.display = 'block';
-      resultsEl.querySelectorAll('.dir-result-item').forEach((el, i) => {
-        el.onclick = () => dirSeleccionarResultado(data[i]);
-      });
-    } catch (e) {
-      console.warn('Error buscando dirección:', e);
-    }
-  }, 500); // debounce para no saturar Nominatim
-}
-
-function dirSeleccionarResultado(r) {
-  const lat = parseFloat(r.lat), lon = parseFloat(r.lon);
-  _dirLat = lat; _dirLon = lon;
-  _dirEstado = (r.address && r.address.state) || null;
-  document.getElementById('cDir').value = r.display_name;
-  document.getElementById('dirBuscador').value = '';
-  document.getElementById('dirResultados').style.display = 'none';
-  if (_dirMapa && _dirMarker) {
-    _dirMapa.setView([lat, lon], 15);
-    _dirMarker.setLatLng([lat, lon]);
-  }
-  dirMostrarZonaAviso(lat, lon);
-}
-
-function dirUsarMiUbicacion() {
-  if (!navigator.geolocation) {
-    toast && toast('Tu navegador no permite obtener tu ubicación', 'var(--rojo)');
-    return;
-  }
-  navigator.geolocation.getCurrentPosition((pos) => {
-    const { latitude, longitude } = pos.coords;
-    if (_dirMapa && _dirMarker) {
-      _dirMapa.setView([latitude, longitude], 16);
-      _dirMarker.setLatLng([latitude, longitude]);
-    }
-    dirGeocodeInverso(latitude, longitude);
-  }, (err) => {
-    console.warn('Geolocalización falló:', err);
-    if (typeof toast === 'function') toast('No se pudo obtener tu ubicación. Búscala o escríbela manualmente.', 'var(--rojo)');
-  }, { timeout: 8000 });
-}
-
-// Cerrar resultados de búsqueda al hacer clic fuera
-document.addEventListener('click', (e) => {
-  const box = document.getElementById('dirResultados');
-  const input = document.getElementById('dirBuscador');
-  if (box && input && !box.contains(e.target) && e.target !== input) {
-    box.style.display = 'none';
-  }
-});
 
 // ════════ FACTURACIÓN ════════
 function toggleFacturaCampos() {
@@ -4747,17 +4593,11 @@ function nuevaCot() {
   document.getElementById('cEmail').value = '';
   document.getElementById('cTipo').value = '';
   document.getElementById('cDir').value = '';
-  const dirBuscadorEl = document.getElementById('dirBuscador');
-  if (dirBuscadorEl) dirBuscadorEl.value = '';
-  const dirResultadosEl = document.getElementById('dirResultados');
-  if (dirResultadosEl) dirResultadosEl.style.display = 'none';
-  const dirZonaEl = document.getElementById('dirZonaAviso');
-  if (dirZonaEl) dirZonaEl.style.display = 'none';
-  if (_dirMapa && _dirMarker) {
-    _dirMapa.setView([CDMX_CENTRO.lat, CDMX_CENTRO.lon], 10);
-    _dirMarker.setLatLng([CDMX_CENTRO.lat, CDMX_CENTRO.lon]);
-  }
-  _dirLat = null; _dirLon = null; _dirEstado = null;
+  // Resetear zona del evento al valor por defecto (Ciudad de México)
+  _dirLat = null; _dirLon = null; _dirEstado = 'Ciudad de México';
+  document.querySelectorAll('#cfg .toggle-opts .toggle-btn[data-val="Ciudad de México"], #cfg .toggle-opts .toggle-btn[data-val="México"]').forEach(b => {
+    b.classList.toggle('active', b.dataset.val === 'Ciudad de México');
+  });
   document.getElementById('cNotas').value = '';
   document.getElementById('fecha-dia').value = '';
   document.getElementById('fecha-mes').value = '';

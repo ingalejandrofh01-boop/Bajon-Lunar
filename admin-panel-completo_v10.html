@@ -1277,6 +1277,32 @@ window._iniciarListenersFirestore = function() {
     window._fbResenas = snap.docs.map(d => ({ _docId: d.id, ...d.data() }));
     if (typeof actualizarFbMonitor === 'function') actualizarFbMonitor();
   }, (err) => console.error('Error en snapshot de reseñas:', err));
+
+  // ── Escucha confirmaciones de dirección exacta (llenadas por el cliente
+  // después de que ya se confirmó el anticipo) y las incorpora sola a la
+  // cotización correspondiente por folio. ──
+  const dirConfQuery = collection(db, 'direccion_confirmacion');
+  window._unsubDirConf = onSnapshot(dirConfQuery, (snap) => {
+    snap.docs.forEach(async (d) => {
+      const data = d.data();
+      if (data.procesado) return; // ya se incorporó antes, no repetir
+      const cot = (window.cotizaciones || []).find(c => c.folio === data.folio);
+      if (!cot || !cot._docId) return; // aún no llega la cotización o no tiene folio
+      try {
+        await updateDoc(doc(db, 'cotizaciones', cot._docId), {
+          dir: data.dir || '',
+          dirLat: data.dirLat || null,
+          dirLon: data.dirLon || null,
+          dirMapsUrl: data.dirMapsUrl || '',
+          estadoUbicacion: data.estadoUbicacion || cot.estadoUbicacion || '',
+        });
+        await updateDoc(doc(db, 'direccion_confirmacion', d.id), { procesado: true });
+        if (typeof toast === 'function') toast(`📍 Dirección confirmada recibida — folio ${data.folio}`, 'var(--verde)');
+      } catch (e) {
+        console.warn('No se pudo incorporar la dirección confirmada:', e);
+      }
+    });
+  }, (err) => console.error('Error en snapshot de direccion_confirmacion:', err));
 };
 
 console.log('🔥 Firebase Firestore conectado — Bajón Lunar Admin');
@@ -3896,6 +3922,7 @@ function enviarWAAnticipo(c, monto, pct) {
   const num = (c.tel || '').replace(/\D/g,'');
   const saldo = Math.max(0, parseFloat(c.total||0) - monto);
   const fechaEvento = c.fecha ? new Date(c.fecha+'T12:00').toLocaleDateString('es-MX',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}) : '(sin fecha)';
+  const linkDireccion = `https://ingalejandrofh01-boop.github.io/Bajon-Lunar/confirmar-direccion.html?folio=${encodeURIComponent(c.folio)}`;
   const msg = encodeURIComponent(
     `¡Hola ${c.nombre}! 🌙\n\n` +
     `Confirmamos que recibimos tu anticipo del *${pct}%* — *${_fmtMXN(monto)}* para tu evento.\n\n` +
@@ -3903,6 +3930,7 @@ function enviarWAAnticipo(c, monto, pct) {
     `📅 Fecha: ${fechaEvento}\n` +
     `💰 Total: ${_fmtMXN(parseFloat(c.total||0))}\n` +
     `🟡 Saldo a liquidar el día del evento: *${_fmtMXN(saldo)}*\n\n` +
+    `📍 Ya para terminar de coordinar, entra a este link y confirma la dirección exacta de tu evento:\n${linkDireccion}\n\n` +
     `¡Tu fecha está apartada! Cualquier duda estamos aquí. 🙌`
   );
   window.open(`https://wa.me/52${num}?text=${msg}`, '_blank');
