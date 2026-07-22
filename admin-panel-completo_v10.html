@@ -1696,6 +1696,29 @@ console.log('🔥 Firebase Firestore conectado — Bajón Lunar Admin');
             <button class="ftab" style="color:var(--rojo);border-color:rgba(239,68,68,0.3);" onclick="logout()">Salir</button>
           </div>
         </div>
+
+        <div class="config-section">
+          <div class="config-title">CÓDIGOS PROMOCIONALES</div>
+          <div class="config-row" style="flex-direction:column;align-items:stretch;gap:10px;">
+            <div class="config-sub">Genera un código para familia, amigos, o promociones puntuales. Cada uno se puede usar solo las veces que definas aquí.</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div>
+                <label style="display:block;font-size:.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--dim);margin-bottom:6px;">Descuento (%)</label>
+                <input type="number" id="promo-descuento" min="1" max="100" value="15" style="width:100%;">
+              </div>
+              <div>
+                <label style="display:block;font-size:.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--dim);margin-bottom:6px;">Usos permitidos</label>
+                <input type="number" id="promo-usos" min="1" value="1" style="width:100%;">
+              </div>
+            </div>
+            <button class="ftab" style="width:100%;justify-content:center;" onclick="generarCodigoPromo()">✨ Generar código</button>
+            <div id="promo-generado" style="display:none;padding:12px;border-radius:10px;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.3);text-align:center;">
+              <div style="font-size:1.2rem;font-weight:800;letter-spacing:2px;color:var(--verde);" id="promo-generado-codigo">—</div>
+              <div style="font-size:.72rem;color:var(--dim);margin-top:4px;">Compártelo directo con la persona — se aplica en el cotizador.</div>
+            </div>
+            <div id="promo-lista" style="margin-top:6px;max-height:240px;overflow-y:auto;"></div>
+          </div>
+        </div>
         <div class="config-section">
           <div class="config-title">NOTIFICACIONES</div>
           <div class="config-row">
@@ -4248,6 +4271,93 @@ async function limpiarCanceladas() {
   }
 }
 
+// ════ CÓDIGOS PROMOCIONALES ════
+function _generarCodigoAleatorio() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // sin caracteres confusos (0/O, 1/I)
+  let suf = '';
+  for (let i = 0; i < 5; i++) suf += chars[Math.floor(Math.random() * chars.length)];
+  return `BL-${suf}`;
+}
+
+async function generarCodigoPromo() {
+  const descEl = document.getElementById('promo-descuento');
+  const usosEl = document.getElementById('promo-usos');
+  const descuentoPct = Math.max(1, Math.min(100, parseInt(descEl.value) || 15));
+  const usosMax = Math.max(1, parseInt(usosEl.value) || 1);
+
+  try {
+    let codigo = _generarCodigoAleatorio();
+    // Asegurar que no choque con uno ya existente (muy improbable, pero por si acaso)
+    let intento = 0;
+    while (intento < 5) {
+      const existente = await window._fbGetDoc(window._fbDoc(window._db, 'promo_codes', codigo));
+      if (!existente.exists()) break;
+      codigo = _generarCodigoAleatorio();
+      intento++;
+    }
+
+    await window._fbSetDoc(window._fbDoc(window._db, 'promo_codes', codigo), {
+      codigo,
+      descuentoPct,
+      usosMax,
+      usosActuales: 0,
+      activo: true,
+      creadoEn: new Date().toISOString(),
+      creadoPor: (usuarioActual && usuarioActual.username) || '',
+    });
+
+    const box = document.getElementById('promo-generado');
+    document.getElementById('promo-generado-codigo').textContent = codigo;
+    box.style.display = 'block';
+    toast(`✅ Código ${codigo} creado (${descuentoPct}%, ${usosMax} uso${usosMax>1?'s':''})`, 'var(--verde)');
+    renderListaPromos();
+  } catch (e) {
+    console.error('Error generando código promocional:', e);
+    toast('❌ No se pudo generar el código', 'var(--rojo)');
+  }
+}
+
+async function renderListaPromos() {
+  const cont = document.getElementById('promo-lista');
+  if (!cont) return;
+  cont.innerHTML = '<div style="padding:10px;opacity:0.6;font-size:0.78rem;">Cargando códigos...</div>';
+  try {
+    const snap = await window._fbGetDocs(window._fbCollection(window._db, 'promo_codes'));
+    const codigos = snap.docs.map(d => d.data()).sort((a, b) => (b.creadoEn || '').localeCompare(a.creadoEn || ''));
+    if (!codigos.length) {
+      cont.innerHTML = '<div style="padding:10px;opacity:0.6;font-size:0.78rem;">Aún no has generado ningún código.</div>';
+      return;
+    }
+    cont.innerHTML = codigos.map(c => {
+      const agotado = !c.activo || (c.usosActuales || 0) >= (c.usosMax || 1);
+      return `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--borde);font-size:.8rem;">
+          <div>
+            <div style="font-weight:700;letter-spacing:1px;">${c.codigo}</div>
+            <div style="font-size:.68rem;color:var(--dim);">${c.descuentoPct}% de descuento · ${c.usosActuales || 0}/${c.usosMax || 1} usado(s)</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:.68rem;padding:3px 10px;border-radius:100px;${agotado ? 'background:rgba(239,68,68,.12);color:var(--rojo);' : 'background:rgba(74,222,128,.12);color:var(--verde);'}">${agotado ? 'Agotado' : 'Activo'}</span>
+            ${!agotado ? `<button class="ftab" style="color:var(--rojo);border-color:rgba(239,68,68,0.3);padding:4px 10px;font-size:.68rem;" onclick="desactivarPromo('${c.codigo}')">Desactivar</button>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (e) {
+    cont.innerHTML = '<div style="padding:10px;color:var(--rojo);font-size:0.78rem;">Error al cargar los códigos.</div>';
+  }
+}
+
+async function desactivarPromo(codigo) {
+  try {
+    await window._fbSetDoc(window._fbDoc(window._db, 'promo_codes', codigo), { activo: false }, { merge: true });
+    toast(`Código ${codigo} desactivado`, 'var(--amarillo)');
+    renderListaPromos();
+  } catch (e) {
+    toast('❌ Error al desactivar el código', 'var(--rojo)');
+  }
+}
+
 async function abrirModalAccesos() {
   document.getElementById('modal-pwd').classList.add('show');
   document.getElementById('acc-nuevo-email').value = '';
@@ -4355,6 +4465,7 @@ function showPage(name, btn) {
   if(name==='desempeno') renderDesempeno();
   if(name==='basedatos') renderBaseDatos();
   if(name==='firebase') actualizarFbMonitor();
+  if(name==='config') renderListaPromos();
   // Close sidebar on tablet after nav
   if (window.innerWidth < 1024) closeSidebar();
   // Sync bottom nav active state

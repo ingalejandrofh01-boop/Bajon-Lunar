@@ -1747,6 +1747,20 @@ body:has([onclick]:hover) .cursor-core::before {
           </div>
         </div>
 
+        <!-- BARRA(S) ADICIONAL(ES) -->
+        <div style="margin-top:18px;padding:16px;border-radius:12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.08);">
+          <div style="font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--blanco-dim);font-weight:600;margin-bottom:10px;">
+            ➕ ¿Quieres agregar otra barra? <span style="opacity:.6;font-weight:400;text-transform:none;letter-spacing:0;">+$500 c/u</span>
+          </div>
+          <div class="chips-row" id="extras-barra-row" style="flex-wrap:wrap;gap:10px;">
+            <label class="chip" data-barra="chilaquiles" onclick="toggleBarraExtra(this,'chilaquiles')"><input type="checkbox" style="display:none;"> 🌮 Chilaquiles</label>
+            <label class="chip" data-barra="maruchan" onclick="toggleBarraExtra(this,'maruchan')"><input type="checkbox" style="display:none;"> 🍜 Maruchan</label>
+            <label class="chip" data-barra="gomitas" onclick="toggleBarraExtra(this,'gomitas')"><input type="checkbox" style="display:none;"> 🍬 Gomitas Locas</label>
+            <label class="chip" data-barra="cantaritos" onclick="toggleBarraExtra(this,'cantaritos')"><input type="checkbox" style="display:none;"> 🍊 Cantaritos</label>
+          </div>
+          <div style="font-size:.68rem;color:var(--blanco-dim);margin-top:8px;">La barra que ya elegiste arriba no aparece aquí — solo puedes agregar las otras.</div>
+        </div>
+
         <!-- OPCIONES DINÁMICAS DE BARRA -->
         <!-- Chilaquiles options -->
         <div class="barra-opts" id="opts-chilaquiles">
@@ -2398,6 +2412,20 @@ body:has([onclick]:hover) .cursor-core::before {
           <span class="res-label">Traslado (estimado)</span>
           <span class="res-val" id="res-traslado">$200.00</span>
         </div>
+
+        <!-- Código promocional -->
+        <div style="padding:12px 0;border-top:1px dashed rgba(255,255,255,.1);margin-top:6px;">
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="cPromo" placeholder="¿Tienes un código promocional?" style="flex:1;text-transform:uppercase;font-size:.8rem;padding:9px 12px;">
+            <button type="button" onclick="aplicarPromo()" style="padding:9px 16px;border-radius:8px;border:1px solid rgba(26,59,255,.4);background:rgba(26,59,255,.1);color:var(--azul);font-size:.78rem;white-space:nowrap;cursor:pointer;">Aplicar</button>
+          </div>
+          <div id="promo-msg" style="font-size:.72rem;margin-top:6px;display:none;"></div>
+        </div>
+        <div class="res-row" id="res-promo-row" style="display:none;">
+          <span class="res-label" id="res-promo-label">🎟️ Código promocional</span>
+          <span class="res-val" id="res-promo-val" style="color:var(--verde);">—</span>
+        </div>
+
         <div class="res-row total">
           <span class="res-label">TOTAL ESTIMADO</span>
           <span class="res-val" id="res-total">—</span>
@@ -2540,6 +2568,7 @@ const PAQ = {
 // ══ ESTADO ══
 let paqActivo = null;
 let barraActiva = 'chilaquiles';
+let extrasBarras = []; // barras adicionales elegidas (+$500 c/u), aparte de la barraActiva
 let nivelActivo = [];
 let vitIncluido = true;
 let vitCantidad = 1;
@@ -2750,6 +2779,7 @@ function elegirPaquete(id) {
   const porWrap = document.getElementById('porciones-wrap');
   if (porWrap) porWrap.style.display = barraActiva === 'cantaritos' ? 'none' : '';
   actualizarMlCortesiaWrap();
+  actualizarExtrasBarraDisponibles();
   calcularTotal();
   setTimeout(() => {
     document.getElementById('cfg').scrollIntoView({ behavior:'smooth', block:'start' });
@@ -2851,7 +2881,40 @@ function elegirBarra(tipo) {
   const porWrap = document.getElementById('porciones-wrap');
   if (porWrap) porWrap.style.display = tipo === 'cantaritos' ? 'none' : '';
   actualizarMlCortesiaWrap();
+  actualizarExtrasBarraDisponibles();
   setPaso(3);
+  calcularTotal();
+}
+
+// ════════ BARRA(S) ADICIONAL(ES) — +$500 c/u ════════
+const PRECIO_BARRA_EXTRA = 500;
+
+function actualizarExtrasBarraDisponibles() {
+  // La barra ya elegida como principal no puede agregarse también como "extra"
+  const row = document.getElementById('extras-barra-row');
+  if (!row) return;
+  row.querySelectorAll('.chip').forEach(chip => {
+    const tipo = chip.dataset.barra;
+    if (tipo === barraActiva) {
+      chip.style.display = 'none';
+      // Si estaba seleccionada como extra y ahora es la principal, se quita de extras
+      const idx = extrasBarras.indexOf(tipo);
+      if (idx > -1) { extrasBarras.splice(idx, 1); chip.classList.remove('active'); }
+    } else {
+      chip.style.display = '';
+    }
+  });
+}
+
+function toggleBarraExtra(chip, tipo) {
+  const idx = extrasBarras.indexOf(tipo);
+  if (idx > -1) {
+    extrasBarras.splice(idx, 1);
+    chip.classList.remove('active');
+  } else {
+    extrasBarras.push(tipo);
+    chip.classList.add('active');
+  }
   calcularTotal();
 }
 
@@ -3665,6 +3728,7 @@ function getPrecioPorcionBarra(barra) {
 
 // ════════ CÁLCULO TOTAL ════════
 const TRASLADO = 200;
+let promoAplicado = null; // { codigo, descPct } cuando hay un código válido aplicado
 function calcularTotal() {
   if (!paqActivo) return;
   const def = PAQ[paqActivo];
@@ -3708,9 +3772,44 @@ function calcularTotal() {
 
   const subtotal = precioPaq + costoProteina + costoCantaritos;
   const descuento = subtotal * descPct;
-  const total = subtotal - descuento + TRASLADO;
+  const costoExtrasBarras = extrasBarras.length * PRECIO_BARRA_EXTRA;
+  const baseConExtras = subtotal - descuento + costoExtrasBarras;
+  const promoDescPct = promoAplicado ? promoAplicado.descPct : 0;
+  const promoDescuento = baseConExtras * promoDescPct;
+  const total = baseConExtras - promoDescuento + TRASLADO;
   const anticipo = total * 0.5;
   const saldo = total * 0.5;
+
+  // Mostrar/ocultar fila de código promocional
+  const resPromoRow = document.getElementById('res-promo-row');
+  if (resPromoRow) {
+    if (promoAplicado && promoDescuento > 0) {
+      resPromoRow.style.display = '';
+      document.getElementById('res-promo-label').textContent = `🎟️ Código ${promoAplicado.codigo} (${(promoDescPct*100).toFixed(0)}%)`;
+      document.getElementById('res-promo-val').textContent = '−$' + promoDescuento.toLocaleString('es-MX', {minimumFractionDigits:2});
+    } else {
+      resPromoRow.style.display = 'none';
+    }
+  }
+
+  // Mostrar/ocultar fila de barra(s) adicional(es)
+  let resExtrasRow = document.getElementById('res-extras-barra-row');
+  if (costoExtrasBarras > 0) {
+    if (!resExtrasRow) {
+      const trasladoRow = document.getElementById('res-traslado').closest('.res-row');
+      resExtrasRow = document.createElement('div');
+      resExtrasRow.className = 'res-row';
+      resExtrasRow.id = 'res-extras-barra-row';
+      resExtrasRow.innerHTML = '<span class="res-label" id="res-extras-barra-label">➕ Barra(s) extra</span><span class="res-val" id="res-extras-barra-val">—</span>';
+      trasladoRow.parentNode.insertBefore(resExtrasRow, trasladoRow);
+    }
+    const NOMBRES_BARRA = {chilaquiles:'Chilaquiles', maruchan:'Maruchan', gomitas:'Gomitas Locas', cantaritos:'Cantaritos'};
+    resExtrasRow.style.display = '';
+    document.getElementById('res-extras-barra-label').textContent = `➕ Barra extra: ${extrasBarras.map(b => NOMBRES_BARRA[b]).join(', ')}`;
+    document.getElementById('res-extras-barra-val').textContent = '+$' + costoExtrasBarras.toLocaleString('es-MX', {minimumFractionDigits:2});
+  } else if (resExtrasRow) {
+    resExtrasRow.style.display = 'none';
+  }
 
   // Mostrar/ocultar fila de descuento
   let resDescRow = document.getElementById('res-descuento-row');
@@ -3822,7 +3921,7 @@ function calcularTotal() {
   document.getElementById('res-saldo').textContent = '$' + saldo.toLocaleString('es-MX', {minimumFractionDigits:2});
 
   setPaso(4);
-  return { total, anticipo, saldo, precioPaq, personas, porciones, totalPorciones, costoProteina, proteinaLabel, proteCantidad, descuento, descPct };
+  return { total, anticipo, saldo, precioPaq, personas, porciones, totalPorciones, costoProteina, proteinaLabel, proteCantidad, descuento, descPct, costoExtrasBarras, promoDescuento, promoCodigo: promoAplicado ? promoAplicado.codigo : '' };
 }
 
 // ════════ FECHA: POBLAR AÑOS ════════
@@ -4019,6 +4118,73 @@ async function crearRastreoPublico(data) {
     });
   } catch(e) {
     console.warn('No se pudo crear el registro de rastreo (no es crítico):', e);
+  }
+}
+
+// ════════ CÓDIGO PROMOCIONAL ════════
+function mostrarPromoMsg(texto, color) {
+  const el = document.getElementById('promo-msg');
+  if (!el) return;
+  el.textContent = texto;
+  el.style.color = color;
+  el.style.display = 'block';
+}
+
+async function aplicarPromo() {
+  const input = document.getElementById('cPromo');
+  const codigo = (input.value || '').trim().toUpperCase();
+  if (!codigo) { mostrarPromoMsg('Escribe un código para aplicarlo', 'var(--rojo)'); return; }
+  if (!window._db) { mostrarPromoMsg('No hay conexión en este momento, intenta de nuevo', 'var(--rojo)'); return; }
+
+  try {
+    const ref = window._fbDoc(window._db, 'promo_codes', codigo);
+    const snap = await window._fbGetDoc(ref);
+    if (!snap.exists()) {
+      mostrarPromoMsg('❌ Ese código no existe o ya no es válido', 'var(--rojo)');
+      promoAplicado = null;
+      calcularTotal();
+      return;
+    }
+    const data = snap.data();
+    const usos = data.usosActuales || 0;
+    const usosMax = data.usosMax || 1;
+    if (!data.activo || usos >= usosMax) {
+      mostrarPromoMsg('❌ Ese código ya llegó a su límite de usos', 'var(--rojo)');
+      promoAplicado = null;
+      calcularTotal();
+      return;
+    }
+    if (data.expira && new Date(data.expira) < new Date()) {
+      mostrarPromoMsg('❌ Ese código ya expiró', 'var(--rojo)');
+      promoAplicado = null;
+      calcularTotal();
+      return;
+    }
+    promoAplicado = { codigo, descPct: (data.descuentoPct || 0) / 100 };
+    mostrarPromoMsg(`✅ Código aplicado — ${data.descuentoPct}% de descuento`, 'var(--verde)');
+    calcularTotal();
+  } catch(e) {
+    console.warn('Error validando código promocional:', e);
+    mostrarPromoMsg('❌ No se pudo validar el código, intenta de nuevo', 'var(--rojo)');
+  }
+}
+
+// Marca el código como usado una vez que la cotización ya se guardó (best-effort)
+async function marcarPromoUsado(codigo) {
+  try {
+    if (!window._db || !codigo) return;
+    const ref = window._fbDoc(window._db, 'promo_codes', codigo);
+    const snap = await window._fbGetDoc(ref);
+    if (!snap.exists()) return;
+    const data = snap.data();
+    const nuevosUsos = (data.usosActuales || 0) + 1;
+    const usosMax = data.usosMax || 1;
+    await window._fbSetDoc(ref, {
+      usosActuales: nuevosUsos,
+      activo: nuevosUsos < usosMax, // se autodesactiva al llegar al límite
+    }, { merge: true });
+  } catch(e) {
+    console.warn('No se pudo registrar el uso del código promocional:', e);
   }
 }
 
@@ -4247,6 +4413,7 @@ async function generarPDF() {
   bloque('SERVICIO CONTRATADO', [
     ['Paquete:', def.nombre],
     ['Tipo de barra:', barraTexto],
+    ['Barra(s) extra (+$500 c/u):', extrasBarras.length ? extrasBarras.map(b => ({chilaquiles:'Chilaquiles',maruchan:'Maruchan',gomitas:'Gomitas Locas',cantaritos:'Cantaritos'}[b])).join(', ') : 'Ninguna'],
     ['Proteína:', barraActiva === 'chilaquiles' && proteinaLabel2 ? `${proteinaLabel2} (+$${datos.costoProteina.toLocaleString('es-MX')})` : 'Sin proteína'],
     ['Nivel de bajón:', nivelTexto],
     ...(barraActiva === 'maruchan' ? [
@@ -4491,6 +4658,8 @@ async function generarPDF() {
     paqueteNombre: def.nombre,
     barra: barraActiva,
     barraTexto: {chilaquiles:'Barra de Chilaquiles',maruchan:'Barra de Maruchan',gomitas:'Gomitas Locas',cantaritos:'Cantaritos'}[barraActiva]||barraActiva,
+    extrasBarras: extrasBarras.slice(),
+    costoExtrasBarras: datos.costoExtrasBarras || 0,
     // DETALLES DE BARRA
     nivel: nivelTextoSave,
     porciones: porcionesSave,
@@ -4521,11 +4690,16 @@ async function generarPDF() {
     total: datos.total.toFixed(2),
     descuento: descuentoSave,
     descPct: descPctSave,
+    promoCodigo: promoAplicado ? promoAplicado.codigo : '',
+    promoDescuento: (datos.promoDescuento || 0).toFixed(2),
     anticipo: anticipoObj,
     saldo: datos.saldo.toFixed(2),
     // LEGACY (compatibilidad)
     _anticipo_monto: datos.anticipo.toFixed(2),
   });
+
+  // Marcar el código promocional como usado (si se aplicó uno)
+  if (promoAplicado) marcarPromoUsado(promoAplicado.codigo);
 
   // Restaurar botón
   if (btnPdf) { btnPdf.innerHTML = paqActivo === 'moonlight' ? '🔄 &nbsp;Regenerar Moonlight' : '🔄 &nbsp;Regenerar Cotización'; btnPdf.disabled = false; }
@@ -4536,6 +4710,13 @@ function nuevaCot() {
   cambiarPaquete();
   barraActiva = 'chilaquiles';
   nivelActivo = [];
+  // Reset barra(s) extra
+  extrasBarras = [];
+  document.querySelectorAll('#extras-barra-row .chip').forEach(chip => chip.classList.remove('active'));
+  // Reset código promocional
+  promoAplicado = null;
+  const cPromoEl = document.getElementById('cPromo'); if (cPromoEl) cPromoEl.value = '';
+  const promoMsgEl = document.getElementById('promo-msg'); if (promoMsgEl) promoMsgEl.style.display = 'none';
   // Reset facturación y aceptación legal
   const cFactura = document.getElementById('cRequiereFactura');
   if (cFactura) { cFactura.checked = false; toggleFacturaCampos(); }
