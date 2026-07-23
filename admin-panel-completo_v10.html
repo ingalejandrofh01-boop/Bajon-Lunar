@@ -2267,6 +2267,7 @@ console.log('🔥 Firebase Firestore conectado — Bajón Lunar Admin');
             <div style="font-size:0.68rem;color:#86efac;margin-top:2px;letter-spacing:0.5px;">Pago completo — sin saldo pendiente</div>
           </div>
           <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+            <button id="ant-btn-confirmar" onclick="ant_confirmarRapido()" style="display:none;background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.35);border-radius:7px;color:#4ade80;font-family:'Bebas Neue',sans-serif;font-size:0.7rem;letter-spacing:2px;padding:5px 14px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(74,222,128,0.25)'" onmouseout="this.style.background='rgba(74,222,128,0.12)'">✅ CONFIRMAR RECIBIDO</button>
             <button onclick="ant_editarModo()" style="background:transparent;border:1px solid var(--borde2);border-radius:7px;color:var(--dim);font-size:0.7rem;padding:5px 14px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--azul)';this.style.color='var(--plasma)'" onmouseout="this.style.borderColor='var(--borde2)';this.style.color='var(--dim)'">✏️ Editar anticipo</button>
             <button id="ant-btn-saldar" onclick="ant_saldar()" style="display:none;background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.35);border-radius:7px;color:#4ade80;font-family:'Bebas Neue',sans-serif;font-size:0.7rem;letter-spacing:2px;padding:5px 14px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(74,222,128,0.25)'" onmouseout="this.style.background='rgba(74,222,128,0.12)'">💰 SALDAR TOTAL</button>
           </div>
@@ -3644,6 +3645,38 @@ window.ant_actualizarPreview = function() {
   }
 };
 
+// ── Confirmar el anticipo ya registrado en un solo clic (sin entrar a editar) ──
+window.ant_confirmarRapido = function() {
+  if (!cotActual) return;
+  const idx = cotizaciones.indexOf(cotActual);
+  const antData = {
+    ...(cotActual.anticipo || {}),
+    recibido: true,
+    fecha: cotActual.anticipo?.fecha || new Date().toISOString().slice(0,10),
+  };
+  cotizaciones[idx].anticipo = antData;
+  cotActual.anticipo = antData;
+
+  if (cotizaciones[idx].estado === 'pendiente') {
+    cotizaciones[idx].estado = 'confirmado';
+    cotActual.estado = 'confirmado';
+  }
+
+  _fbGuardarCot(cotizaciones[idx]);
+  guardarCotizaciones();
+  cargarAnticipoEnModal(cotActual);
+  toast(`✅ Anticipo confirmado como recibido`, 'var(--verde)');
+
+  const monto = parseFloat(antData.monto || 0);
+  const total = parseFloat(cotActual.total || 0);
+  const pct = total > 0 ? Math.round((monto / total) * 100) : 0;
+  setTimeout(() => enviarWAAnticipo(cotActual, monto, pct), 400);
+
+  const estadoLabels = {pendiente:'⏳ Pendiente',confirmado:'✅ Confirmado',contrato_generado:'📄 Contrato generado',cancelado:'❌ Cancelado'};
+  const mdEstado = document.getElementById('md-estado');
+  if (mdEstado) mdEstado.textContent = estadoLabels[cotActual.estado] || cotActual.estado;
+};
+
 // ── Guardar anticipo (con validación) ──
 window.ant_guardar = function() {
   if (!cotActual) return;
@@ -3759,9 +3792,11 @@ function cargarAnticipoEnModal(c) {
     document.getElementById('ant-barra-pct').textContent    = barPct + '% pagado';
     document.getElementById('ant-barra-total').textContent  = 'de ' + _fmtMXN(total);
 
-    // Mostrar/ocultar botón Saldar y banner liquidado
+    // Mostrar/ocultar botón Saldar, botón Confirmar rápido, y banner liquidado
     const btnSaldar = document.getElementById('ant-btn-saldar');
+    const btnConfirmar = document.getElementById('ant-btn-confirmar');
     const bannerLiq = document.getElementById('ant-liquidado-banner');
+    if (btnConfirmar) btnConfirmar.style.display = (!ant.recibido && saldo > 0) ? 'inline-flex' : 'none';
     if (saldo <= 0) {
       if (btnSaldar) btnSaldar.style.display = 'none';
       if (bannerLiq) bannerLiq.style.display = 'block';
