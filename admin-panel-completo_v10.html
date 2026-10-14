@@ -1215,7 +1215,7 @@ if (_messaging) {
     }
     // Native notification fallback when app is open
     if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-      try { new Notification(title, { body, tag: payload.data?.folio || 'fcm', icon: '/icon-192.png' }); } catch(e){}
+      try { new Notification(title, { body, tag: payload.data?.folio || 'fcm', icon: 'icon-192.png' }); } catch(e){}
     }
     // Toast
     if (typeof toast === 'function') toast('🔔 ' + title + (body ? ': ' + body : ''), 'var(--azul)');

@@ -875,174 +875,299 @@ section {
   .galeria-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
   .galeria-section { padding: 60px 20px 80px; }
 }
-.paq-card {
-  position: relative;
-  background: var(--gris);
-  border: 1px solid var(--borde);
-  border-radius: 4px;
-  padding: 36px 28px 28px;
-  overflow: hidden;
-  transition: border-color 0.3s ease, transform 0.3s ease;
-  display: flex;
-  flex-direction: column;
+
+/* ══ PAQUETES — SINCRONIZADO CON EL COTIZADOR ══
+   Estilos, tarjetas, barras y precios copiados 1:1 de cotizador-cosmos_2026_v8.html.
+   Si cambias precios en el cotizador (PAQ / BARRA_PRECIOS / CANT_MIN), cámbialos también
+   en el bloque de JavaScript "BL_PAQ_SYNC" de esta página. */
+.cz-sync{
+  --blanco-dim:#A0A0C0; --gold:#C8A96E; --verde:#4ade80; --gris-borde:#252538;
+  --r-sm:10px; --negro:#07070E;
+  max-width:980px;margin:0 auto;text-align:left;
 }
-.paq-card:hover {
-  border-color: rgba(26,59,255,0.35);
-  transform: translateY(-6px);
+.cz-sync .sec-title{font-family:'Bebas Neue',sans-serif;letter-spacing:4px;font-size:1rem;color:var(--azul);
+  text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.cz-sync .sec-title::after{content:'';flex:1;height:1px;background:var(--gris-borde);}
+.cz-sync .paq-card,.cz-sync .barra-card{cursor:none;}
+@media (hover:none){.cz-sync .paq-card,.cz-sync .barra-card{cursor:pointer;}}
+/* ════════ PAQUETES GRID ════════ */
+.cz-sync .paq-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:20px;
+  margin-bottom:10px;
+  perspective:1200px;
 }
-.paq-card-featured {
-  border-color: rgba(200, 169, 110, 0.3);
-  background: linear-gradient(160deg, rgba(200,169,110,0.06) 0%, var(--gris) 50%);
+@media(max-width:900px){
+.cz-sync .cz-barra-grid{grid-template-columns:1fr 1fr !important;}}
+@media(max-width:480px){
+.cz-sync .cz-barra-grid{grid-template-columns:1fr !important;}}
+@media(max-width:480px){
+.cz-sync .paq-grid{grid-template-columns:1fr;}}
+
+/* ── CARD BASE ── */
+.cz-sync .paq-card{
+  position:relative;overflow:hidden;
+  border-radius:24px;
+  padding:0;
+  cursor:pointer;
+  transition:transform .45s cubic-bezier(.22,1,.36,1), box-shadow .45s ease;
+  color:var(--blanco);
+  font-family:'DM Sans',sans-serif;
+  min-height:400px;
+  display:flex;flex-direction:column;
+  border:1px solid rgba(26,59,255,.15);
+  background:var(--negro);
+  transform-style:preserve-3d;
 }
-.paq-card-featured:hover {
-  border-color: rgba(200,169,110,0.6);
+
+/* Base atmosphere layer */
+.cz-sync .paq-card::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%,rgba(26,59,255,.22) 0%,transparent 70%),
+    linear-gradient(180deg,rgba(7,7,14,0) 40%,rgba(7,7,14,.97) 100%);
+  z-index:1;transition:opacity .4s;pointer-events:none;
 }
-.paq-glow {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--azul), transparent);
-  opacity: 0.5;
+.cz-sync .paq-card.gold::before{
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%,rgba(200,169,110,.28) 0%,transparent 70%),
+    linear-gradient(180deg,rgba(7,7,14,0) 40%,rgba(7,7,14,.97) 100%);
 }
-.paq-glow-featured {
-  background: linear-gradient(90deg, transparent, #C8A96E, transparent);
-  opacity: 0.8;
+
+/* Animated border glow */
+.cz-sync .paq-card::after{
+  content:'';position:absolute;inset:-1px;border-radius:25px;
+  background:linear-gradient(135deg,rgba(26,59,255,.5),rgba(96,207,255,.2),rgba(26,59,255,.1),rgba(26,59,255,.4));
+  z-index:0;opacity:0;transition:opacity .4s;pointer-events:none !important;
 }
-.paq-featured-ribbon {
-  position: absolute;
-  top: 16px; right: -28px;
-  background: #C8A96E;
-  color: #050508;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  padding: 5px 36px;
-  transform: rotate(45deg);
-  font-family: 'DM Sans', sans-serif;
+.cz-sync .paq-card.gold::after{
+  background:linear-gradient(135deg,rgba(200,169,110,.6),rgba(255,223,100,.2),rgba(200,169,110,.1),rgba(200,169,110,.5));
 }
-.paq-num {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 11px;
-  letter-spacing: 4px;
-  color: var(--azul);
-  opacity: 1;
-  margin-bottom: 12px;
+.cz-sync .paq-card:hover::after{opacity:1;}
+.cz-sync .paq-card.sel::after{opacity:1;}
+
+/* Outer mask so ::after doesn't bleed out */
+.cz-sync .paq-card-mask{
+  position:absolute;inset:1px;border-radius:23px;
+  background:var(--negro);z-index:0;pointer-events:none;
 }
-.paq-badge {
-  display: inline-block;
-  font-size: 10px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--azul);
-  border: 1px solid rgba(26,59,255,0.4);
-  padding: 3px 9px;
-  border-radius: 1px;
-  margin-bottom: 16px;
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 600;
+.cz-sync .paq-glow-pulse,
+.cz-sync .paq-shine,
+.cz-sync .paq-illustration,
+.cz-sync .paq-inner,
+.cz-sync .paq-badge{
+  pointer-events:none !important;
 }
-.paq-badge-gold {
-  color: #C8A96E;
-  border-color: rgba(200,169,110,0.35);
+.cz-sync .paq-card:hover{
+  transform:translateY(-14px) scale(1.03) rotateX(2deg);
+  box-shadow:
+    0 40px 80px rgba(26,59,255,.35),
+    0 0 60px rgba(26,59,255,.15),
+    0 0 0 1px rgba(26,59,255,.5);
 }
-.paq-badge-luna {
-  color: #C8A96E;
-  border-color: rgba(200,169,110,0.5);
-  background: rgba(200,169,110,0.06);
+.cz-sync .paq-card.gold:hover{
+  transform:translateY(-14px) scale(1.03) rotateX(2deg);
+  box-shadow:
+    0 40px 80px rgba(200,169,110,.3),
+    0 0 60px rgba(200,169,110,.12),
+    0 0 0 1px rgba(200,169,110,.6);
 }
-.paq-name {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 32px;
-  letter-spacing: 3px;
-  color: var(--blanco);
-  line-height: 1;
-  margin-bottom: 6px;
+.cz-sync .paq-card.sel{
+  transform:translateY(-10px) scale(1.025);
+  box-shadow:0 0 0 2px var(--azul), 0 32px 80px rgba(26,59,255,.45), 0 0 80px rgba(26,59,255,.15);
 }
-.paq-tagline {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 13px;
-  color: var(--dim);
-  margin-bottom: 20px;
-  line-height: 1.4;
+.cz-sync .paq-card.gold.sel{
+  box-shadow:0 0 0 2px var(--gold), 0 32px 80px rgba(200,169,110,.4), 0 0 80px rgba(200,169,110,.12);
 }
-.paq-divider {
-  width: 28px;
-  height: 1px;
-  background: rgba(26,59,255,0.4);
-  margin-bottom: 20px;
+
+/* ── ILUSTRACION CINEMATICA ── */
+.cz-sync .paq-illustration{
+  position:absolute;top:0;left:0;right:0;
+  height:195px;z-index:1;overflow:hidden;
+  pointer-events:none;
 }
-.paq-divider-gold {
-  background: rgba(200,169,110,0.5);
+.cz-sync .paq-illustration canvas{
+  position:absolute;inset:0;width:100%;height:100%;
+  pointer-events:none;
 }
-.paq-includes {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  flex: 1;
-  margin-bottom: 24px;
+.cz-sync .paq-illustration svg{
+  position:absolute;inset:0;width:100%;height:100%;
+  transition:transform .5s cubic-bezier(.22,1,.36,1);
+  pointer-events:none;
 }
-.paq-includes li {
-  font-size: 13px;
-  color: var(--blanco);
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  letter-spacing: 0.2px;
+.cz-sync .paq-card:hover .paq-illustration svg{transform:scale(1.06) translateY(-4px);}
+
+/* fade bottom del illustration */
+.cz-sync .paq-illustration::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:80px;
+  background:linear-gradient(0deg,var(--negro) 0%,transparent 100%);
+  z-index:2;pointer-events:none;
 }
-.paq-no { opacity: 0.35; }
-.paq-check {
-  color: var(--azul);
-  font-size: 8px;
-  flex-shrink: 0;
+
+/* ── INNER CONTENT ── */
+.cz-sync .paq-inner{
+  position:relative;z-index:4;
+  display:flex;flex-direction:column;
+  height:100%;padding:185px 22px 22px;
+  gap:0;
+  pointer-events:none;
 }
-.paq-check-gold { color: #C8A96E; }
-.paq-x { color: var(--dim); font-size: 10px; flex-shrink: 0; }
-.paq-note {
-  font-size: 11px;
-  color: var(--dim);
-  letter-spacing: 0.5px;
+
+/* número */
+.cz-sync .paq-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:9px;letter-spacing:5px;
+  color:var(--azul);opacity:.8;
+  margin-bottom:4px;
 }
-.paq-footer {
-  border-top: 1px solid var(--borde);
-  padding-top: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.cz-sync .gold .paq-num{color:var(--gold);}
+
+/* nombre */
+.cz-sync .paq-name{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.75rem;letter-spacing:4px;
+  line-height:1;margin-bottom:6px;
+  text-shadow:0 2px 20px rgba(26,59,255,.4);
 }
-.paq-desde {
-  font-size: 11px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--dim);
-  font-family: 'DM Sans', sans-serif;
+.cz-sync .gold .paq-name{text-shadow:0 2px 20px rgba(200,169,110,.4);}
+
+/* rango */
+.cz-sync .paq-rango{
+  font-size:.62rem;font-weight:700;letter-spacing:1px;
+  color:var(--azul);
+  background:rgba(26,59,255,.12);
+  border:1px solid rgba(26,59,255,.22);
+  border-radius:100px;
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 10px;margin-bottom:12px;width:fit-content;
 }
-.paq-precio {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 36px;
-  letter-spacing: 2px;
-  color: var(--blanco);
-  line-height: 1;
+.cz-sync .gold .paq-rango{color:var(--gold);background:rgba(200,169,110,.1);border-color:rgba(200,169,110,.28);}
+
+/* features list */
+.cz-sync .paq-list{
+  list-style:none;
+  font-size:.71rem;color:rgba(220,220,240,.72);
+  line-height:1;
+  display:flex;flex-direction:column;gap:7px;
+  flex:1;
 }
-.paq-precio-gold { color: #C8A96E; }
-.paq-cta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 10px;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  color: var(--azul);
-  text-decoration: none;
-  font-weight: 600;
-  margin-top: 4px;
-  transition: gap 0.2s ease;
+.cz-sync .paq-list li{display:flex;align-items:center;gap:7px;}
+.cz-sync .paq-list li::before{
+  content:'';width:5px;height:5px;border-radius:50%;
+  background:var(--azul);flex-shrink:0;
+  box-shadow:0 0 7px var(--azul);
 }
-.paq-cta:hover { gap: 14px; }
-.paq-cta-gold { color: #C8A96E; }
+.cz-sync .gold .paq-list li::before{background:var(--gold);box-shadow:0 0 7px var(--gold);}
+
+/* precio */
+.cz-sync .paq-footer{
+  margin-top:14px;padding-top:12px;
+  border-top:1px solid rgba(255,255,255,.07);
+  display:flex;align-items:flex-end;justify-content:space-between;
+}
+.cz-sync .paq-desde{
+  font-size:.52rem;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--blanco-dim);margin-bottom:2px;
+  line-height:1.4;
+}
+.cz-sync .paq-desde.cant-label{
+  font-size:.5rem;letter-spacing:1px;text-transform:uppercase;
+  color:var(--blanco-dim);margin-bottom:3px;
+  line-height:1.5;
+}
+.cz-sync .paq-precio{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:2.1rem;letter-spacing:2px;
+  color:var(--blanco);line-height:1;
+  text-shadow:0 0 24px rgba(26,59,255,.45);
+}
+.cz-sync .gold .paq-precio{color:var(--gold);text-shadow:0 0 24px rgba(200,169,110,.5);}
+
+/* CTA arrow */
+.cz-sync .paq-cta{
+  font-size:.6rem;letter-spacing:2px;text-transform:uppercase;
+  color:var(--azul);font-weight:700;
+  display:flex;align-items:center;gap:4px;
+  transition:gap .25s, color .2s;
+  pointer-events:none;
+}
+.cz-sync .paq-card:hover .paq-cta{gap:10px;}
+.cz-sync .gold .paq-cta{color:var(--gold);}
+
+/* ── BADGE ── */
+.cz-sync .paq-badge{
+  position:absolute;top:14px;left:18px;z-index:6;
+  font-family:'Bebas Neue',sans-serif;font-size:.62rem;letter-spacing:3px;
+  padding:4px 13px;border-radius:100px;
+  background:var(--azul);color:#fff;
+  box-shadow:0 2px 16px rgba(26,59,255,.55);
+}
+.cz-sync .paq-badge.gold{background:var(--gold);color:#05050A;box-shadow:0 2px 16px rgba(200,169,110,.55);}
+
+/* ── GLOW PULSE on hover ── */
+.cz-sync .paq-glow-pulse{
+  position:absolute;inset:0;z-index:0;border-radius:24px;
+  background:radial-gradient(ellipse 60% 40% at 50% 50%,rgba(26,59,255,.12),transparent);
+  opacity:0;transition:opacity .4s;pointer-events:none;
+}
+.cz-sync .paq-card:hover .paq-glow-pulse{opacity:1;animation:czGlowPulse 2s ease-in-out infinite;}
+.cz-sync .paq-card.gold .paq-glow-pulse{background:radial-gradient(ellipse 60% 40% at 50% 50%,rgba(200,169,110,.1),transparent);}
+@keyframes czGlowPulse{0%,100%{opacity:.6;}50%{opacity:1;}}
+
+/* ── SHINE SWEEP ── */
+.cz-sync .paq-shine{
+  position:absolute;top:-100%;left:-80%;
+  width:50%;height:280%;
+  background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.055) 50%,transparent 65%);
+  transform:skewX(-15deg);
+  transition:left .7s cubic-bezier(.22,1,.36,1);z-index:5;pointer-events:none;
+}
+.cz-sync .paq-card:hover .paq-shine{left:140%;}
+
+/* ribbon viejo — ya no se usa */
+.cz-sync .paq-ribbon{display:none;}
+.cz-sync .paq-scan{display:none;}
+.cz-sync .paq-bg{display:none;}
+.cz-sync .paq-emoji{display:none;}
+
+
+.cz-sync .barra-card{
+  background:var(--negro);border:1px solid var(--gris-borde);
+  border-radius:var(--r-sm);padding:16px;cursor:pointer;
+  transition:all .2s;font-family:'DM Sans',sans-serif;text-align:left;
+  position:relative;overflow:hidden;
+}
+.cz-sync .barra-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(26,59,255,.06),transparent);
+  opacity:0;transition:opacity .2s;
+}
+.cz-sync .barra-card:hover::before{opacity:1;}
+.cz-sync .barra-card:hover{border-color:rgba(26,59,255,.45);transform:translateY(-2px);}
+.cz-sync .barra-card.activo{
+  border-color:var(--azul);background:rgba(26,59,255,.1);
+  box-shadow:0 0 0 1px var(--azul);
+}
+.cz-sync .barra-card.activo::before{opacity:1;}
+.cz-sync .barra-card .bc-check{
+  position:absolute;top:10px;right:10px;
+  width:20px;height:20px;border-radius:50%;
+  background:var(--azul);display:none;align-items:center;justify-content:center;
+  font-size:.65rem;color:#fff;
+}
+.cz-sync .barra-card.activo .bc-check{display:flex;}
+.cz-sync .bc-icon{font-size:1.6rem;margin-bottom:7px;}
+.cz-sync .bc-name{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--blanco);}
+.cz-sync .bc-desc{font-size:.63rem;color:var(--blanco-dim);margin-top:3px;line-height:1.45;}
+.cz-sync .bc-precio{font-size:.65rem;color:var(--azul);font-weight:600;margin-top:6px;letter-spacing:.5px;}
+.cz-sync .paq-card.cz-flash{animation:czFlash .6s ease;}
+@keyframes czFlash{0%{filter:brightness(1)}40%{filter:brightness(1.35)}100%{filter:brightness(1)}}
+.cz-sync .paq-footer{flex-wrap:wrap;gap:8px 10px;}
+.cz-sync #cz-paso-paquete > p:last-child{max-width:none;width:100%;}
+.cz-sync .cz-barra-hint{font-size:.78rem;color:var(--blanco-dim);margin-bottom:20px;line-height:1.7;}
+@media(max-width:1000px) and (min-width:481px){.cz-sync .paq-grid{grid-template-columns:repeat(2,1fr);}}
+
 .paq-nota {
   margin-top: 48px;
   display: flex;
@@ -2139,9 +2264,11 @@ footer {
 <div class="mobile-menu" id="mobileMenu">
   <a href="#inicio" onclick="closeMobile()">Inicio</a>
   <a href="#herramientas" onclick="closeMobile()">Servicios</a>
+  <a href="#conocenos" onclick="closeMobile()">Conócenos</a>
   <a href="#paquetes" onclick="closeMobile()">Paquetes</a>
   <a href="#galeria" onclick="closeMobile()">Galería</a>
   <a href="#nosotros" onclick="closeMobile()">Nosotros</a>
+  <a href="#resenas" onclick="closeMobile()">Reseñas</a>
   <a href="#contacto" onclick="closeMobile()">Contacto</a>
   <div class="mobile-ctas">
     <a href="admin-panel-completo_v10.html" class="btn-ghost">Panel Admin</a>
@@ -2184,8 +2311,8 @@ footer {
 <div class="stats-section">
   <div class="stats-inner">
     <div class="stat-item reveal">
-      <div class="stat-number">5<span class="stat-unit">+</span></div>
-      <div class="stat-label">Servicios disponibles</div>
+      <div class="stat-number">4</div>
+      <div class="stat-label">Barras para elegir</div>
     </div>
     <div class="stat-item reveal reveal-delay-1">
       <div class="stat-number">24<span class="stat-unit">h</span></div>
@@ -2269,112 +2396,759 @@ footer {
   </div>
 </section>
 
-<!-- ══ PAQUETES ══ -->
+<!-- ══ CONÓCENOS: PRESENTACIÓN + FLYER ══ -->
+<section id="conocenos">
+<style>
+.cn-section{padding:120px 48px;max-width:1180px;margin:0 auto;position:relative;z-index:2;}
+.cn-head{text-align:center;margin-bottom:44px;}
+.cn-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(44px,7vw,84px);letter-spacing:3px;line-height:.95;color:var(--blanco);}
+.cn-title em{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--azul);letter-spacing:0;}
+.cn-sub{color:var(--dim);font-size:15px;max-width:620px;margin:14px auto 0;line-height:1.6;}
+.cn-grid{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(0,1fr);gap:28px;align-items:start;}
+.cn-viewer{background:var(--gris);border:1px solid rgba(26,59,255,.28);border-radius:18px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.45);}
+.cn-stage{position:relative;aspect-ratio:16/9;background:#05050c;overflow:hidden;touch-action:pan-y;}
+.cn-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .45s ease;}
+.cn-stage img.on{opacity:1;}
+.cn-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.25);
+  background:rgba(5,5,12,.65);color:#fff;display:grid;place-items:center;font-size:20px;cursor:none;transition:background .2s,border-color .2s;z-index:2;}
+.cn-nav:hover{background:var(--azul);border-color:var(--azul);}
+.cn-prev{left:12px}.cn-next{right:12px}
+.cn-bar{display:flex;align-items:center;gap:12px;padding:12px 16px;border-top:1px solid var(--borde);}
+.cn-dots{display:flex;gap:6px;flex:1;flex-wrap:wrap;}
+.cn-dot{width:22px;height:4px;border-radius:2px;background:var(--borde);border:0;cursor:none;transition:background .3s,width .3s;padding:0;}
+.cn-dot.on{background:var(--azul);width:34px;}
+.cn-count{font-family:'Bebas Neue',sans-serif;letter-spacing:2px;color:var(--dim);font-size:15px;}
+.cn-full{background:none;border:1px solid var(--borde);color:var(--blanco);width:34px;height:34px;border-radius:8px;display:grid;place-items:center;font-size:16px;cursor:none;}
+.cn-full:hover{border-color:var(--azul);}
+.cn-actions{display:flex;flex-wrap:wrap;gap:10px;padding:0 16px 16px;}
+.cn-btn{display:inline-flex;align-items:center;gap:8px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;
+  color:#fff;text-decoration:none;padding:12px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.18);transition:border-color .2s,background .2s;cursor:none;}
+.cn-btn:hover{border-color:var(--azul);}
+.cn-btn.solid{background:var(--azul);border-color:var(--azul);}
+.cn-btn.solid:hover{background:#2f4dff;}
+.cn-btn svg{width:15px;height:15px;flex-shrink:0;}
+.cn-flyer{background:var(--gris);border:1px solid rgba(26,59,255,.28);border-radius:18px;padding:18px;}
+.cn-flyer-k{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--azul);font-weight:600;margin-bottom:10px;}
+.cn-flyer-t{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:2px;line-height:1;margin-bottom:6px;}
+.cn-flyer-d{color:var(--dim);font-size:13px;line-height:1.55;margin-bottom:14px;}
+.cn-flyer a.cn-thumb{display:block;border-radius:12px;overflow:hidden;border:1px solid var(--borde);margin-bottom:14px;cursor:none;}
+.cn-flyer a.cn-thumb img{display:block;width:100%;height:auto;transition:transform .5s ease;}
+.cn-flyer a.cn-thumb:hover img{transform:scale(1.03);}
+.cn-flyer .cn-actions{padding:0;}
+.cn-modal{position:fixed;inset:0;z-index:100000;background:rgba(3,3,8,.94);display:none;align-items:center;justify-content:center;padding:20px;}
+.cn-modal.on{display:flex;}
+.cn-modal img{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 0 0 1px rgba(26,59,255,.4);}
+.cn-close{position:absolute;top:16px;right:16px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(5,5,12,.7);color:#fff;font-size:20px;display:grid;place-items:center;cursor:none;}
+@media(hover:none){.cn-nav,.cn-dot,.cn-full,.cn-btn,.cn-flyer a.cn-thumb,.cn-close{cursor:pointer;}}
+@media(max-width:900px){.cn-grid{grid-template-columns:1fr;}.cn-section{padding:90px 20px;}.cn-flyer{max-width:520px;margin:0 auto;width:100%;}}
+@media(max-width:520px){.cn-nav{width:36px;height:36px;font-size:16px}.cn-btn{flex:1 1 100%;justify-content:center;}}
+</style>
+  <div class="cn-section">
+    <div class="cn-head reveal">
+      <div class="section-label" style="justify-content:center">Conócenos</div>
+      <h2 class="cn-title">Todo Bajón Lunar<br><em>en 2 minutos.</em></h2>
+      <p class="cn-sub">Quiénes somos, nuestras barras, paquetes, precios y cómo cotizar. Hojea la presentación aquí o descárgala para compartirla.</p>
+    </div>
+    <div class="cn-grid">
+      <div class="cn-viewer reveal">
+        <div class="cn-stage" id="cnStage">
+          <img src="presentacion/slide-1.jpg" alt="Presentación Bajón Lunar — diapositiva 1 de 9" loading="eager" class="on">
+          <img src="presentacion/slide-2.jpg" alt="Presentación Bajón Lunar — diapositiva 2 de 9" loading="lazy">
+          <img src="presentacion/slide-3.jpg" alt="Presentación Bajón Lunar — diapositiva 3 de 9" loading="lazy">
+          <img src="presentacion/slide-4.jpg" alt="Presentación Bajón Lunar — diapositiva 4 de 9" loading="lazy">
+          <img src="presentacion/slide-5.jpg" alt="Presentación Bajón Lunar — diapositiva 5 de 9" loading="lazy">
+          <img src="presentacion/slide-6.jpg" alt="Presentación Bajón Lunar — diapositiva 6 de 9" loading="lazy">
+          <img src="presentacion/slide-7.jpg" alt="Presentación Bajón Lunar — diapositiva 7 de 9" loading="lazy">
+          <img src="presentacion/slide-8.jpg" alt="Presentación Bajón Lunar — diapositiva 8 de 9" loading="lazy">
+          <img src="presentacion/slide-9.jpg" alt="Presentación Bajón Lunar — diapositiva 9 de 9" loading="lazy">
+          <button class="cn-nav cn-prev" type="button" aria-label="Diapositiva anterior" onclick="cnGo(-1)"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="m15 18-6-6 6-6"></path></svg></button>
+          <button class="cn-nav cn-next" type="button" aria-label="Diapositiva siguiente" onclick="cnGo(1)"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="m9 18 6-6-6-6"></path></svg></button>
+        </div>
+        <div class="cn-bar">
+          <div class="cn-dots" id="cnDots"></div>
+          <span class="cn-count" id="cnCount">1 / 9</span>
+          <button class="cn-full" type="button" aria-label="Ver en pantalla completa" onclick="cnOpen()"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" x2="14" y1="3" y2="10"></line><line x1="3" x2="10" y1="21" y2="14"></line></svg></button>
+        </div>
+        <div class="cn-actions">
+          <a class="cn-btn solid" href="bajon-lunar-presentacion.pptx" download><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M2 3h20"></path><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"></path><path d="m7 21 5-5 5 5"></path></svg> Descargar PowerPoint</a>
+          <a class="cn-btn" href="bajon-lunar-presentacion.pdf" download><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg> Descargar PDF</a>
+          <a class="cn-btn" href="cotizador-cosmos_2026_v8.html">Cotizar ahora →</a>
+        </div>
+      </div>
+      <aside class="cn-flyer reveal reveal-delay-1">
+        <div class="cn-flyer-k">Flyer oficial</div>
+        <div class="cn-flyer-t">Llévate el flyer</div>
+        <p class="cn-flyer-d">Barras, paquetes, precios y QR para cotizar, en tamaño carta. Imprímelo o compártelo por WhatsApp.</p>
+        <a class="cn-thumb" href="flyer.html" aria-label="Abrir flyer"><img src="flyer-preview.jpg" alt="Flyer Bajón Lunar 2026" loading="lazy" width="612" height="792"></a>
+        <div class="cn-actions">
+          <a class="cn-btn solid" href="flyer.html"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"></path><rect x="6" y="14" width="12" height="8" rx="1"></rect></svg> Ver e imprimir</a>
+          <a class="cn-btn" href="bajon-lunar-flyer.pdf" download><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg> PDF</a>
+          <a class="cn-btn" href="bajon-lunar-flyer.png" download><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg> Imagen</a>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <div class="cn-modal" id="cnModal" role="dialog" aria-modal="true" aria-label="Presentación en pantalla completa" onclick="if(event.target===this)cnClose()">
+    <img id="cnModalImg" alt="">
+    <button class="cn-close" type="button" aria-label="Cerrar" onclick="cnClose()"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+    <button class="cn-nav cn-prev" type="button" aria-label="Anterior" onclick="cnGo(-1)"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="m15 18-6-6 6-6"></path></svg></button>
+    <button class="cn-nav cn-next" type="button" aria-label="Siguiente" onclick="cnGo(1)"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="m9 18 6-6-6-6"></path></svg></button>
+  </div>
+<script>
+(function(){
+  var stage=document.getElementById('cnStage'); if(!stage) return;
+  var imgs=[].slice.call(stage.querySelectorAll('img')), n=imgs.length, i=0, timer=null;
+  var dots=document.getElementById('cnDots'), count=document.getElementById('cnCount');
+  var modal=document.getElementById('cnModal'), mImg=document.getElementById('cnModalImg');
+  imgs.forEach(function(_,k){ var b=document.createElement('button'); b.type='button'; b.className='cn-dot'+(k?'':' on'); b.setAttribute('aria-label','Ir a diapositiva '+(k+1)); b.onclick=function(){show(k);stop();}; dots.appendChild(b); });
+  function show(k){
+    i=(k+n)%n;
+    imgs.forEach(function(im,j){ im.classList.toggle('on',j===i); });
+    [].forEach.call(dots.children,function(d,j){ d.classList.toggle('on',j===i); });
+    count.textContent=(i+1)+' / '+n;
+    if(modal.classList.contains('on')) mImg.src=imgs[i].src;
+    var nx=imgs[(i+1)%n]; if(nx.loading==='lazy') nx.loading='eager';
+  }
+  function stop(){ if(timer){clearInterval(timer);timer=null;} }
+  window.cnGo=function(d){ show(i+d); stop(); };
+  window.cnOpen=function(){ mImg.src=imgs[i].src; mImg.alt=imgs[i].alt; modal.classList.add('on'); document.body.style.overflow='hidden'; stop(); };
+  window.cnClose=function(){ modal.classList.remove('on'); document.body.style.overflow=''; };
+  stage.addEventListener('click',function(e){ if(e.target.tagName==='IMG') cnOpen(); });
+  document.addEventListener('keydown',function(e){
+    if(!modal.classList.contains('on')) return;
+    if(e.key==='Escape') cnClose(); else if(e.key==='ArrowRight') cnGo(1); else if(e.key==='ArrowLeft') cnGo(-1);
+  });
+  var x0=null;
+  [stage,modal].forEach(function(el){
+    el.addEventListener('touchstart',function(e){ x0=e.touches[0].clientX; },{passive:true});
+    el.addEventListener('touchend',function(e){ if(x0===null) return; var dx=e.changedTouches[0].clientX-x0; if(Math.abs(dx)>40) cnGo(dx<0?1:-1); x0=null; });
+  });
+  // Avance automático solo mientras está en pantalla
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(function(es){ es.forEach(function(en){
+      if(en.isIntersecting && !timer && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) timer=setInterval(function(){show(i+1);},5000);
+      else if(!en.isIntersecting) stop();
+    }); },{threshold:.4}).observe(stage);
+  }
+})();
+</script>
+</section>
+
+<!-- ══ PAQUETES (idéntico al cotizador: misma barra, mismas tarjetas, mismos precios) ══ -->
 <section id="paquetes">
   <div class="paquetes-section">
     <div class="paquetes-header reveal">
       <div class="section-label" style="justify-content:center">Paquetes 2026</div>
       <h2 class="paquetes-title">Elige tu<br><em>órbita.</em></h2>
-      <p class="paquetes-sub">Del bajón íntimo a la fiesta completa — hay un paquete para cada tipo de noche.</p>
+      <p class="paquetes-sub">Elige tu barra y mira cómo cambian los precios de cada paquete — son exactamente los mismos que en el cotizador.</p>
     </div>
 
-    <div class="paquetes-grid">
+    <div class="cz-sync reveal">
+  <div id="cz-paso-barra">
+    <p class="sec-title" style="margin-top:0;">🍽️ 01 — Elige tu barra</p>
+    <div class="cz-barra-hint">
+      Primero elige el tipo de barra para tu evento — los precios de cada paquete dependen de esta selección.
+    </div>
 
-      <!-- 01 NEBULA MIX -->
-      <div class="paq-card reveal" data-tier="1">
-        <div class="paq-glow"></div>
-        <div class="paq-num">01</div>
-        <div class="paq-badge">Básico</div>
-        <h3 class="paq-name">Nebula Mix</h3>
-        <p class="paq-tagline">El primer destello de la noche.</p>
-        <div class="paq-divider"></div>
-        <ul class="paq-includes">
-          <li><span class="paq-check">✦</span> Gomitas locas <span class="paq-note">1 variedad</span></li>
-          <li><span class="paq-check">✦</span> Hasta 30 personas</li>
-          <li class="paq-no"><span class="paq-x">—</span> Sin cantaritos</li>
-          <li class="paq-no"><span class="paq-x">—</span> Sin chilaquiles</li>
-        </ul>
-        <div class="paq-footer">
-          <div class="paq-desde">Desde</div>
-          <div class="paq-precio">$2,500</div>
-          <a href="cotizador-cosmos_2026_v8.html" class="paq-cta">Cotizar <span class="btn-arrow">→</span></a>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px;" class="cz-barra-grid">
+
+      <div class="barra-card activo" id="ix-bpv-chilaquiles" onclick="blSelBarra(\'chilaquiles\')" style="cursor:pointer;padding:20px 16px;text-align:center;">
+        <div class="bc-check">&#10003;</div>
+        <div class="bc-icon" style="font-size:2rem;margin-bottom:8px;">&#127869;</div>
+        <div class="bc-name" style="font-size:.88rem;">Chilaquiles</div>
+        <div class="bc-desc" style="font-size:.65rem;margin-top:6px;">El baj&#243;n cl&#225;sico y reconfortante. Salsa, prote&#237;na y todo el amor casero.</div>
+        <div style="margin-top:8px;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1px;color:var(--azul);">$90/porción · $115 con proteína</div>
+      </div>
+
+      <div class="barra-card" id="ix-bpv-maruchan" onclick="blSelBarra(\'maruchan\')" style="cursor:pointer;padding:20px 16px;text-align:center;">
+        <div class="bc-check">&#10003;</div>
+        <div class="bc-icon" style="font-size:2rem;margin-bottom:8px;">&#127836;</div>
+        <div class="bc-name" style="font-size:.88rem;">Maruchan</div>
+        <div class="bc-desc" style="font-size:.65rem;margin-top:6px;">Madrugada garantizada. Maruchan preparado con botanas y el toque lunar.</div>
+        <div style="margin-top:8px;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1px;color:var(--azul);">$90/porción</div>
+      </div>
+
+      <div class="barra-card" id="ix-bpv-gomitas" onclick="blSelBarra(\'gomitas\')" style="cursor:pointer;padding:20px 16px;text-align:center;">
+        <div class="bc-check">&#10003;</div>
+        <div class="bc-icon" style="font-size:2rem;margin-bottom:8px;">&#127852;</div>
+        <div class="bc-name" style="font-size:.88rem;">Gomitas Locas</div>
+        <div class="bc-desc" style="font-size:.65rem;margin-top:6px;">Chile, lim&#243;n, chamoy. La botana que nadie puede parar de comer.</div>
+        <div style="margin-top:8px;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1px;color:var(--azul);">$45/porción</div>
+      </div>
+
+      <div class="barra-card" id="ix-bpv-cantaritos" onclick="blSelBarra(\'cantaritos\')" style="cursor:pointer;padding:20px 16px;text-align:center;">
+        <div class="bc-check">&#10003;</div>
+        <div class="bc-icon" style="font-size:2rem;margin-bottom:8px;">&#127818;</div>
+        <div class="bc-name" style="font-size:.88rem;">Cantaritos</div>
+        <div class="bc-desc" style="font-size:.65rem;margin-top:6px;">Bebida fresca en cantarito de barro. Tequila, mezcal o sin alcohol.</div>
+        <div style="margin-top:8px;font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:0px;color:var(--azul);">$450 tradicional · $950 Don Julio · $1,050 Dobel</div>
+      </div>
+
+    </div>
+
+    <!-- Opción otra barra -->
+    <a href="https://wa.me/525571901664?text=Hola,%20me%20interesa%20otra%20barra%20para%20mi%20evento%20con%20Baj%C3%B3n%20Lunar%20%F0%9F%8C%99" target="_blank"
+       style="display:flex;align-items:center;gap:14px;background:rgba(37,211,102,.06);border:1px solid rgba(37,211,102,.2);border-radius:var(--r-sm);padding:16px 20px;text-decoration:none;transition:border-color .2s;margin-bottom:32px;"
+       onmouseover="this.style.borderColor='rgba(37,211,102,.5)'" onmouseout="this.style.borderColor='rgba(37,211,102,.2)'">
+      <span style="font-size:1.6rem;">&#128172;</span>
+      <div style="flex:1;">
+        <div style="font-size:.82rem;font-weight:600;color:var(--blanco);margin-bottom:2px;">&#191;Tienes otra barra en mente?</div>
+        <div style="font-size:.7rem;color:rgba(160,230,160,.8);">Pl&#225;tica con nosotros por WhatsApp y armamos algo a tu medida.</div>
+      </div>
+      <span style="font-size:.75rem;font-weight:700;letter-spacing:2px;color:#25D366;font-family:'Bebas Neue',sans-serif;">ESCR&#205;BENOS &#8594;</span>
+    </a>
+  </div>
+
+      <div id="cz-paso-paquete">
+        <p class="sec-title" style="margin-top:0;">02 — Elige tu paquete</p>
+    <div class="paq-grid">
+
+      <!-- ══ NEBULA MIX ══ -->
+      <div class="paq-card" id="ix-pc-nebula" onclick="blIrCotizar(\'nebula\')" role="link" tabindex="0">
+        <div class="paq-card-mask"></div>
+        <div class="paq-glow-pulse"></div>
+        <div class="paq-shine"></div>
+
+        <!-- ILUSTRACIÓN: plato humeante con nebulosa -->
+        <div class="paq-illustration">
+          <svg viewBox="0 0 320 195" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="ix-neb-sky" cx="50%" cy="30%">
+                <stop offset="0%" stop-color="#0d1a5c"/>
+                <stop offset="100%" stop-color="#07070E"/>
+              </radialGradient>
+              <radialGradient id="ix-neb-plate-glow" cx="50%" cy="50%">
+                <stop offset="0%" stop-color="rgba(26,59,255,0.35)"/>
+                <stop offset="100%" stop-color="transparent"/>
+              </radialGradient>
+              <filter id="ix-neb-blur"><feGaussianBlur stdDeviation="2.5"/></filter>
+              <filter id="ix-neb-glow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            </defs>
+            <!-- Sky bg -->
+            <rect width="320" height="195" fill="url(#ix-neb-sky)"/>
+            <!-- Nebula clouds -->
+            <ellipse cx="80" cy="60" rx="90" ry="45" fill="rgba(26,59,255,0.12)" filter="url(#ix-neb-blur)"/>
+            <ellipse cx="240" cy="80" rx="70" ry="35" fill="rgba(96,207,255,0.08)" filter="url(#ix-neb-blur)"/>
+            <ellipse cx="160" cy="40" rx="110" ry="28" fill="rgba(60,100,255,0.07)" filter="url(#ix-neb-blur)"/>
+            <!-- Stars scattered -->
+            <circle cx="18" cy="22" r="1.2" fill="rgba(255,255,255,0.9)"/><circle cx="58" cy="14" r="0.8" fill="rgba(200,210,255,0.7)"/><circle cx="105" cy="30" r="1" fill="white" opacity=".6"/><circle cx="150" cy="10" r="1.5" fill="white" opacity=".8"/><circle cx="198" cy="25" r="0.7" fill="rgba(200,210,255,0.6)"/><circle cx="240" cy="12" r="1.1" fill="white" opacity=".7"/><circle cx="285" cy="35" r="0.9" fill="rgba(150,190,255,0.8)"/><circle cx="305" cy="18" r="1.3" fill="white" opacity=".6"/><circle cx="35" cy="48" r="0.6" fill="rgba(200,220,255,0.5)"/><circle cx="270" cy="55" r="0.8" fill="white" opacity=".5"/><circle cx="120" cy="55" r="0.6" fill="rgba(180,200,255,0.6)"/>
+            <!-- Glowing star -->
+            <circle cx="290" cy="28" r="2" fill="white" filter="url(#ix-neb-glow)" opacity=".9"/>
+            <circle cx="55" cy="38" r="1.8" fill="rgba(150,200,255,1)" filter="url(#ix-neb-glow)" opacity=".7"/>
+            <!-- Ground / table horizon -->
+            <ellipse cx="160" cy="195" rx="220" ry="50" fill="rgba(15,15,35,0.9)"/>
+            <!-- Plate glow on surface -->
+            <ellipse cx="160" cy="160" rx="65" ry="16" fill="rgba(26,59,255,0.2)" filter="url(#ix-neb-blur)"/>
+            <!-- Plate base / shadow -->
+            <ellipse cx="160" cy="162" rx="52" ry="11" fill="rgba(0,0,0,0.6)"/>
+            <!-- Plate rim -->
+            <ellipse cx="160" cy="152" rx="52" ry="12" fill="none" stroke="rgba(120,150,255,0.5)" stroke-width="1.5"/>
+            <ellipse cx="160" cy="152" rx="52" ry="12" fill="rgba(20,25,60,0.7)"/>
+            <!-- Plate food (chilaquiles) - colorful -->
+            <ellipse cx="160" cy="150" rx="42" ry="9" fill="#1a1a3e"/>
+            <!-- Chips / food texture -->
+            <path d="M135,148 L142,143 L150,149 L158,144 L166,150 L174,144 L182,149 L188,147" stroke="rgba(200,169,110,0.6)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M138,152 L145,147 L153,153 L162,147 L170,153 L178,148 L184,152" stroke="rgba(200,169,110,0.4)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <!-- Salsa red splash -->
+            <ellipse cx="152" cy="149" rx="8" ry="4" fill="rgba(220,60,40,0.45)"/>
+            <ellipse cx="168" cy="151" rx="6" ry="3" fill="rgba(220,80,40,0.35)"/>
+            <!-- Crema white dots -->
+            <circle cx="145" cy="148" r="2.5" fill="rgba(255,255,255,0.5)"/>
+            <circle cx="165" cy="146" r="2" fill="rgba(255,255,255,0.4)"/>
+            <circle cx="175" cy="150" r="1.5" fill="rgba(255,255,255,0.35)"/>
+            <!-- Steam wisps -->
+            <path d="M148,140 C145,132 150,126 147,118" stroke="rgba(180,200,255,0.35)" stroke-width="2" fill="none" stroke-linecap="round">
+              <animate attributeName="d" dur="3s" repeatCount="indefinite" values="M148,140 C145,132 150,126 147,118;M148,140 C151,131 146,125 149,117;M148,140 C145,132 150,126 147,118"/>
+              <animate attributeName="opacity" dur="3s" repeatCount="indefinite" values="0.35;0.15;0.35"/>
+            </path>
+            <path d="M160,138 C158,128 163,122 160,112" stroke="rgba(180,200,255,0.3)" stroke-width="1.5" fill="none" stroke-linecap="round">
+              <animate attributeName="d" dur="4s" repeatCount="indefinite" values="M160,138 C158,128 163,122 160,112;M160,138 C163,129 158,123 162,113;M160,138 C158,128 163,122 160,112"/>
+              <animate attributeName="opacity" dur="4s" repeatCount="indefinite" values="0.3;0.1;0.3"/>
+            </path>
+            <path d="M172,141 C175,132 170,126 173,118" stroke="rgba(180,200,255,0.25)" stroke-width="1.5" fill="none" stroke-linecap="round">
+              <animate attributeName="d" dur="3.5s" repeatCount="indefinite" values="M172,141 C175,132 170,126 173,118;M172,141 C169,131 174,125 171,117;M172,141 C175,132 170,126 173,118"/>
+              <animate attributeName="opacity" dur="3.5s" repeatCount="indefinite" values="0.25;0.08;0.25"/>
+            </path>
+            <!-- Vitrolero jar left -->
+            <rect x="88" y="128" width="22" height="36" rx="4" fill="rgba(15,20,55,0.85)" stroke="rgba(60,120,255,0.4)" stroke-width="1"/>
+            <rect x="90" y="124" width="18" height="6" rx="2" fill="rgba(26,59,255,0.5)" stroke="rgba(80,140,255,0.5)" stroke-width="0.8"/>
+            <!-- Liquid in jar -->
+            <rect x="90" y="142" width="18" height="20" rx="2" fill="rgba(220,30,30,0.35)"/>
+            <rect x="90" y="128" width="18" height="6" rx="1" fill="rgba(255,255,255,0.05)"/>
+            <!-- Shine on jar -->
+            <rect x="92" y="130" width="4" height="20" rx="2" fill="rgba(255,255,255,0.08)"/>
+            <!-- Neon streak diagonal -->
+            <line x1="0" y1="95" x2="80" y2="60" stroke="rgba(26,59,255,0.15)" stroke-width="1"/>
+            <line x1="240" y1="70" x2="320" y2="110" stroke="rgba(96,207,255,0.1)" stroke-width="0.8"/>
+          </svg>
+        </div>
+
+        <div class="paq-inner">
+          <div class="paq-num">PAQUETE 01</div>
+          <div class="paq-name">Nebula Mix</div>
+          <div class="paq-rango">👥 20 – 30 personas</div>
+          <ul class="paq-list">
+            <li>Barra 2 horas de servicio</li>
+            <li id="ix-paq-vit-nebula">1 vitrolero de cortesía</li>
+            <li>Barra a elegir</li>
+            <li>Setup básico incluido</li>
+            <li>🌙 Experiencia Bajón Lunar ✨</li>
+          </ul>
+          <div class="paq-footer">
+            <div>
+              <div class="paq-desde" id="ix-pc-subprecio-nebula">Desde · $90/porción</div>
+              <div class="paq-precio" id="ix-pc-precio-nebula">$1,800</div>
+            </div>
+            <div class="paq-cta">Cotizar <span>→</span></div>
+          </div>
         </div>
       </div>
 
-      <!-- 02 COSMOS PACK -->
-      <div class="paq-card reveal reveal-delay-1" data-tier="2">
-        <div class="paq-glow"></div>
-        <div class="paq-num">02</div>
-        <div class="paq-badge">Popular</div>
-        <h3 class="paq-name">Cosmos Pack</h3>
-        <p class="paq-tagline">La experiencia completa del bajón.</p>
-        <div class="paq-divider"></div>
-        <ul class="paq-includes">
-          <li><span class="paq-check">✦</span> Gomitas locas <span class="paq-note">2 variedades</span></li>
-          <li><span class="paq-check">✦</span> Cantaritos <span class="paq-note">medio litro</span></li>
-          <li><span class="paq-check">✦</span> Hasta 60 personas</li>
-          <li class="paq-no"><span class="paq-x">—</span> Sin chilaquiles</li>
-        </ul>
-        <div class="paq-footer">
-          <div class="paq-desde">Desde</div>
-          <div class="paq-precio">$4,800</div>
-          <a href="cotizador-cosmos_2026_v8.html" class="paq-cta">Cotizar <span class="btn-arrow">→</span></a>
+      <!-- ══ COSMOS PACK ══ -->
+      <div class="paq-card" id="ix-pc-cosmos" onclick="blIrCotizar(\'cosmos\')" role="link" tabindex="0">
+        <div class="paq-badge">⭐ Popular</div>
+        <div class="paq-card-mask"></div>
+        <div class="paq-glow-pulse"></div>
+        <div class="paq-shine"></div>
+
+        <!-- ILUSTRACIÓN: luna llena con espejo instagrameable -->
+        <div class="paq-illustration">
+          <svg viewBox="0 0 320 195" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="ix-cos-moon-grad" cx="40%" cy="35%">
+                <stop offset="0%" stop-color="#e8e8ff"/>
+                <stop offset="50%" stop-color="#a0a0cc"/>
+                <stop offset="100%" stop-color="#404080"/>
+              </radialGradient>
+              <radialGradient id="ix-cos-sky" cx="50%" cy="0%">
+                <stop offset="0%" stop-color="#050520"/>
+                <stop offset="100%" stop-color="#07070E"/>
+              </radialGradient>
+              <radialGradient id="ix-cos-halo" cx="50%" cy="50%">
+                <stop offset="0%" stop-color="rgba(180,180,255,0.15)"/>
+                <stop offset="70%" stop-color="rgba(100,100,220,0.06)"/>
+                <stop offset="100%" stop-color="transparent"/>
+              </radialGradient>
+              <filter id="ix-cos-glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              <filter id="ix-cos-soft"><feGaussianBlur stdDeviation="3"/></filter>
+              <clipPath id="ix-cos-moon-clip"><circle cx="160" cy="72" r="52"/></clipPath>
+            </defs>
+            <rect width="320" height="195" fill="url(#ix-cos-sky)"/>
+            <!-- Milky way streak -->
+            <ellipse cx="160" cy="50" rx="180" ry="20" fill="rgba(100,120,220,0.06)" filter="url(#ix-cos-soft)"/>
+            <!-- Stars -->
+            <circle cx="12" cy="15" r="1" fill="white" opacity=".8"/><circle cx="40" cy="8" r="1.4" fill="white" opacity=".7"/><circle cx="72" cy="20" r="0.8" fill="rgba(200,210,255,0.6)"/><circle cx="100" cy="6" r="1.2" fill="white" opacity=".9"/><circle cx="220" cy="8" r="1" fill="white" opacity=".7"/><circle cx="260" cy="18" r="1.5" fill="white" opacity=".6"/><circle cx="295" cy="10" r="0.9" fill="rgba(200,220,255,0.8)"/><circle cx="310" cy="25" r="1.1" fill="white" opacity=".5"/><circle cx="25" cy="45" r="0.7" fill="rgba(180,200,255,0.6)"/><circle cx="48" cy="55" r="1" fill="white" opacity=".5"/><circle cx="275" cy="40" r="0.8" fill="rgba(200,210,255,0.7)"/><circle cx="305" cy="50" r="1.2" fill="white" opacity=".6"/>
+            <!-- Twinkle stars with animation -->
+            <circle cx="85" cy="12" r="1.8" fill="white" opacity=".9" filter="url(#ix-cos-glow)"><animate attributeName="opacity" dur="2.5s" repeatCount="indefinite" values="0.9;0.3;0.9"/></circle>
+            <circle cx="235" cy="30" r="1.5" fill="rgba(180,220,255,1)" filter="url(#ix-cos-glow)"><animate attributeName="opacity" dur="3.2s" repeatCount="indefinite" values="0.7;0.2;0.7"/></circle>
+            <!-- Moon halo -->
+            <circle cx="160" cy="72" r="80" fill="url(#ix-cos-halo)" filter="url(#ix-cos-soft)"/>
+            <circle cx="160" cy="72" r="62" fill="rgba(160,160,220,0.08)" filter="url(#ix-cos-soft)"/>
+            <!-- Moon body -->
+            <circle cx="160" cy="72" r="52" fill="url(#ix-cos-moon-grad)"/>
+            <!-- Moon craters -->
+            <circle cx="140" cy="60" r="8" fill="rgba(100,100,160,0.25)" stroke="rgba(160,160,200,0.15)" stroke-width="0.5"/>
+            <circle cx="175" cy="80" r="12" fill="rgba(100,100,150,0.2)" stroke="rgba(150,150,190,0.12)" stroke-width="0.5"/>
+            <circle cx="155" cy="85" r="5" fill="rgba(120,120,170,0.2)"/>
+            <circle cx="168" cy="55" r="4" fill="rgba(110,110,165,0.18)"/>
+            <!-- Moon shadow (crescent effect) -->
+            <circle cx="175" cy="65" r="50" fill="rgba(5,5,20,0.5)" clip-path="url(#ix-cos-moon-clip)"/>
+            <!-- Moon glow ring -->
+            <circle cx="160" cy="72" r="52" fill="none" stroke="rgba(200,200,255,0.2)" stroke-width="1"/>
+            <!-- Neon mirror frame on ground -->
+            <rect x="108" y="148" width="104" height="40" rx="6" fill="rgba(10,10,30,0.8)" stroke="rgba(26,59,255,0.6)" stroke-width="1.5"/>
+            <!-- Neon glow on frame -->
+            <rect x="108" y="148" width="104" height="40" rx="6" fill="none" stroke="rgba(96,207,255,0.3)" stroke-width="3" filter="url(#ix-cos-soft)"/>
+            <!-- Reflection in mirror -->
+            <ellipse cx="160" cy="168" rx="44" ry="15" fill="rgba(15,20,60,0.9)"/>
+            <circle cx="160" cy="162" r="14" fill="rgba(160,160,220,0.12)"/>
+            <circle cx="160" cy="162" r="10" fill="rgba(180,180,240,0.08)"/>
+            <!-- Mirror legs -->
+            <rect x="130" y="188" width="8" height="7" rx="2" fill="rgba(26,59,255,0.5)"/>
+            <rect x="182" y="188" width="8" height="7" rx="2" fill="rgba(26,59,255,0.5)"/>
+            <!-- Neon sign text -->
+            <text x="160" y="172" text-anchor="middle" font-family="sans-serif" font-size="7" fill="rgba(96,207,255,0.8)" letter-spacing="2">📸 BAJÓN LUNAR</text>
+            <!-- Vitroleros flanking -->
+            <rect x="72" y="150" width="20" height="38" rx="4" fill="rgba(10,15,50,0.9)" stroke="rgba(60,207,255,0.4)" stroke-width="1"/>
+            <rect x="74" y="146" width="16" height="6" rx="2" fill="rgba(26,59,255,0.5)"/>
+            <rect x="74" y="162" width="16" height="24" rx="2" fill="rgba(100,60,200,0.35)"/>
+            <rect x="74" y="150" width="16" height="6" fill="rgba(255,255,255,0.05)"/>
+            <rect x="228" y="150" width="20" height="38" rx="4" fill="rgba(10,15,50,0.9)" stroke="rgba(60,207,255,0.4)" stroke-width="1"/>
+            <rect x="230" y="146" width="16" height="6" rx="2" fill="rgba(26,59,255,0.5)"/>
+            <rect x="230" y="162" width="16" height="24" rx="2" fill="rgba(40,150,60,0.35)"/>
+            <!-- Ground reflection glow -->
+            <ellipse cx="160" cy="193" rx="100" ry="18" fill="rgba(26,59,255,0.08)" filter="url(#ix-cos-soft)"/>
+            <!-- Orbiting particle -->
+            <circle r="3" fill="rgba(96,207,255,0.9)" filter="url(#ix-cos-glow)">
+              <animateMotion dur="8s" repeatCount="indefinite" path="M160,72 m-65,0 a65,65 0 1,1 130,0 a65,65 0 1,1 -130,0"/>
+            </circle>
+          </svg>
+        </div>
+
+        <div class="paq-inner">
+          <div class="paq-num">PAQUETE 02</div>
+          <div class="paq-name">Cosmos Pack</div>
+          <div class="paq-rango">👥 40 – 60 personas</div>
+          <ul class="paq-list">
+            <li>Barra 2 horas de servicio</li>
+            <li id="ix-paq-vit-cosmos">2 vitroleros de cortesía</li>
+            <li>🌙 Experiencia Bajón Lunar ✨</li>
+            <li>Espejo instagrameable</li>
+            <li>Barra neon + setup</li>
+          </ul>
+          <div class="paq-footer">
+            <div>
+              <div class="paq-desde" id="ix-pc-subprecio-cosmos">Desde · $90/porción</div>
+              <div class="paq-precio" id="ix-pc-precio-cosmos">$2,700</div>
+              <div style="display:inline-flex;align-items:center;gap:5px;margin-top:5px;background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.35);border-radius:100px;padding:3px 10px;font-size:.62rem;font-weight:700;color:var(--verde);letter-spacing:1px;">🏷️ 5% de descuento</div>
+            </div>
+            <div class="paq-cta">Cotizar <span>→</span></div>
+          </div>
         </div>
       </div>
 
-      <!-- 03 AFTER MOON -->
-      <div class="paq-card reveal reveal-delay-2" data-tier="3">
-        <div class="paq-glow"></div>
-        <div class="paq-num">03</div>
-        <div class="paq-badge paq-badge-gold">After</div>
-        <h3 class="paq-name">After Moon</h3>
-        <p class="paq-tagline">Pa' los que no se quieren ir.</p>
-        <div class="paq-divider"></div>
-        <ul class="paq-includes">
-          <li><span class="paq-check">✦</span> Gomitas locas <span class="paq-note">ilimitadas</span></li>
-          <li><span class="paq-check">✦</span> Cantaritos <span class="paq-note">litro completo</span></li>
-          <li><span class="paq-check">✦</span> Maruchan de madrugada 🍜</li>
-          <li><span class="paq-check">✦</span> Hasta 80 personas</li>
-        </ul>
-        <div class="paq-footer">
-          <div class="paq-desde">Desde</div>
-          <div class="paq-precio">$7,500</div>
-          <a href="cotizador-cosmos_2026_v8.html" class="paq-cta">Cotizar <span class="btn-arrow">→</span></a>
+      <!-- ══ AFTER MOON ══ -->
+      <div class="paq-card" id="ix-pc-after" onclick="blIrCotizar(\'after\')" role="link" tabindex="0">
+        <div class="paq-badge">🔥 After</div>
+        <div class="paq-card-mask"></div>
+        <div class="paq-glow-pulse"></div>
+        <div class="paq-shine"></div>
+
+        <!-- ILUSTRACIÓN: after party night, crowd silhouettes, neon lights -->
+        <div class="paq-illustration">
+          <svg viewBox="0 0 320 195" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="ix-aft-sky" cx="50%" cy="50%">
+                <stop offset="0%" stop-color="#0e0520"/>
+                <stop offset="100%" stop-color="#07070E"/>
+              </radialGradient>
+              <radialGradient id="ix-aft-spot1" cx="50%" cy="50%">
+                <stop offset="0%" stop-color="rgba(26,59,255,0.5)"/>
+                <stop offset="100%" stop-color="transparent"/>
+              </radialGradient>
+              <radialGradient id="ix-aft-spot2" cx="50%" cy="50%">
+                <stop offset="0%" stop-color="rgba(200,50,200,0.4)"/>
+                <stop offset="100%" stop-color="transparent"/>
+              </radialGradient>
+              <radialGradient id="ix-aft-spot3" cx="50%" cy="50%">
+                <stop offset="0%" stop-color="rgba(96,207,100,0.35)"/>
+                <stop offset="100%" stop-color="transparent"/>
+              </radialGradient>
+              <filter id="ix-aft-glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              <filter id="ix-aft-soft"><feGaussianBlur stdDeviation="4"/></filter>
+              <filter id="ix-aft-vsoft"><feGaussianBlur stdDeviation="8"/></filter>
+            </defs>
+            <rect width="320" height="195" fill="url(#ix-aft-sky)"/>
+            <!-- Ambient color blobs -->
+            <ellipse cx="80" cy="120" rx="90" ry="70" fill="url(#ix-aft-spot1)" filter="url(#ix-aft-vsoft)"/>
+            <ellipse cx="240" cy="100" rx="80" ry="60" fill="url(#ix-aft-spot2)" filter="url(#ix-aft-vsoft)"/>
+            <ellipse cx="160" cy="150" rx="70" ry="50" fill="url(#ix-aft-spot3)" filter="url(#ix-aft-vsoft)"/>
+            <!-- Stars sparse -->
+            <circle cx="20" cy="12" r="1" fill="white" opacity=".6"/><circle cx="55" cy="20" r="0.8" fill="white" opacity=".5"/><circle cx="160" cy="8" r="1.2" fill="white" opacity=".7"/><circle cx="260" cy="15" r="1" fill="white" opacity=".6"/><circle cx="300" cy="25" r="0.9" fill="rgba(200,210,255,0.6)"/>
+            <!-- Big glowing moon top right -->
+            <circle cx="275" cy="35" r="28" fill="rgba(200,180,255,0.08)" filter="url(#ix-aft-soft)"/>
+            <circle cx="275" cy="35" r="20" fill="rgba(180,160,240,0.12)"/>
+            <circle cx="275" cy="35" r="14" fill="rgba(200,180,255,0.15)"/>
+            <circle cx="275" cy="35" r="14" fill="none" stroke="rgba(200,180,255,0.25)" stroke-width="1"/>
+            <!-- Spotlights beams from top -->
+            <polygon points="60,0 48,0 90,195 102,195" fill="rgba(26,59,255,0.06)"/>
+            <polygon points="155,0 145,0 158,195 168,195" fill="rgba(200,80,200,0.05)"/>
+            <polygon points="255,0 245,0 230,195 240,195" fill="rgba(26,59,255,0.05)"/>
+            <!-- Spotlight heads -->
+            <rect x="50" y="0" width="20" height="6" rx="2" fill="rgba(26,59,255,0.7)" filter="url(#ix-aft-glow)"/>
+            <rect x="147" y="0" width="16" height="5" rx="2" fill="rgba(220,60,220,0.8)" filter="url(#ix-aft-glow)"/>
+            <rect x="243" y="0" width="16" height="5" rx="2" fill="rgba(26,59,255,0.7)" filter="url(#ix-aft-glow)"/>
+            <!-- Ground / floor glow -->
+            <ellipse cx="160" cy="195" rx="200" ry="35" fill="rgba(20,10,40,0.95)"/>
+            <ellipse cx="160" cy="192" rx="140" ry="18" fill="rgba(40,20,80,0.8)"/>
+            <!-- Floor neon line -->
+            <line x1="20" y1="178" x2="300" y2="178" stroke="rgba(26,59,255,0.3)" stroke-width="1.5" filter="url(#ix-aft-glow)"/>
+            <line x1="20" y1="178" x2="300" y2="178" stroke="rgba(26,59,255,0.5)" stroke-width="0.5"/>
+            <!-- Crowd silhouettes (people) -->
+            <!-- Person 1 -->
+            <ellipse cx="55" cy="172" rx="10" ry="3" fill="rgba(0,0,0,0.6)"/>
+            <rect x="49" y="148" width="12" height="25" rx="6" fill="#0a0015"/>
+            <circle cx="55" cy="143" r="7" fill="#0a0015"/>
+            <!-- Person 2 - taller -->
+            <ellipse cx="90" cy="170" rx="10" ry="3" fill="rgba(0,0,0,0.5)"/>
+            <rect x="84" y="140" width="12" height="30" rx="6" fill="#0c0018"/>
+            <circle cx="90" cy="135" r="8" fill="#0c0018"/>
+            <!-- arms up -->
+            <line x1="84" y1="150" x2="75" y2="140" stroke="#0c0018" stroke-width="5" stroke-linecap="round"/>
+            <line x1="96" y1="150" x2="105" y2="138" stroke="#0c0018" stroke-width="5" stroke-linecap="round"/>
+            <!-- Person 3 -->
+            <ellipse cx="130" cy="173" rx="9" ry="3" fill="rgba(0,0,0,0.5)"/>
+            <rect x="124" y="147" width="12" height="27" rx="6" fill="#08001a"/>
+            <circle cx="130" cy="142" r="7" fill="#08001a"/>
+            <line x1="124" y1="155" x2="115" y2="148" stroke="#08001a" stroke-width="5" stroke-linecap="round"/>
+            <!-- Person 4 center big -->
+            <ellipse cx="165" cy="170" rx="12" ry="4" fill="rgba(0,0,0,0.6)"/>
+            <rect x="158" y="140" width="14" height="30" rx="7" fill="#050010"/>
+            <circle cx="165" cy="134" r="9" fill="#050010"/>
+            <line x1="158" y1="148" x2="146" y2="138" stroke="#050010" stroke-width="6" stroke-linecap="round"/>
+            <line x1="172" y1="148" x2="184" y2="136" stroke="#050010" stroke-width="6" stroke-linecap="round"/>
+            <!-- Person 5 -->
+            <ellipse cx="200" cy="173" rx="9" ry="3" fill="rgba(0,0,0,0.5)"/>
+            <rect x="194" y="148" width="12" height="26" rx="6" fill="#080018"/>
+            <circle cx="200" cy="143" r="7" fill="#080018"/>
+            <line x1="206" y1="155" x2="215" y2="147" stroke="#080018" stroke-width="5" stroke-linecap="round"/>
+            <!-- Person 6 -->
+            <ellipse cx="235" cy="171" rx="10" ry="3" fill="rgba(0,0,0,0.5)"/>
+            <rect x="229" y="144" width="12" height="28" rx="6" fill="#0a0015"/>
+            <circle cx="235" cy="139" r="8" fill="#0a0015"/>
+            <line x1="229" y1="152" x2="220" y2="143" stroke="#0a0015" stroke-width="5" stroke-linecap="round"/>
+            <line x1="241" y1="151" x2="250" y2="142" stroke="#0a0015" stroke-width="5" stroke-linecap="round"/>
+            <!-- Person 7 -->
+            <ellipse cx="270" cy="173" rx="9" ry="3" fill="rgba(0,0,0,0.5)"/>
+            <rect x="264" y="149" width="12" height="25" rx="6" fill="#0a0015"/>
+            <circle cx="270" cy="144" r="7" fill="#0a0015"/>
+            <!-- Colored rim lights on crowd -->
+            <ellipse cx="90" cy="148" rx="8" ry="3" fill="rgba(26,59,255,0.2)"/>
+            <ellipse cx="165" cy="145" rx="9" ry="3" fill="rgba(220,60,220,0.2)"/>
+            <ellipse cx="235" cy="150" rx="8" ry="3" fill="rgba(26,59,255,0.15)"/>
+            <!-- Floating music notes / sparkles -->
+            <text x="45" y="132" font-size="9" fill="rgba(96,207,255,0.6)" font-family="serif">♪</text>
+            <text x="280" y="118" font-size="8" fill="rgba(220,120,255,0.5)" font-family="serif">♫</text>
+            <text x="18" y="100" font-size="7" fill="rgba(26,59,255,0.5)" font-family="serif">♪</text>
+            <!-- Sparkles -->
+            <circle cx="115" cy="105" r="1.5" fill="rgba(255,255,200,0.8)" filter="url(#ix-aft-glow)"><animate attributeName="opacity" dur="1.8s" repeatCount="indefinite" values="0.8;0.1;0.8"/></circle>
+            <circle cx="210" cy="90" r="1.2" fill="rgba(200,180,255,0.9)" filter="url(#ix-aft-glow)"><animate attributeName="opacity" dur="2.4s" repeatCount="indefinite" values="0.9;0.2;0.9"/></circle>
+            <circle cx="145" cy="80" r="1.8" fill="rgba(96,207,255,0.8)" filter="url(#ix-aft-glow)"><animate attributeName="opacity" dur="1.5s" repeatCount="indefinite" values="0.8;0.1;0.8"/></circle>
+            <!-- Neon sign in background -->
+            <rect x="110" y="108" width="100" height="22" rx="5" fill="rgba(5,5,20,0.7)" stroke="rgba(220,60,220,0.3)" stroke-width="1"/>
+            <text x="160" y="123" text-anchor="middle" font-family="sans-serif" font-size="8" fill="rgba(220,120,255,0.8)" letter-spacing="1.5">AFTER MOON</text>
+          </svg>
+        </div>
+
+        <div class="paq-inner">
+          <div class="paq-num">PAQUETE 03</div>
+          <div class="paq-name">After Moon</div>
+          <div class="paq-rango">👥 70 – 100 personas</div>
+          <ul class="paq-list">
+            <li>Barra 3 horas de servicio</li>
+            <li id="ix-paq-vit-after">2 vitroleros 20L cortesía</li>
+            <li>🌙 Experiencia Bajón Lunar ✨</li>
+            <li>Espejo + barra neon</li>
+            <li>Vasos y platos temáticos</li>
+          </ul>
+          <div class="paq-footer">
+            <div>
+              <div class="paq-desde" id="ix-pc-subprecio-after">Desde · $90/porción</div>
+              <div class="paq-precio" id="ix-pc-precio-after">$5,400</div>
+              <div style="display:inline-flex;align-items:center;gap:5px;margin-top:5px;background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.35);border-radius:100px;padding:3px 10px;font-size:.62rem;font-weight:700;color:var(--verde);letter-spacing:1px;">🏷️ 10% de descuento</div>
+            </div>
+            <div class="paq-cta">Cotizar <span>→</span></div>
+          </div>
         </div>
       </div>
 
-      <!-- 04 MOONLIGHT -->
-      <div class="paq-card paq-card-featured reveal reveal-delay-3" data-tier="4">
-        <div class="paq-glow paq-glow-featured"></div>
-        <div class="paq-featured-ribbon">⭐ FULL EXPERIENCE</div>
-        <div class="paq-num">04</div>
-        <div class="paq-badge paq-badge-luna">Premium</div>
-        <h3 class="paq-name">Moonlight</h3>
-        <p class="paq-tagline">La noche que nadie va a olvidar.</p>
-        <div class="paq-divider paq-divider-gold"></div>
-        <ul class="paq-includes">
-          <li><span class="paq-check paq-check-gold">✦</span> Gomitas locas <span class="paq-note">ilimitadas</span></li>
-          <li><span class="paq-check paq-check-gold">✦</span> Cantaritos Don Julio <span class="paq-note">litro</span></li>
-          <li><span class="paq-check paq-check-gold">✦</span> Chilaquiles <span class="paq-note">con proteína</span></li>
-          <li><span class="paq-check paq-check-gold">✦</span> Maruchan de madrugada 🍜</li>
-          <li><span class="paq-check paq-check-gold">✦</span> Más de 100 personas</li>
-        </ul>
-        <div class="paq-footer">
-          <div class="paq-desde">Desde</div>
-          <div class="paq-precio paq-precio-gold">$12,000</div>
-          <a href="cotizador-cosmos_2026_v8.html" class="paq-cta paq-cta-gold">Cotizar <span class="btn-arrow">→</span></a>
+      <!-- ══ MOONLIGHT ══ -->
+      <div class="paq-card gold" id="ix-pc-moonlight" onclick="blIrCotizar(\'moonlight\')" role="link" tabindex="0">
+        <div class="paq-badge gold">👑 Premium</div>
+        <div class="paq-card-mask"></div>
+        <div class="paq-glow-pulse"></div>
+        <div class="paq-shine"></div>
+
+        <!-- ILUSTRACIÓN: luxury gold moon — majestic crescent + crown + stars -->
+        <div class="paq-illustration">
+          <svg viewBox="0 0 320 195" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="ix-ml-sky" cx="50%" cy="40%">
+                <stop offset="0%" stop-color="#12100a"/>
+                <stop offset="100%" stop-color="#07070E"/>
+              </radialGradient>
+              <radialGradient id="ix-ml-moon" cx="35%" cy="30%">
+                <stop offset="0%" stop-color="#ffe8a0"/>
+                <stop offset="40%" stop-color="#d4a050"/>
+                <stop offset="80%" stop-color="#8a5c18"/>
+                <stop offset="100%" stop-color="#4a2e08"/>
+              </radialGradient>
+              <radialGradient id="ix-ml-halo" cx="50%" cy="50%">
+                <stop offset="0%" stop-color="rgba(200,169,110,0.2)"/>
+                <stop offset="60%" stop-color="rgba(200,140,50,0.08)"/>
+                <stop offset="100%" stop-color="transparent"/>
+              </radialGradient>
+              <radialGradient id="ix-ml-ground" cx="50%" cy="100%">
+                <stop offset="0%" stop-color="rgba(200,169,110,0.12)"/>
+                <stop offset="100%" stop-color="transparent"/>
+              </radialGradient>
+              <filter id="ix-ml-glow"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              <filter id="ix-ml-soft"><feGaussianBlur stdDeviation="4"/></filter>
+              <filter id="ix-ml-vsoft"><feGaussianBlur stdDeviation="10"/></filter>
+              <clipPath id="ix-ml-crescent">
+                <path d="M160,20 a70,70 0 1,1 0,140 a70,70 0 1,1 0,-140 Z M185,30 a55,55 0 1,0 0,120 a55,55 0 1,0 0,-120 Z"/>
+              </clipPath>
+            </defs>
+            <rect width="320" height="195" fill="url(#ix-ml-sky)"/>
+            <!-- Background galaxy dust -->
+            <ellipse cx="160" cy="90" rx="200" ry="80" fill="rgba(200,150,50,0.03)" filter="url(#ix-ml-vsoft)"/>
+            <!-- Gold stars — many more for luxury feel -->
+            <circle cx="10" cy="18" r="1.2" fill="#ffd700" opacity=".8"/><circle cx="28" cy="8" r="0.8" fill="#ffeb80" opacity=".7"/><circle cx="50" cy="22" r="1.5" fill="#ffd700" opacity=".9"/><circle cx="75" cy="10" r="1" fill="#ffe060" opacity=".6"/><circle cx="95" cy="30" r="0.8" fill="#ffd700" opacity=".7"/><circle cx="115" cy="12" r="1.3" fill="white" opacity=".5"/><circle cx="215" cy="8" r="1.2" fill="#ffd700" opacity=".8"/><circle cx="245" cy="20" r="0.9" fill="#ffeb80" opacity=".7"/><circle cx="268" cy="10" r="1.5" fill="#ffd700" opacity=".6"/><circle cx="290" cy="28" r="1" fill="#ffe060" opacity=".8"/><circle cx="308" cy="15" r="0.8" fill="white" opacity=".6"/><circle cx="20" cy="50" r="0.7" fill="#ffd700" opacity=".5"/><circle cx="48" cy="62" r="1" fill="#ffe080" opacity=".6"/><circle cx="300" cy="55" r="1.1" fill="#ffd700" opacity=".7"/><circle cx="312" cy="45" r="0.8" fill="#ffeb80" opacity=".6"/>
+            <!-- Twinkling gold stars -->
+            <circle cx="35" cy="35" r="2" fill="#ffd700" filter="url(#ix-ml-glow)"><animate attributeName="opacity" dur="2s" repeatCount="indefinite" values="0.9;0.3;0.9"/></circle>
+            <circle cx="285" cy="42" r="1.8" fill="#ffe080" filter="url(#ix-ml-glow)"><animate attributeName="opacity" dur="3s" repeatCount="indefinite" values="0.8;0.2;0.8"/></circle>
+            <circle cx="130" cy="25" r="1.5" fill="#ffd700" filter="url(#ix-ml-glow)"><animate attributeName="opacity" dur="2.5s" repeatCount="indefinite" values="0.7;0.15;0.7"/></circle>
+            <!-- 4-point star sparkles -->
+            <path d="M60,50 L62,44 L64,50 L70,52 L64,54 L62,60 L60,54 L54,52 Z" fill="#ffd700" opacity=".6" filter="url(#ix-ml-soft)"/>
+            <path d="M255,65 L257,59 L259,65 L265,67 L259,69 L257,75 L255,69 L249,67 Z" fill="#ffd700" opacity=".5" filter="url(#ix-ml-soft)"/>
+            <path d="M18,75 L19.5,70 L21,75 L26,76.5 L21,78 L19.5,83 L18,78 L13,76.5 Z" fill="#ffe080" opacity=".6" filter="url(#ix-ml-soft)"/>
+            <!-- Big moon halo -->
+            <circle cx="148" cy="80" r="100" fill="url(#ix-ml-halo)" filter="url(#ix-ml-vsoft)"/>
+            <circle cx="148" cy="80" r="80" fill="rgba(200,169,110,0.06)" filter="url(#ix-ml-soft)"/>
+            <!-- Crescent moon shape: full circle then mask -->
+            <circle cx="148" cy="80" r="68" fill="url(#ix-ml-moon)" clip-path="url(#ix-ml-crescent)"/>
+            <!-- Moon surface texture on crescent -->
+            <circle cx="120" cy="65" r="7" fill="rgba(100,60,10,0.3)" clip-path="url(#ix-ml-crescent)"/>
+            <circle cx="138" cy="95" r="5" fill="rgba(90,50,8,0.25)" clip-path="url(#ix-ml-crescent)"/>
+            <circle cx="108" cy="85" r="4" fill="rgba(110,65,12,0.2)" clip-path="url(#ix-ml-crescent)"/>
+            <!-- Crescent outline glow -->
+            <circle cx="148" cy="80" r="68" fill="none" stroke="rgba(255,210,100,0.3)" stroke-width="1.5" clip-path="url(#ix-ml-crescent)"/>
+            <!-- Rim light on crescent edge -->
+            <circle cx="148" cy="80" r="70" fill="none" stroke="rgba(255,220,120,0.15)" stroke-width="3" filter="url(#ix-ml-soft)"/>
+            <!-- Crown above moon -->
+            <g transform="translate(148, 8)">
+              <!-- Crown base -->
+              <rect x="-22" y="4" width="44" height="10" rx="2" fill="#c8a96e" stroke="#ffd700" stroke-width="0.8"/>
+              <!-- Crown points -->
+              <polygon points="-22,4 -18,-8 -14,4" fill="#c8a96e" stroke="#ffd700" stroke-width="0.8"/>
+              <polygon points="-8,4 0,-14 8,4" fill="#d4b57a" stroke="#ffd700" stroke-width="0.8"/>
+              <polygon points="14,4 18,-8 22,4" fill="#c8a96e" stroke="#ffd700" stroke-width="0.8"/>
+              <!-- Crown gems -->
+              <circle cx="-18" cy="-4" r="2.5" fill="#ff6060" filter="url(#ix-ml-soft)"/>
+              <circle cx="0" cy="-9" r="3" fill="#60cfff" filter="url(#ix-ml-soft)"/>
+              <circle cx="18" cy="-4" r="2.5" fill="#ff6060" filter="url(#ix-ml-soft)"/>
+              <!-- Crown glow -->
+              <rect x="-22" y="-14" width="44" height="28" rx="4" fill="none" stroke="rgba(255,215,100,0.4)" stroke-width="1" filter="url(#ix-ml-soft)"/>
+            </g>
+            <!-- Ground luxury -->
+            <ellipse cx="160" cy="195" rx="200" ry="30" fill="rgba(15,10,5,0.95)"/>
+            <rect width="320" height="195" fill="url(#ix-ml-ground)" opacity="0.6" y="140"/>
+            <!-- Gold horizontal line ground -->
+            <line x1="0" y1="168" x2="320" y2="168" stroke="rgba(200,169,110,0.2)" stroke-width="1"/>
+            <line x1="30" y1="168" x2="290" y2="168" stroke="rgba(200,169,110,0.4)" stroke-width="0.5" filter="url(#ix-ml-soft)"/>
+            <!-- Luxury drape / table cloth hint -->
+            <path d="M0,168 Q80,158 160,162 Q240,168 320,160 L320,195 L0,195 Z" fill="rgba(20,15,5,0.8)"/>
+            <!-- Gold candlesticks -->
+            <rect x="60" y="142" width="6" height="26" rx="1" fill="#c8a96e" opacity=".8"/>
+            <ellipse cx="63" cy="142" rx="8" ry="3" fill="#c8a96e" opacity=".7"/>
+            <ellipse cx="63" cy="168" rx="10" ry="3" fill="#c8a96e" opacity=".6"/>
+            <ellipse cx="63" cy="138" rx="3" ry="4" fill="#ffd700" opacity=".5" filter="url(#ix-ml-glow)"/>
+            <rect x="254" y="142" width="6" height="26" rx="1" fill="#c8a96e" opacity=".8"/>
+            <ellipse cx="257" cy="142" rx="8" ry="3" fill="#c8a96e" opacity=".7"/>
+            <ellipse cx="257" cy="168" rx="10" ry="3" fill="#c8a96e" opacity=".6"/>
+            <ellipse cx="257" cy="138" rx="3" ry="4" fill="#ffd700" opacity=".5" filter="url(#ix-ml-glow)"/>
+            <!-- Diamond shapes floating -->
+            <path d="M305,80 L310,72 L315,80 L310,88 Z" fill="rgba(255,215,100,0.3)" stroke="rgba(255,215,100,0.5)" stroke-width="0.5"/>
+            <path d="M8,90 L13,83 L18,90 L13,97 Z" fill="rgba(255,215,100,0.25)" stroke="rgba(255,215,100,0.4)" stroke-width="0.5"/>
+            <!-- Orbiting gold particle -->
+            <circle r="2.5" fill="#ffd700" filter="url(#ix-ml-glow)" opacity=".9">
+              <animateMotion dur="12s" repeatCount="indefinite" path="M148,80 m-80,0 a80,80 0 1,1 160,0 a80,80 0 1,1 -160,0"/>
+            </circle>
+            <!-- Second smaller orbit -->
+            <circle r="1.5" fill="rgba(255,200,80,0.7)" filter="url(#ix-ml-soft)">
+              <animateMotion dur="7s" repeatCount="indefinite" path="M148,80 m-55,0 a55,55 0 1,0 110,0 a55,55 0 1,0 -110,0"/>
+            </circle>
+          </svg>
+        </div>
+
+        <div class="paq-inner">
+          <div class="paq-num" style="color:var(--gold);">PAQUETE 04</div>
+          <div class="paq-name">Moonlight</div>
+          <div class="paq-rango">👥 +110 personas</div>
+          <ul class="paq-list">
+            <li>Cotización personalizada</li>
+            <li>Todo completamente a medida</li>
+            <li>Atención directa y exclusiva</li>
+            <li>Sin límites de servicio</li>
+          </ul>
+          <div class="paq-footer">
+            <div>
+              <div class="paq-desde" id="ix-pc-subprecio-moonlight">Desde</div>
+              <div class="paq-precio" id="ix-pc-precio-moonlight">$12,000</div>
+              <div style="display:inline-flex;align-items:center;gap:5px;margin-top:5px;background:rgba(200,169,110,.15);border:1px solid rgba(200,169,110,.4);border-radius:100px;padding:3px 10px;font-size:.62rem;font-weight:700;color:var(--gold);letter-spacing:1px;">🏷️ 20% desde 110 personas</div>
+            </div>
+            <div class="paq-cta" style="color:var(--gold);">Contactar <span>→</span></div>
+          </div>
         </div>
       </div>
 
+        <p style="font-size:.68rem;color:var(--blanco-dim);text-align:center;margin:10px auto 0;letter-spacing:.5px;max-width:none;width:100%;display:block;">Toca un paquete y te llevamos al cotizador con tu barra y paquete ya seleccionados →</p>
+      </div>
     </div>
 
     <div class="paq-nota reveal">
       <span>🌙</span>
-      <p>Todos los paquetes son <em>puntos de partida</em> — en el cotizador puedes personalizar cada detalle a tu gusto.</p>
-      <a href="cotizador-cosmos_2026_v8.html" class="hero-btn-secondary" style="cursor:pointer;font-size:10px;padding:10px 20px;">Armar mi paquete → </a>
+      <p>Todos los paquetes son <em>puntos de partida</em> — en el cotizador ajustas personas, porciones, proteínas, tequila y extras, y ves tu total al instante.</p>
+      <a href="cotizador-cosmos_2026_v8.html" id="ix-cta-armar" class="hero-btn-secondary" style="font-size:10px;padding:10px 20px;">Armar mi paquete → </a>
     </div>
   </div>
 </section>
+
+<script>
+/* ══ BL_PAQ_SYNC — misma lógica que actualizarPreciosPaquetes() del cotizador ══ */
+(function(){
+  var PAQ = {
+    nebula:   { minPax:20,  base:2500  },
+    cosmos:   { minPax:40,  base:4800  },
+    after:    { minPax:70,  base:7500  },
+    moonlight:{ minPax:110, base:12000 }
+  };
+  var BARRA_PRECIOS = {
+    chilaquiles: { tipo:'porcion', precio:90,  label:'$90/porción (sencillo)' },
+    maruchan:    { tipo:'porcion', precio:90,  label:'$90/porción' },
+    gomitas:     { tipo:'porcion', precio:45,  label:'$45/porción' },
+    cantaritos:  { tipo:'botella', precio:450, label:'$450/botella (tradicional)' }
+  };
+  var CANT_MIN = { nebula:4, cosmos:8, after:14, moonlight:22 };
+  var CANT_CORTESIA_LABEL = { nebula:null, cosmos:'🥃 1 botella tradicional cortesía', after:'🥃 2 botellas tradicionales cortesía' };
+  var VIT_LABEL_ORIG = { nebula:'1 vitrolero de cortesía', cosmos:'2 vitroleros de cortesía', after:'2 vitroleros 20L cortesía' };
+  var barra = 'chilaquiles';
+  try { var s = localStorage.getItem('bl_barra'); if (s && BARRA_PRECIOS[s]) barra = s; } catch(e){}
+
+  function fmt(n){ return '$' + n.toLocaleString('es-MX'); }
+  function $(id){ return document.getElementById(id); }
+
+  function pintar(){
+    ['chilaquiles','maruchan','gomitas','cantaritos'].forEach(function(t){
+      var el = $('ix-bpv-' + t); if (el) el.classList.toggle('activo', t === barra);
+    });
+    ['nebula','cosmos','after','moonlight'].forEach(function(id){
+      var def = PAQ[id], el = $('ix-pc-precio-' + id), sub = $('ix-pc-subprecio-' + id), vit = $('ix-paq-vit-' + id);
+      var precio;
+      if (barra === 'cantaritos') {
+        precio = def.base + CANT_MIN[id] * 450;
+        if (sub) { sub.className = 'paq-desde cant-label'; sub.innerHTML = '🥃 ' + CANT_MIN[id] + ' botellas · precio desde'; }
+        if (vit) { var c = CANT_CORTESIA_LABEL[id]; vit.textContent = c || 'Sin botellas de cortesía'; vit.style.opacity = c ? '1' : '0.4'; }
+      } else {
+        precio = def.minPax * BARRA_PRECIOS[barra].precio;
+        if (sub) { sub.className = 'paq-desde'; sub.textContent = 'desde · ' + BARRA_PRECIOS[barra].label; }
+        if (vit) { vit.textContent = VIT_LABEL_ORIG[id]; vit.style.opacity = '1'; }
+      }
+      if (el) el.textContent = fmt(precio);
+      var card = $('ix-pc-' + id);
+      if (card) { card.classList.remove('cz-flash'); void card.offsetWidth; card.classList.add('cz-flash'); }
+    });
+    var cta = $('ix-cta-armar');
+    if (cta) cta.href = 'cotizador-cosmos_2026_v8.html?barra=' + barra;
+  }
+
+  window.blSelBarra = function(t){
+    barra = t;
+    try { localStorage.setItem('bl_barra', t); } catch(e){}
+    pintar();
+  };
+  window.blIrCotizar = function(paq){
+    try { localStorage.setItem('bl_barra', barra); } catch(e){}
+    location.href = 'cotizador-cosmos_2026_v8.html?barra=' + encodeURIComponent(barra) + '&paq=' + encodeURIComponent(paq) + '#paso-paquete';
+  };
+  document.addEventListener('keydown', function(e){
+    if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.id && e.target.id.indexOf('ix-pc-') === 0) {
+      e.preventDefault(); window.blIrCotizar(e.target.id.replace('ix-pc-',''));
+    }
+  });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', pintar); else pintar();
+})();
+</script>
 
 <!-- ══ GALERÍA DE EVENTOS ══ -->
 <section id="galeria">
@@ -2490,7 +3264,7 @@ function filtrarGaleria(paquete, btn) {
         <h2 class="reviews-title">Lo que dicen<br><em>los que vivieron</em> el bajón</h2>
       </div>
       <div class="reviews-meta">
-        <div class="reviews-avg" id="avgDisplay">4.9</div>
+        <div class="reviews-avg" id="avgDisplay">—</div>
         <div class="reviews-stars-avg">
           <div class="stars-row" id="avgStars">
             <span class="star-icon">★</span>
@@ -2499,7 +3273,7 @@ function filtrarGaleria(paquete, btn) {
             <span class="star-icon">★</span>
             <span class="star-icon">★</span>
           </div>
-          <div class="reviews-count" id="reviewsCountLabel">12 reseñas verificadas</div>
+          <div class="reviews-count" id="reviewsCountLabel">Cargando reseñas…</div>
         </div>
       </div>
     </div>

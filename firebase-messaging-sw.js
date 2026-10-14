@@ -33,7 +33,7 @@ messaging.onBackgroundMessage((payload) => {
      (data.total  ? ' · $' + parseFloat(data.total).toLocaleString('es-MX', { minimumFractionDigits: 2 }) : ''));
 
   // Ícono embebido del logo Bajón Lunar
-  const ICON = 'https://ingalejandrofh01-boop.github.io/Bajon-Lunar/icon-192.png';
+  const ICON = self.registration.scope + 'icon-192.png';
 
   return self.registration.showNotification(title, {
     body,
@@ -42,7 +42,7 @@ messaging.onBackgroundMessage((payload) => {
     tag:       data.folio || 'bl-cot',
     renotify:  true,
     vibrate:   [100, 50, 200, 50, 100],  // patrón de vibración 🌙
-    data:      { url: '/', folio: data.folio },
+    data:      { url: self.registration.scope + 'admin-panel-completo_v10.html', folio: data.folio },
     actions:   [
       { action: 'ver',     title: '👁 Ver' },
       { action: 'ignorar', title: 'Ignorar' },
@@ -56,13 +56,14 @@ self.addEventListener('notificationclick', (event) => {
 
   if (event.action === 'ignorar') return;
 
-  const urlToOpen = event.notification.data?.url || 'https://ingalejandrofh01-boop.github.io/Bajon-Lunar/';
+  const urlToOpen = event.notification.data?.url || (self.registration.scope + 'admin-panel-completo_v10.html');
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
       // Si ya está abierta, enfocarla
+      // Si el panel ya está abierto, enfocarlo (antes enfocaba cualquier pestaña del sitio)
       for (const client of clientList) {
-        if (client.url.includes(self.location.origin) && 'focus' in client) {
+        if (client.url.includes('admin-panel') && 'focus' in client) {
           return client.focus();
         }
       }

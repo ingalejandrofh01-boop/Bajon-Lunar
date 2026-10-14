@@ -247,10 +247,11 @@ header{
   margin-bottom:10px;
   perspective:1200px;
 }
-@media(max-width:900px){#barra-previa-grid{grid-template-columns:1fr 1fr;}}
-@media(max-width:480px){#barra-previa-grid{grid-template-columns:1fr;}}
+@media(max-width:900px){#barra-previa-grid{grid-template-columns:1fr 1fr !important;}}
+@media(max-width:480px){#barra-previa-grid{grid-template-columns:1fr !important;}}
 
 
+@media(max-width:1000px) and (min-width:481px){.paq-grid{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:480px){.paq-grid{grid-template-columns:1fr;}}
 
 /* ── CARD BASE ── */
@@ -429,6 +430,7 @@ header{
 }
 .gold .paq-precio{color:var(--gold);text-shadow:0 0 24px rgba(200,169,110,.5);}
 
+.paq-footer{flex-wrap:wrap;gap:8px 10px;} /* evita que "Contactar"/"Elegir" se corten */
 /* CTA arrow */
 .paq-cta{
   font-size:.6rem;letter-spacing:2px;text-transform:uppercase;
@@ -2768,7 +2770,8 @@ function elegirPaquete(id) {
   document.getElementById('exp-lunar-wrap').style.display = def.exp && id !== 'moonlight' ? 'block' : 'none';
   // Vitrolero hint — se actualiza dinámicamente en calcularTotal también
   const personas0 = def.minPax;
-  const nVit0 = calcVitCortesia(id, personas0);
+  const _v0 = calcVitCortesia(id, personas0);
+  const nVit0 = (_v0.base || 0) + (_v0.extras || 0);
   document.getElementById('vit-hint').textContent = barraActiva === 'cantaritos'
     ? 'Botellas de cortesía según paquete'
     : (def.vit
@@ -5159,8 +5162,7 @@ function nuevaCot() {
 ['nebula','cosmos','after','moonlight'].forEach(function(id){
   var el = document.getElementById('pc-' + id);
   if(el){
-    el.addEventListener('click', function(e){ elegirPaquete(id); });
-    el.style.cursor = 'pointer';
+    el.style.cursor = 'pointer'; // el click ya lo maneja onclick="elegirPaquete()" (antes se disparaba 2 veces)
   }
 });
 
@@ -5168,6 +5170,24 @@ function nuevaCot() {
 renderSaboresVit();
 actualizarCapVit();
 actualizarPreciosPaquetes(); // inicializar precios según barra por defecto
+
+// ════════ PRESELECCIÓN DESDE EL INICIO (index.html) ════════
+// index.html manda ?barra=gomitas&paq=cosmos — así lo que el cliente eligió en el inicio
+// aparece ya seleccionado aquí, con los mismos precios.
+(function(){
+  try {
+    var q = new URLSearchParams(location.search);
+    var b = q.get('barra'), p = q.get('paq');
+    if (!b) { try { b = localStorage.getItem('bl_barra'); } catch(e){} }
+    if (b && BARRA_PRECIOS[b]) selBarraPrevia(b);
+    if (p && PAQ[p]) setTimeout(function(){ elegirPaquete(p); }, 250);
+  } catch(e) { console.warn('Preselección:', e); }
+})();
+// Guardar la barra elegida para que el inicio la recuerde
+(function(){
+  var _orig = selBarraPrevia;
+  selBarraPrevia = function(t){ try{ localStorage.setItem('bl_barra', t); }catch(e){} return _orig(t); };
+})();
 </script>
 
 <!-- ════════ BOTÓN HOME FLOTANTE ════════ -->
