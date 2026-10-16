@@ -713,6 +713,18 @@ header{
 .vit-cant button:hover{background:rgba(26,59,255,.2);}
 .vit-cant span{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;padding:0 4px;min-width:40px;text-align:center;}
 
+/* vitroleros regalo / extra */
+.vitg-head{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;}
+.vitg-badge{flex-shrink:0;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;font-size:.8rem;padding:4px 10px;border-radius:100px;background:rgba(74,222,128,.14);border:1px solid rgba(74,222,128,.4);color:var(--verde);}
+.vitg-t{font-size:.82rem;font-weight:700;color:var(--blanco);}
+.vitg-s{font-size:.66rem;color:var(--blanco-dim);margin-top:3px;line-height:1.5;}
+.vitg-lbl{font-size:.64rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--blanco-dim);margin-bottom:8px;font-weight:500;}
+.vitx{margin-top:16px;padding-top:16px;border-top:1px dashed rgba(255,255,255,.12);}
+.vitx-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+.vitx-costo{margin-top:12px;font-size:.74rem;padding:10px 14px;border-radius:8px;background:rgba(26,59,255,.08);border:1px solid rgba(26,59,255,.25);color:var(--blanco);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.vitx-costo.pend{background:rgba(251,191,36,.07);border-color:rgba(251,191,36,.3);color:var(--amarillo);}
+.chip.gift{border-color:rgba(74,222,128,.45);}
+.chip.gift.active{background:rgba(74,222,128,.16);border-color:var(--verde);color:var(--blanco);}
 /* sabores vitrolero */
 .sabor-vit-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
 .sabor-vit-label{font-size:.66rem;color:var(--blanco-dim);min-width:80px;}
@@ -1081,7 +1093,7 @@ body:has([onclick]:hover) .cursor-core::before {
         <div class="bc-icon" style="font-size:2rem;margin-bottom:8px;">&#127869;</div>
         <div class="bc-name" style="font-size:.88rem;">Chilaquiles</div>
         <div class="bc-desc" style="font-size:.65rem;margin-top:6px;">El baj&#243;n cl&#225;sico y reconfortante. Salsa, prote&#237;na y todo el amor casero.</div>
-        <div style="margin-top:8px;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1px;color:var(--azul);">$90/porción · $115 con proteína</div>
+        <div style="margin-top:8px;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1px;color:var(--azul);">Bowl 16 oz · $75 · $99 con proteína</div>
       </div>
 
       <div class="barra-card" id="bpv-maruchan" onclick="selBarraPrevia('maruchan')" style="cursor:pointer;padding:20px 16px;text-align:center;">
@@ -1089,7 +1101,7 @@ body:has([onclick]:hover) .cursor-core::before {
         <div class="bc-icon" style="font-size:2rem;margin-bottom:8px;">&#127836;</div>
         <div class="bc-name" style="font-size:.88rem;">Maruchan</div>
         <div class="bc-desc" style="font-size:.65rem;margin-top:6px;">Madrugada garantizada. Maruchan preparado con botanas y el toque lunar.</div>
-        <div style="margin-top:8px;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1px;color:var(--azul);">$90/porción</div>
+        <div style="margin-top:8px;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1px;color:var(--azul);">$60/porción</div>
       </div>
 
       <div class="barra-card" id="bpv-gomitas" onclick="selBarraPrevia('gomitas')" style="cursor:pointer;padding:20px 16px;text-align:center;">
@@ -1097,7 +1109,7 @@ body:has([onclick]:hover) .cursor-core::before {
         <div class="bc-icon" style="font-size:2rem;margin-bottom:8px;">&#127852;</div>
         <div class="bc-name" style="font-size:.88rem;">Gomitas Locas</div>
         <div class="bc-desc" style="font-size:.65rem;margin-top:6px;">Chile, lim&#243;n, chamoy. La botana que nadie puede parar de comer.</div>
-        <div style="margin-top:8px;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1px;color:var(--azul);">$45/porción</div>
+        <div style="margin-top:8px;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1px;color:var(--azul);">$60/porción</div>
       </div>
 
       <div class="barra-card" id="bpv-cantaritos" onclick="selBarraPrevia('cantaritos')" style="cursor:pointer;padding:20px 16px;text-align:center;">
@@ -1105,7 +1117,7 @@ body:has([onclick]:hover) .cursor-core::before {
         <div class="bc-icon" style="font-size:2rem;margin-bottom:8px;">&#127818;</div>
         <div class="bc-name" style="font-size:.88rem;">Cantaritos</div>
         <div class="bc-desc" style="font-size:.65rem;margin-top:6px;">Bebida fresca en cantarito de barro. Tequila, mezcal o sin alcohol.</div>
-        <div style="margin-top:8px;font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:0px;color:var(--azul);">$450 tradicional · $950 Don Julio · $1,050 Dobel</div>
+        <div style="margin-top:8px;font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:0px;color:var(--azul);">Por botella · $450 tradicional · $950 Don Julio · $1,050 Dobel</div>
       </div>
 
     </div>
@@ -1222,7 +1234,7 @@ body:has([onclick]:hover) .cursor-core::before {
           </ul>
           <div class="paq-footer">
             <div>
-              <div class="paq-desde" id="pc-subprecio-nebula">Desde · $90/porción</div>
+              <div class="paq-desde" id="pc-subprecio-nebula">Desde · $75/bowl</div>
               <div class="paq-precio" id="pc-precio-nebula">$1,800</div>
             </div>
             <div class="paq-cta">Elegir <span>→</span></div>
@@ -1324,7 +1336,7 @@ body:has([onclick]:hover) .cursor-core::before {
           </ul>
           <div class="paq-footer">
             <div>
-              <div class="paq-desde" id="pc-subprecio-cosmos">Desde · $90/porción</div>
+              <div class="paq-desde" id="pc-subprecio-cosmos">Desde · $75/bowl</div>
               <div class="paq-precio" id="pc-precio-cosmos">$2,700</div>
               <div style="display:inline-flex;align-items:center;gap:5px;margin-top:5px;background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.35);border-radius:100px;padding:3px 10px;font-size:.62rem;font-weight:700;color:var(--verde);letter-spacing:1px;">🏷️ 5% de descuento</div>
             </div>
@@ -1459,7 +1471,7 @@ body:has([onclick]:hover) .cursor-core::before {
           </ul>
           <div class="paq-footer">
             <div>
-              <div class="paq-desde" id="pc-subprecio-after">Desde · $90/porción</div>
+              <div class="paq-desde" id="pc-subprecio-after">Desde · $75/bowl</div>
               <div class="paq-precio" id="pc-precio-after">$5,400</div>
               <div style="display:inline-flex;align-items:center;gap:5px;margin-top:5px;background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.35);border-radius:100px;padding:3px 10px;font-size:.62rem;font-weight:700;color:var(--verde);letter-spacing:1px;">🏷️ 10% de descuento</div>
             </div>
@@ -1723,7 +1735,7 @@ body:has([onclick]:hover) .cursor-core::before {
             <div class="bc-icon">🍽️</div>
             <div class="bc-name">Barra de Chilaquiles</div>
             <div class="bc-desc">El bajón clásico y reconfortante. Salsa, proteína y todo el amor casero.</div>
-            <div class="bc-precio">$90/porción · $115 con proteína</div>
+            <div class="bc-precio">Bowl 16 oz · $75 · $99 con proteína</div>
           </div>
           <!-- Maruchan -->
           <div class="barra-card" id="bc-maruchan" onclick="elegirBarra('maruchan')">
@@ -1731,7 +1743,7 @@ body:has([onclick]:hover) .cursor-core::before {
             <div class="bc-icon">🍜</div>
             <div class="bc-name">Barra de Maruchan</div>
             <div class="bc-desc">Madrugada garantizada. Maruchan preparado con botanas y el toque lunar.</div>
-            <div class="bc-precio">$90/porción</div>
+            <div class="bc-precio">$60/porción</div>
           </div>
           <!-- Gomitas -->
           <div class="barra-card" id="bc-gomitas" onclick="elegirBarra('gomitas')">
@@ -1739,7 +1751,7 @@ body:has([onclick]:hover) .cursor-core::before {
             <div class="bc-icon">🍬</div>
             <div class="bc-name">Gomitas Locas</div>
             <div class="bc-desc">Chile, limón, chamoy. La botana que nadie puede parar de comer.</div>
-            <div class="bc-precio">$45/porción</div>
+            <div class="bc-precio">$60/porción</div>
           </div>
           <!-- Cantaritos -->
           <div class="barra-card" id="bc-cantaritos" onclick="elegirBarra('cantaritos')">
@@ -1769,19 +1781,19 @@ body:has([onclick]:hover) .cursor-core::before {
           </div>
           <!-- Proteína -->
           <div style="margin-top:16px;">
-            <div class="opts-title">🍗 Proteína <span style="opacity:.6;font-size:.58rem;">(opcional — sencillo $90/plato · con proteína $115/plato · puedes elegir hasta 2)</span></div>
+            <div class="opts-title">🍗 Proteína <span style="opacity:.6;font-size:.58rem;">(opcional — bowl 16 oz sencillo $75 · con proteína $99 · puedes elegir hasta 2)</span></div>
             <div class="chips-row" id="proteina-chips-row">
               <label class="chip active" id="chip-sin-proteina" onclick="selProteinSin(event)"><input type="checkbox" id="sin-proteina" checked> 🌿 Sin proteína</label>
-              <label class="chip" id="chip-pollo" onclick="toggleProteina(this,'Pollo',event)"><input type="checkbox" id="con-pollo"> 🍗 Pollo <span style="color:var(--azul);font-size:.68rem;margin-left:4px;">$115/plato</span></label>
-              <label class="chip" id="chip-bistec" onclick="toggleProteina(this,'Bistec',event)"><input type="checkbox" id="con-bistec"> 🥩 Bistec <span style="color:var(--azul);font-size:.68rem;margin-left:4px;">$115/plato</span></label>
-              <label class="chip" id="chip-pastor" onclick="toggleProteina(this,'Pastor',event)"><input type="checkbox" id="con-pastor"> 🌮 Pastor <span style="color:var(--azul);font-size:.68rem;margin-left:4px;">$115/plato</span></label>
+              <label class="chip" id="chip-pollo" onclick="toggleProteina(this,'Pollo',event)"><input type="checkbox" id="con-pollo"> 🍗 Pollo <span style="color:var(--azul);font-size:.68rem;margin-left:4px;">$99/bowl</span></label>
+              <label class="chip" id="chip-bistec" onclick="toggleProteina(this,'Bistec',event)"><input type="checkbox" id="con-bistec"> 🥩 Bistec <span style="color:var(--azul);font-size:.68rem;margin-left:4px;">$99/bowl</span></label>
+              <label class="chip" id="chip-pastor" onclick="toggleProteina(this,'Pastor',event)"><input type="checkbox" id="con-pastor"> 🌮 Pastor <span style="color:var(--azul);font-size:.68rem;margin-left:4px;">$99/bowl</span></label>
             </div>
             <!-- Cuántos van con cada proteína -->
             <div id="prote-cantidad-wrap" style="display:none;margin-top:14px;background:rgba(26,59,255,0.07);border:1px solid rgba(26,59,255,0.2);border-radius:10px;padding:14px 16px;">
               <div style="font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--blanco-dim);margin-bottom:10px;">¿Cuántos platos con proteína?</div>
               <div id="prote-detalle-wrap" style="display:flex;flex-direction:column;gap:10px;"></div>
               <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(26,59,255,.15);font-size:.72rem;color:var(--blanco-dim);">
-                Costo extra vs sencillo ($90): <span id="prote-costo-preview" style="color:var(--azul);font-weight:600;">$0.00</span>
+                Costo extra vs sencillo ($75): <span id="prote-costo-preview" style="color:var(--azul);font-weight:600;">$0.00</span>
               </div>
             </div>
           </div>
@@ -2037,47 +2049,38 @@ body:has([onclick]:hover) .cursor-core::before {
         </div>
       </div>
 
-      <!-- VITROLERO -->
-      <p class="sec-title">🫗 Vitrolero de aguas frescas</p>
+      <!-- VITROLEROS: DE REGALO (sin costo) + EXTRA (con costo) -->
+      <p class="sec-title">🫗 Vitroleros de aguas frescas</p>
       <div class="card" style="margin-bottom:20px;">
-        <div class="vit-toggle-row">
-          <div>
-            <div style="font-size:.8rem;font-weight:600;color:var(--blanco);">¿Incluir vitrolero?</div>
-            <div style="font-size:.65rem;color:var(--blanco-dim);margin-top:2px;" id="vit-hint">Tu paquete incluye vitrolero de cortesía</div>
+        <div class="vitg">
+          <div class="vitg-head">
+            <span class="vitg-badge">🎁 De regalo</span>
+            <div style="flex:1;min-width:0;">
+              <div class="vitg-t" id="vit-hint">Tu paquete incluye vitroleros de cortesía</div>
+              <div class="vitg-s" id="vitg-sub">Ya vienen incluidos en tu paquete, sin costo. Solo elige el sabor de cada uno.</div>
+            </div>
           </div>
-          <div class="vit-sw on" id="vit-sw" onclick="toggleVitrolero()">
-            <div class="vit-sw-knob"></div>
-          </div>
+          <div id="vitg-sabores"></div>
         </div>
-
-        <div id="vit-body">
-          <!-- Cantidad -->
-          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+        <div class="vitx">
+          <div class="vitx-head">
             <div>
-              <div style="font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--blanco-dim);margin-bottom:6px;">Cantidad de vitroleros</div>
-              <div class="vit-cant">
-                <button onclick="cambiarVit(-1)">−</button>
-                <span id="vit-num">1</span>
-                <button onclick="cambiarVit(1)">+</button>
-              </div>
+              <div class="vitg-t">➕ ¿Quieres más? Vitroleros extra</div>
+              <div class="vitg-s">Opcionales · se cobran aparte del paquete</div>
             </div>
-            <div>
-              <div style="font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--blanco-dim);margin-bottom:6px;">Tamaño</div>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <label class="chip" onclick="soloChip(this,'vit-litros')"><input type="radio" name="vit-litros" value="5"> 5L</label>
-                <label class="chip active" onclick="soloChip(this,'vit-litros')"><input type="radio" name="vit-litros" value="10" checked> 10L</label>
-                <label class="chip" onclick="soloChip(this,'vit-litros')"><input type="radio" name="vit-litros" value="20"> 20L</label>
-              </div>
-            </div>
-            <div style="text-align:right;">
-              <div style="font-size:.62rem;color:var(--blanco-dim);">Capacidad total</div>
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:var(--azul);" id="vit-cap">10 L</div>
+            <div class="vit-cant">
+              <button type="button" onclick="cambiarVitExtra(-1)" aria-label="Quitar vitrolero extra">−</button>
+              <span id="vitx-num">0</span>
+              <button type="button" onclick="cambiarVitExtra(1)" aria-label="Agregar vitrolero extra">+</button>
             </div>
           </div>
-
-          <!-- Sabores por vitrolero -->
-          <div style="font-size:.66rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--blanco-dim);margin-bottom:10px;font-weight:500;">Sabor por vitrolero</div>
-          <div id="vit-sabores-wrap"></div>
+          <div id="vitx-body" style="display:none;">
+            <div class="vitg-lbl">Tamaño de los extra</div>
+            <div id="vitx-sizes" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;"></div>
+            <div class="vitg-lbl">Sabor por vitrolero extra</div>
+            <div id="vitx-sabores"></div>
+            <div class="vitx-costo" id="vitx-costo"></div>
+          </div>
         </div>
       </div>
 
@@ -2416,6 +2419,10 @@ body:has([onclick]:hover) .cursor-core::before {
           <span class="res-label" id="res-cortesia-ml-label">🎁 Incluye de cortesía</span>
           <span class="res-val" id="res-cortesia-ml" style="font-size:.78rem;text-align:right;max-width:220px;line-height:1.4;color:var(--gold);">—</span>
         </div>
+        <div class="res-row" id="res-vitx-row" style="display:none;">
+          <span class="res-label" id="res-vitx-label">➕ Vitroleros extra</span>
+          <span class="res-val" id="res-vitx">—</span>
+        </div>
         <div class="res-row">
           <span class="res-label">Traslado (estimado)</span>
           <span class="res-val" id="res-traslado">$200.00</span>
@@ -2526,6 +2533,36 @@ body:has([onclick]:hover) .cursor-core::before {
   </div><!-- /cfg -->
 
 </div><!-- /wrap -->
+
+<!-- FLYER Y PRESENTACIÓN -->
+<style>
+.cz-mat{position:relative;z-index:10;max-width:980px;margin:0 auto 10px;padding:0 24px;}
+.cz-mat-in{display:grid;grid-template-columns:150px 1fr;gap:22px;align-items:center;background:var(--gris);border:1px solid rgba(26,59,255,.28);border-radius:var(--r);padding:20px;}
+.cz-mat-in img{width:150px;height:auto;border-radius:10px;border:1px solid var(--gris-borde);display:block;}
+.cz-mat-k{font-size:.62rem;letter-spacing:4px;text-transform:uppercase;color:var(--azul);font-weight:700;}
+.cz-mat-t{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:2px;line-height:1;margin:6px 0;}
+.cz-mat-d{font-size:.76rem;color:var(--blanco-dim);line-height:1.55;margin-bottom:12px;}
+.cz-mat-a{display:flex;flex-wrap:wrap;gap:8px;}
+.cz-mat-a a{display:inline-flex;align-items:center;gap:7px;font-size:.66rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#fff;text-decoration:none;padding:9px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.18);}
+.cz-mat-a a.pri{background:var(--azul);border-color:var(--azul);}
+.cz-mat-a svg{width:14px;height:14px;}
+@media(max-width:600px){.cz-mat-in{grid-template-columns:1fr;}.cz-mat-in img{width:100%;max-width:260px;margin:0 auto;}.cz-mat-a a{flex:1 1 100%;justify-content:center;}}
+</style>
+<div class="cz-mat">
+  <div class="cz-mat-in">
+    <a href="flyer.html"><img src="flyer-preview.jpg" alt="Flyer Bajón Lunar 2026" loading="lazy" width="612" height="792"></a>
+    <div>
+      <div class="cz-mat-k">Para compartir</div>
+      <div class="cz-mat-t">Nuestro flyer y presentación</div>
+      <div class="cz-mat-d">Precios de cada paquete según la barra, regalos, descuentos y recomendaciones. Mándaselo a quien organiza el evento contigo.</div>
+      <div class="cz-mat-a">
+        <a class="pri" href="flyer.html"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg> Ver flyer</a>
+        <a href="bajon-lunar-flyer.pdf" download><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg> Flyer PDF</a>
+        <a href="bajon-lunar-presentacion.pdf" download><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M2 3h20"></path><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"></path><path d="m7 21 5-5 5 5"></path></svg> Presentación</a>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- CONTACT BAR -->
 <div class="contact-bar">
@@ -3138,8 +3175,8 @@ function calcularCostoBarraExtra(b, def, totalPorciones, descPct) {
     const costoBotellas = tq.custom ? 0 : b.config.botellas * tq.precio;
     consumo = base + costoBotellas;
   } else {
-    const ppPax = BARRA_PRECIOS[b.tipo]?.precio || 90;
-    // Proteína extra (solo chilaquiles): mismo diferencial $115 vs $90 por porción, aplicado a toda la barra
+    const ppPax = BARRA_PRECIOS[b.tipo]?.precio || 75;
+    // Proteína extra (solo chilaquiles): mismo diferencial $99 vs $75 por bowl, aplicado a toda la barra
     const costoProteinaExtra = (b.tipo === 'chilaquiles' && b.config.proteina !== 'Sin') ? totalPorciones * 25 : 0;
     consumo = totalPorciones * ppPax + costoProteinaExtra;
   }
@@ -3460,10 +3497,10 @@ function renderMaruCustomTags() {
   }
 }
 
-// ════════ PROTEÍNA — multi-select hasta 2, $90 sencillo / $115 con proteína ════════
-const PRECIO_SENCILLO = 90;
-const PRECIO_PROTEINA = 115;
-const PRECIO_EXTRA_PROTEINA = PRECIO_PROTEINA - PRECIO_SENCILLO; // $25 extra por plato con proteína
+// ════════ PROTEÍNA — multi-select hasta 2, $75 sencillo / $99 con proteína (bowl 16 oz) ════════
+const PRECIO_SENCILLO = 75;  // bowl 16 oz sin proteína
+const PRECIO_PROTEINA = 99;  // bowl 16 oz con proteína
+const PRECIO_EXTRA_PROTEINA = PRECIO_PROTEINA - PRECIO_SENCILLO; // $24 extra por bowl con proteína
 
 let proteinasSeleccionadas = []; // array de {nombre, cantidad}
 
@@ -3605,16 +3642,16 @@ const PAQ_INCLUDES_CANT = {
 // Includes de Moonlight por barra de comida
 const PAQ_INCLUDES_ML = {
   chilaquiles: ['🍶 Servicio de barra personalizado','🫙 3 vitroleros 20L  ó  ☕ Café para todos los invitados','🌙 Experiencia Bajón Lunar','🪞 Espejo instagrameable','💡 Barra neon','🎨 Vasos y platos temáticos'],
-  maruchan:    ['🍶 Servicio de barra personalizado','🍬 Dulces de regalo incluidos','🫙 2 vitroleros 15L de cortesía','🌙 Experiencia Bajón Lunar','🪞 Espejo instagrameable','💡 Barra neon','🎨 Vasos y platos temáticos'],
-  gomitas:     ['🍶 Servicio de barra personalizado','🍬 Dulces de regalo incluidos','🫙 2 vitroleros 15L de cortesía','🌙 Experiencia Bajón Lunar','🪞 Espejo instagrameable','💡 Barra neon','🎨 Vasos y platos temáticos'],
+  maruchan:    ['🍶 Servicio de barra personalizado','🍬 Dulces de regalo incluidos','🫙 3 vitroleros 15L de cortesía','🌙 Experiencia Bajón Lunar','🪞 Espejo instagrameable','💡 Barra neon','🎨 Vasos y platos temáticos'],
+  gomitas:     ['🍶 Servicio de barra personalizado','🍬 Dulces de regalo incluidos','🫙 3 vitroleros 15L de cortesía','🌙 Experiencia Bajón Lunar','🪞 Espejo instagrameable','💡 Barra neon','🎨 Vasos y platos temáticos'],
   cantaritos:  ['🍶 Servicio de barra personalizado','🥃 3 botellas tradicionales de cortesía','🥔 Bolsa gigante de papas incluida','🌙 Experiencia Bajón Lunar','🪞 Espejo instagrameable','💡 Barra neon','🎨 Vasos y platos temáticos'],
 };
 // Precio por porción para barras de comida / precio por botella para cantaritos
 const BARRA_PRECIOS = {
-  chilaquiles: { tipo:'porcion', precio:90,  label:'$90/porción (sencillo)' },
-  maruchan:    { tipo:'porcion', precio:90,  label:'$90/porción' },
-  gomitas:     { tipo:'porcion', precio:45,  label:'$45/porción' },
-  cantaritos:  { tipo:'botella', precio:450, label:'$450/botella (tradicional)' },
+  chilaquiles: { tipo:'porcion', precio:75,  label:'$75/bowl 16 oz (sin proteína)' },
+  maruchan:    { tipo:'porcion', precio:60,  label:'$60/porción' },
+  gomitas:     { tipo:'porcion', precio:60,  label:'$60/porción' },
+  cantaritos:  { tipo:'botella', precio:450, label:'$450 por botella (tequila tradicional)' },
 };
 
 // ════════ CANTARITOS – BOTELLAS ════════
@@ -3939,8 +3976,8 @@ function actualizarPreciosPaquetes() {
   if (mlDesc) {
     const mlTextos = {
       chilaquiles: 'Para eventos de <strong style="color:var(--blanco);">más de 110 personas</strong>. Incluye <strong style="color:var(--blanco);">3 vitroleros 20L</strong>  ó  <strong style="color:var(--blanco);">café para todos los invitados</strong> (a elegir). Llena el formulario o mándanos un mensaje.',
-      maruchan:    'Para eventos de <strong style="color:var(--blanco);">más de 110 personas</strong>. Incluye <strong style="color:var(--blanco);">dulces de regalo</strong> y <strong style="color:var(--blanco);">2 vitroleros 15L</strong> de cortesía. Llena el formulario o mándanos un mensaje.',
-      gomitas:     'Para eventos de <strong style="color:var(--blanco);">más de 110 personas</strong>. Incluye <strong style="color:var(--blanco);">dulces de regalo</strong> y <strong style="color:var(--blanco);">2 vitroleros 15L</strong> de cortesía. Llena el formulario o mándanos un mensaje.',
+      maruchan:    'Para eventos de <strong style="color:var(--blanco);">más de 110 personas</strong>. Incluye <strong style="color:var(--blanco);">dulces de regalo</strong> y <strong style="color:var(--blanco);">3 vitroleros 15L</strong> de cortesía. Llena el formulario o mándanos un mensaje.',
+      gomitas:     'Para eventos de <strong style="color:var(--blanco);">más de 110 personas</strong>. Incluye <strong style="color:var(--blanco);">dulces de regalo</strong> y <strong style="color:var(--blanco);">3 vitroleros 15L</strong> de cortesía. Llena el formulario o mándanos un mensaje.',
       cantaritos:  'Para eventos de <strong style="color:var(--blanco);">más de 110 personas</strong>. Incluye <strong style="color:var(--blanco);">3 botellas tradicionales de cortesía</strong> y <strong style="color:var(--blanco);">bolsa gigante de papas</strong>. Llena el formulario o mándanos un mensaje.',
     };
     mlDesc.innerHTML = mlTextos[barraActiva] || mlTextos['chilaquiles'];
@@ -3975,7 +4012,7 @@ function actualizarPreciosPaquetes() {
 }
 
 function getPrecioPorcionBarra(barra) {
-  return BARRA_PRECIOS[barra]?.precio || 90;
+  return BARRA_PRECIOS[barra]?.precio || 75;
 }
 
 // ════════ CÁLCULO TOTAL ════════
@@ -4028,7 +4065,9 @@ function calcularTotal() {
   const baseConExtras = subtotal - descuento + costoExtrasBarras;
   const promoDescPct = promoAplicado ? promoAplicado.descPct : 0;
   const promoDescuento = baseConExtras * promoDescPct;
-  const total = baseConExtras - promoDescuento + TRASLADO;
+  renderVitroleros();
+  const costoVitExtra = getCostoVitExtra(); // vitroleros extra: precio fijo, sin descuento
+  const total = baseConExtras - promoDescuento + costoVitExtra + TRASLADO;
   const anticipo = total * 0.5;
   const saldo = total * 0.5;
 
@@ -4153,13 +4192,14 @@ function calcularTotal() {
     const { base: bVit, extras: eVit } = calcVitCortesia(paqActivo, personas);
     const nVit = bVit + eVit;
     while (vitSabores.length < nVit) vitSabores.push(vitSabores[vitSabores.length-1] || 'Jamaica');
-    const saboresStr = vitSabores.slice(0, nVit).join(', ');
-    if (vitValEl) vitValEl.textContent = vitIncluido
-      ? `${nVit} vitrolero${nVit>1?'s':''} 20L (${saboresStr}) · de cortesía`
-      : 'No incluido';
-    // Actualizar vit-hint
-    const vitHintEl = document.getElementById('vit-hint');
-    if (vitHintEl) vitHintEl.textContent = `Tu paquete incluye ${nVit} vitrolero${nVit>1?'s':''} 20L de cortesía`;
+    const saboresStr = vitGiftSabores.slice(0, nVit).join(', ');
+    if (vitValEl) vitValEl.textContent = `${nVit} vitrolero${nVit>1?'s':''} 20L (${saboresStr}) · de regalo`;
+  }
+  const vxRow = document.getElementById('res-vitx-row');
+  if (vxRow) {
+    vxRow.style.display = vitExtraN > 0 ? '' : 'none';
+    document.getElementById('res-vitx-label').textContent = `➕ Vitroleros extra (${vitExtraN} × ${vitExtraSize}L)`;
+    document.getElementById('res-vitx').textContent = vitExtraPendiente() ? 'Por confirmar' : '+' + fmtMx(costoVitExtra);
   }
   document.getElementById('res-traslado').textContent = '$' + TRASLADO.toFixed(2);
   document.getElementById('res-total').textContent = '$' + total.toLocaleString('es-MX', {minimumFractionDigits:2});
@@ -4167,7 +4207,7 @@ function calcularTotal() {
   document.getElementById('res-saldo').textContent = '$' + saldo.toLocaleString('es-MX', {minimumFractionDigits:2});
 
   setPaso(4);
-  return { total, anticipo, saldo, precioPaq, personas, porciones, totalPorciones, costoProteina, proteinaLabel, proteCantidad, descuento, descPct, costoExtrasBarras, promoDescuento, promoCodigo: promoAplicado ? promoAplicado.codigo : '' };
+  return { costoVitExtra, costoCantaritos, total, anticipo, saldo, precioPaq, personas, porciones, totalPorciones, costoProteina, proteinaLabel, proteCantidad, descuento, descPct, costoExtrasBarras, promoDescuento, promoCodigo: promoAplicado ? promoAplicado.codigo : '' };
 }
 
 // ════════ FECHA: POBLAR AÑOS ════════
@@ -4559,7 +4599,7 @@ async function generarPDF() {
   const dir    = document.getElementById('cDir').value || '';
   const notasLugar = document.getElementById('cNotasLugar')?.value || '';
   const barraTexto = {chilaquiles:'Barra de Chilaquiles',maruchan:'Barra de Maruchan',gomitas:'Gomitas Locas',cantaritos:'Cantaritos'}[barraActiva] || '';
-  const vitTexto = vitIncluido ? `${vitCantidad} vitrolero${vitCantidad>1?'s':''} — ${vitSabores.join(', ')}` : 'No incluido';
+  const vitTexto = vitResumenTexto();
   const NIVEL_NAMES = ['','Suave Lunar','El Bajón Clásico','Lunar Fuerte'];
   const nivelesArr = Array.isArray(nivelActivo) ? nivelActivo : (nivelActivo ? [nivelActivo] : []);
   const nivelTexto = barraActiva === 'chilaquiles' && nivelesArr.length > 0
@@ -4610,8 +4650,28 @@ async function generarPDF() {
   doc.text(`$${datos.total.toLocaleString('es-MX',{minimumFractionDigits:2})}`, 190, y + 9, { align:'right' });
   y += 30;
 
+  // Paginación: si el contenido no cabe, continúa en otra hoja con el mismo fondo y pie
+  const PIE_Y = 280;
+  const pieDePagina = () => {
+    if (isMoon) { doc.setFillColor(160, 130, 70); } else { doc.setFillColor(26, 59, 255); }
+    doc.rect(0, 288, 210, 9, 'F');
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
+    doc.setTextColor(isMoon ? 20 : 255, isMoon ? 10 : 255, isMoon ? 5 : 255);
+    doc.text('BAJÓN LUNAR  ·  @bajon_lunar  ·  WA: 55 7190 1664  ·  bajonlunar@gmail.com', 105, 293.5, { align:'center' });
+  };
+  const nuevaPagina = () => {
+    pieDePagina();
+    doc.addPage();
+    doc.setFillColor(7, 7, 14); doc.rect(0, 0, 210, 297, 'F');
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(100, 130, 255);
+    doc.text(`BAJÓN LUNAR  ·  Folio ${folio}  ·  continuación`, 14, 12);
+    y = 20;
+  };
+  const espacio = (h) => { if (y + h > PIE_Y) nuevaPagina(); };
+
   // Datos del cliente
   const bloque = (titulo, pares) => {
+    espacio(8 + 7 * Math.min(pares.length, 3));
     doc.setFillColor(24, 24, 40);
     doc.roundedRect(14, y, 182, 8, 2, 2, 'F');
     doc.setFont('helvetica', 'bold');
@@ -4620,6 +4680,7 @@ async function generarPDF() {
     doc.text(titulo, 17, y + 5.5);
     y += 8;
     pares.forEach(([lbl, val], i) => {
+      if (y + 7 > PIE_Y) nuevaPagina();
       doc.setFillColor(i%2===0?18:22, i%2===0?18:22, i%2===0?28:32);
       doc.rect(14, y, 182, 7, 'F');
       doc.setFont('helvetica', 'normal');
@@ -4670,11 +4731,12 @@ async function generarPDF() {
       ['Toppings incluidos:', 'Limón · Salsa'],
       ['Extras:', [...maruToppings, ...(maruToppingCustom ? [`${maruToppingCustom} (personalizado)`] : [])].join(' · ') || 'Ninguno'],
     ] : []),
-    ['Vitrolero:', vitTexto],
-    ['Exp. Lunar:', def.exp ? 'Incluida ✓' : 'No incluida'],
+    ['Vitroleros:', vitTexto],
+    ['Exp. Lunar:', def.exp ? 'Incluida' : 'No incluida'],
   ]);
 
   // Incluye del paquete
+  espacio(8 + def.includes.length * 6 + 6);
   doc.setFillColor(20, 30, 60);
   doc.roundedRect(14, y, 182, 8, 2, 2, 'F');
   doc.setFont('helvetica', 'bold');
@@ -4688,12 +4750,13 @@ async function generarPDF() {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(6.5);
     doc.setTextColor(200, 210, 240);
-    doc.text('✦  ' + inc, 17, y + 4.2);
+    doc.text('•  ' + inc.replace(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\uFE0F\u200D]/gu, '').replace(/\s+/g, ' ').trim(), 17, y + 4.2);
     y += 6;
   });
   y += 6;
 
   // Tabla de totales
+  espacio(110);
   if (isMoon) { doc.setFillColor(160, 130, 70); } else { doc.setFillColor(26, 59, 255); }
   doc.roundedRect(120, y, 76, 8, 2, 2, 'F');
   doc.setFont('helvetica', 'bold');
@@ -4702,10 +4765,15 @@ async function generarPDF() {
   doc.text('RESUMEN DE PAGO', 130, y + 5.5);
   y += 8;
   [
-    ['Paquete base:', `$${def.base.toLocaleString('es-MX')}`],
-    ['Extra por personas:', `$${Math.max(0, datos.totalPorciones - def.minPax) * def.ppPax}`],
+    ...(barraActiva === 'cantaritos'
+      ? [['Servicio de barra:', `$${datos.precioPaq.toLocaleString('es-MX',{minimumFractionDigits:2})}`],
+         ...(datos.costoCantaritos > 0 ? [[`Botellas (${cantBotellas}):`, `$${datos.costoCantaritos.toLocaleString('es-MX',{minimumFractionDigits:2})}`]] : [])]
+      : [[`${barraTexto} (${datos.totalPorciones} × $${getPrecioPorcion()}):`, `$${datos.precioPaq.toLocaleString('es-MX',{minimumFractionDigits:2})}`]]),
     ...(datos.costoProteina > 0 ? [[`Proteína (${proteinaLabel2}):`, `+$${datos.costoProteina.toLocaleString('es-MX')}`]] : []),
-    ...(datos.descuento > 0 ? [[`Descuento (${(datos.descPct*100).toFixed(0)}%):`, `−$${datos.descuento.toLocaleString('es-MX',{minimumFractionDigits:2})}`]] : []),
+    ...(datos.descuento > 0 ? [[`Descuento (${(datos.descPct*100).toFixed(0)}%):`, `-$${datos.descuento.toLocaleString('es-MX',{minimumFractionDigits:2})}`]] : []),
+    ...(datos.costoExtrasBarras > 0 ? [['Barras extra:', `+$${datos.costoExtrasBarras.toLocaleString('es-MX',{minimumFractionDigits:2})}`]] : []),
+    ...(datos.promoDescuento > 0 ? [[`Código ${datos.promoCodigo}:`, `-$${datos.promoDescuento.toLocaleString('es-MX',{minimumFractionDigits:2})}`]] : []),
+    ...(vitExtraN > 0 ? [[`Vitroleros extra (${vitExtraN}×${vitExtraSize}L):`, vitExtraPendiente() ? 'Por confirmar' : `+$${datos.costoVitExtra.toLocaleString('es-MX',{minimumFractionDigits:2})}`]] : []),
     ['Traslado:', `$${TRASLADO}`],
   ].forEach(([lbl, val], i) => {
     doc.setFillColor(i%2===0?18:22, i%2===0?18:22, i%2===0?28:32);
@@ -4746,6 +4814,7 @@ async function generarPDF() {
 
   // Notas del lugar
   if (notasLugar) {
+    espacio(22);
     doc.setFillColor(24, 24, 40);
     doc.roundedRect(14, y, 100, 20, 2, 2, 'F');
     doc.setFont('helvetica', 'bold');
@@ -4759,6 +4828,7 @@ async function generarPDF() {
   }
 
   // Condiciones
+  if (y > 243) nuevaPagina();
   const yTerm = 245;
   doc.setFillColor(14, 14, 24);
   doc.rect(0, yTerm, 210, 40, 'F');
@@ -4841,9 +4911,7 @@ async function generarPDF() {
   }
 
   // ── Vitrolero texto ──
-  const vitTextoGuardar = vitIncluido
-    ? `${vitCantidad} vitrolero${vitCantidad>1?'s':''} — ${vitSabores.join(', ')}`
-    : 'No incluido';
+  const vitTextoGuardar = vitResumenTexto();
 
   // ── Desglose financiero ──
   const subtotalValor = (datos.total - TRASLADO + (datos.descuento||0) - 0).toFixed(2);
@@ -4926,6 +4994,12 @@ async function generarPDF() {
     vitIncluido,
     vitCantidad,
     vitSabores: [...vitSabores],
+    vitRegalo: getVitGiftN(),
+    vitRegaloSabores: vitGiftSabores.slice(0, getVitGiftN()),
+    vitExtraCantidad: vitExtraN,
+    vitExtraLitros: vitExtraSize,
+    vitExtraCosto: getCostoVitExtra(),
+    vitExtraPrecioPendiente: vitExtraPendiente(),
     // VENUE
     venue: venueSave,
     notasLugar: notasLugarSave,
@@ -5002,6 +5076,7 @@ function nuevaCot() {
   if (protWrap) protWrap.style.display = 'none';
   horaSeleccionada = '';
   vitIncluido = true; vitCantidad = 1; vitSabores = ['Jamaica'];
+  vitGiftSabores = []; vitExtraN = 0; vitExtraSabores = []; vitExtraSize = 20;
   document.getElementById('cNombre').value = '';
   document.getElementById('cTel').value = '';
   document.getElementById('cEmail').value = '';
@@ -5165,6 +5240,103 @@ function nuevaCot() {
     el.style.cursor = 'pointer'; // el click ya lo maneja onclick="elegirPaquete()" (antes se disparaba 2 veces)
   }
 });
+
+// ════════ VITROLEROS: REGALO + EXTRA ════════
+// PRECIOS DE VITROLEROS EXTRA — escribe aquí el precio de cada tamaño (null = "precio por confirmar")
+const PRECIO_VIT_EXTRA = { 5: null, 10: null, 20: null };
+let vitGiftSabores = [];       // un sabor por cada vitrolero de regalo
+let vitExtraN = 0;             // vitroleros extra (con costo)
+let vitExtraSize = 20;         // litros de los extra
+let vitExtraSabores = [];
+
+function getVitGiftN() {
+  if (!paqActivo || paqActivo === 'moonlight' || barraActiva === 'cantaritos') return 0;
+  const personas = parseInt(document.getElementById('paq-personas')?.value) || PAQ[paqActivo].minPax;
+  const v = calcVitCortesia(paqActivo, personas);
+  return (v.base || 0) + (v.extras || 0);
+}
+function vitExtraPrecioUnit() { return PRECIO_VIT_EXTRA[vitExtraSize]; }
+function vitExtraPendiente() { return vitExtraN > 0 && (vitExtraPrecioUnit() === null || vitExtraPrecioUnit() === undefined); }
+function getCostoVitExtra() { const p = vitExtraPrecioUnit(); return vitExtraN * (typeof p === 'number' ? p : 0); }
+function fmtMx(n) { return '$' + n.toLocaleString('es-MX', { minimumFractionDigits: 2 }); }
+function vitResumenTexto() {
+  const g = getVitGiftN(), parts = [];
+  if (g > 0) parts.push(`${g} de regalo 20L (${vitGiftSabores.slice(0, g).join(', ')})`);
+  if (vitExtraN > 0) parts.push(`${vitExtraN} extra ${vitExtraSize}L (${vitExtraSabores.slice(0, vitExtraN).join(', ')}) · ${vitExtraPendiente() ? 'precio por confirmar' : fmtMx(getCostoVitExtra())}`);
+  return parts.length ? parts.join(' + ') : 'No incluido';
+}
+function syncVitLegacy() {
+  // Variables que ya usaban el PDF, Firebase y el panel: ahora suman regalo + extra
+  const g = getVitGiftN();
+  vitCantidad = g + vitExtraN;
+  vitIncluido = vitCantidad > 0;
+  vitSabores = [...vitGiftSabores.slice(0, g), ...vitExtraSabores.slice(0, vitExtraN)];
+}
+function chipsSabor(cont, label, arr, idx, gift) {
+  const row = document.createElement('div'); row.className = 'sabor-vit-row';
+  const l = document.createElement('span'); l.className = 'sabor-vit-label'; l.textContent = label; row.appendChild(l);
+  VIT_SABORES.forEach(({ val, emoji }) => {
+    const c = document.createElement('button'); c.type = 'button';
+    c.className = 'chip' + (gift ? ' gift' : '') + (arr[idx] === val ? ' active' : '');
+    c.textContent = emoji + ' ' + val;
+    c.onclick = (e) => { e.preventDefault(); arr[idx] = val; renderVitroleros(); calcularTotal(); };
+    row.appendChild(c);
+  });
+  cont.appendChild(row);
+}
+function renderVitroleros() {
+  const g = getVitGiftN();
+  while (vitGiftSabores.length < g) vitGiftSabores.push(['Jamaica', 'Limón', 'Horchata'][vitGiftSabores.length % 3]);
+  while (vitExtraSabores.length < vitExtraN) vitExtraSabores.push('Jamaica');
+  const hint = document.getElementById('vit-hint'), sub = document.getElementById('vitg-sub'), gs = document.getElementById('vitg-sabores');
+  if (gs) {
+    gs.innerHTML = '';
+    if (g > 0) {
+      hint.textContent = `Tu paquete incluye ${g} vitrolero${g > 1 ? 's' : ''} 20L de regalo`;
+      sub.textContent = 'Ya vienen incluidos, sin costo (1 extra de regalo por cada 50 personas). Solo elige el sabor de cada uno.';
+      for (let i = 0; i < g; i++) chipsSabor(gs, `🎁 Regalo ${i + 1}`, vitGiftSabores, i, true);
+    } else if (paqActivo === 'moonlight') {
+      hint.textContent = 'Tus cortesías Moonlight se eligen arriba';
+      sub.textContent = 'Vitroleros, café o botellas de cortesía según tu barra. Aquí puedes agregar vitroleros extra.';
+    } else if (barraActiva === 'cantaritos') {
+      hint.textContent = 'Con cantaritos tu regalo son botellas de tequila';
+      sub.textContent = 'Las botellas de cortesía se muestran arriba. Si quieres aguas frescas, agrega vitroleros extra.';
+    } else {
+      hint.textContent = 'Elige un paquete para ver tus vitroleros de regalo';
+      sub.textContent = '';
+    }
+  }
+  document.getElementById('vitx-num').textContent = vitExtraN;
+  document.getElementById('vitx-body').style.display = vitExtraN > 0 ? 'block' : 'none';
+  const sz = document.getElementById('vitx-sizes');
+  if (sz) {
+    sz.innerHTML = '';
+    [5, 10, 20].forEach(L => {
+      const p = PRECIO_VIT_EXTRA[L];
+      const c = document.createElement('button'); c.type = 'button';
+      c.className = 'chip' + (vitExtraSize === L ? ' active' : '');
+      c.textContent = `${L}L · ${typeof p === 'number' ? '$' + p.toLocaleString('es-MX') + ' c/u' : 'precio por confirmar'}`;
+      c.onclick = (e) => { e.preventDefault(); vitExtraSize = L; renderVitroleros(); calcularTotal(); };
+      sz.appendChild(c);
+    });
+  }
+  const xs = document.getElementById('vitx-sabores');
+  if (xs) { xs.innerHTML = ''; for (let i = 0; i < vitExtraN; i++) chipsSabor(xs, `Extra ${i + 1}`, vitExtraSabores, i, false); }
+  const cst = document.getElementById('vitx-costo');
+  if (cst) {
+    const pend = vitExtraPendiente();
+    cst.className = 'vitx-costo' + (pend ? ' pend' : '');
+    cst.innerHTML = pend
+      ? `<span>${vitExtraN} × ${vitExtraSize}L</span><span>Precio por confirmar — te lo confirmamos por WhatsApp</span>`
+      : `<span>${vitExtraN} × ${vitExtraSize}L × ${fmtMx(vitExtraPrecioUnit() || 0)}</span><strong>+${fmtMx(getCostoVitExtra())}</strong>`;
+  }
+  syncVitLegacy();
+}
+function cambiarVitExtra(d) { vitExtraN = Math.max(0, Math.min(20, vitExtraN + d)); renderVitroleros(); calcularTotal(); }
+window.cambiarVitExtra = cambiarVitExtra;
+// Las funciones viejas del vitrolero único ya no tienen controles en pantalla
+function renderSaboresVit() { renderVitroleros(); }
+function actualizarCapVit() {}
 
 // ════════ INIT ════════
 renderSaboresVit();
