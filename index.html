@@ -4,6 +4,17 @@
 <link rel="icon" type="image/png" href="icon-192.png">
 
 <meta charset="UTF-8">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Bajón Lunar">
+<meta property="og:title" content="Bajón Lunar — Barra & antojitos para eventos">
+<meta property="og:description" content="Barras de chilaquiles, maruchan, gomitas locas y cantaritos para tus eventos en CDMX y Edomex. Cotiza en línea en minutos.">
+<meta property="og:image" content="https://ingalejandrofh01-boop.github.io/Bajon-Lunar/bajon-lunar-compartir.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://ingalejandrofh01-boop.github.io/Bajon-Lunar/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="description" content="Barras de chilaquiles, maruchan, gomitas locas y cantaritos para tus eventos en CDMX y Edomex. Cotiza en línea en minutos.">
+
 <link rel="apple-touch-icon" href="https://ingalejandrofh01-boop.github.io/Bajon-Lunar/icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Bajón Lunar">
@@ -1465,6 +1476,12 @@ section {
 .about-right {
   position: relative;
 }
+.about-photo{margin:0;position:relative;border-radius:18px;overflow:hidden;border:1px solid rgba(26,59,255,.35);box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 60px rgba(26,59,255,.18);aspect-ratio:896/1191;background:#05050c;}
+.about-photo img{display:block;width:100%;height:100%;object-fit:cover;}
+.about-photo figcaption{position:absolute;left:0;right:0;top:0;padding:18px 20px 60px;background:linear-gradient(180deg,rgba(5,5,12,.92),rgba(5,5,12,.55) 60%,transparent);}
+.about-photo-k{display:block;font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:#fff;margin-bottom:10px;}
+.about-photo-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.about-photo-chips span{font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600;color:#fff;padding:5px 10px;border-radius:999px;background:rgba(26,59,255,.28);border:1px solid rgba(96,130,255,.5);}
 
 .about-card {
   background: var(--gris);
@@ -3162,6 +3179,10 @@ window.__blIntro3D = function(){
       4. Copia/pega un bloque .galeria-item completo por cada foto nueva que quieras agregar — no hay límite.
     -->
     <div class="galeria-grid" id="galeria-grid">
+      <div class="galeria-item reveal" data-paquete="todos">
+        <img src="barra-bajon-lunar.webp" alt="Barra de chilaquiles Bajón Lunar en un evento" loading="lazy" style="object-position:50% 100%">
+        <div class="galeria-item-overlay">Barra de chilaquiles · evento en jardín</div>
+      </div>
       <div class="galeria-item reveal" data-paquete="nebula">
         <img src="fotos/nebula-1.jpg" alt="Evento Nebula Mix" loading="lazy" onerror="this.closest('.galeria-item').style.display='none'">
         <div class="galeria-item-overlay">Nebula Mix</div>
@@ -3215,26 +3236,13 @@ function filtrarGaleria(paquete, btn) {
     </div>
 
     <div class="about-right reveal">
-      <div class="about-card">
-        <ul class="about-services">
-          <li class="about-service-item">
-            <span class="about-service-name">🫙 Chilaquiles</span>
-            <span class="about-service-badge">Disponible</span>
-          </li>
-          <li class="about-service-item">
-            <span class="about-service-name">🐛 Gomitas Locas</span>
-            <span class="about-service-badge">Disponible</span>
-          </li>
-          <li class="about-service-item">
-            <span class="about-service-name">🍊 Cantaritos</span>
-            <span class="about-service-badge">Disponible</span>
-          </li>
-          <li class="about-service-item">
-            <span class="about-service-name">🍜 Maruchan</span>
-            <span class="about-service-badge">Disponible</span>
-          </li>
-        </ul>
-      </div>
+      <figure class="about-photo">
+        <img src="barra-bajon-lunar.webp" alt="Barra de chilaquiles Bajón Lunar montada en un evento, con su letrero iluminado" loading="lazy" width="896" height="1191">
+        <figcaption>
+          <span class="about-photo-k">Así llega Bajón Lunar a tu evento</span>
+          <span class="about-photo-chips"><span>Chilaquiles</span><span>Maruchan</span><span>Gomitas locas</span><span>Cantaritos</span></span>
+        </figcaption>
+      </figure>
     </div>
   </div>
 </section>
