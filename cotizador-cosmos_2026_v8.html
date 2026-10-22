@@ -1124,7 +1124,7 @@ footer p{font-size:.7rem;color:var(--blanco-dim);letter-spacing:.5px;}
         <div class="bc-icon" style="font-size:2rem;margin-bottom:8px;">&#127818;</div>
         <div class="bc-name" style="font-size:.88rem;">Cantaritos</div>
         <div class="bc-desc" style="font-size:.65rem;margin-top:6px;">Bebida fresca en cantarito de barro. Tequila, mezcal o sin alcohol.</div>
-        <div style="margin-top:8px;font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:0px;color:var(--azul);">Por botella · $450 tradicional · $950 Don Julio · $1,050 Dobel</div>
+        <div style="margin-top:8px;font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:0px;color:var(--azul);">Por botella · $450 económico · $650 gama media · $1,200 premium</div>
       </div>
 
     </div>
@@ -3642,30 +3642,30 @@ const PAQ_INCLUDES_ORIG = {
 };
 const PAQ_INCLUDES_CANT = {
   nebula:    ['🍶 Servicio de barra 2 horas','🥃 Sin botellas de cortesía','🌙 Experiencia Bajón Lunar','🪞 Espejo instagrameable','💡 Barra neon','🎨 Vasos y platos temáticos','🍽️ Cantaritos incluidos'],
-  cosmos:    ['🍶 Servicio de barra 2 horas','🥃 1 botella tradicional cortesía','🌙 Experiencia Bajón Lunar','🪞 Espejo instagrameable','💡 Barra neon','🎨 Vasos y platos temáticos'],
-  after:     ['🍶 Servicio de barra 3 horas','🥃 2 botellas tradicionales cortesía','🌙 Experiencia Bajón Lunar','🪞 Espejo instagrameable','💡 Barra neon','🎨 Vasos y platos temáticos'],
-  moonlight: ['🍶 Servicio de barra personalizado','🥃 3 botellas tradicionales de cortesía','🥔 Bolsa gigante de papas incluida','🌙 Experiencia Bajón Lunar','🪞 Espejo instagrameable','💡 Barra neon','🎨 Vasos y platos temáticos'],
+  cosmos:    ['🍶 Servicio de barra 2 horas','🥃 1 botella de tequila económico de cortesía','🌙 Experiencia Bajón Lunar','🪞 Espejo instagrameable','💡 Barra neon','🎨 Vasos y platos temáticos'],
+  after:     ['🍶 Servicio de barra 3 horas','🥃 2 botellas de tequila económico de cortesía','🌙 Experiencia Bajón Lunar','🪞 Espejo instagrameable','💡 Barra neon','🎨 Vasos y platos temáticos'],
+  moonlight: ['🍶 Servicio de barra personalizado','🥃 3 botellas de tequila económico de cortesía','🥔 Bolsa gigante de papas incluida','🌙 Experiencia Bajón Lunar','🪞 Espejo instagrameable','💡 Barra neon','🎨 Vasos y platos temáticos'],
 };
 // Includes de Moonlight por barra de comida
 const PAQ_INCLUDES_ML = {
   chilaquiles: ['🍶 Servicio de barra personalizado','🫙 3 vitroleros 20L  ó  ☕ Café para todos los invitados','🌙 Experiencia Bajón Lunar','🪞 Espejo instagrameable','💡 Barra neon','🎨 Vasos y platos temáticos'],
   maruchan:    ['🍶 Servicio de barra personalizado','🍬 Dulces de regalo incluidos','🫙 3 vitroleros 15L de cortesía','🌙 Experiencia Bajón Lunar','🪞 Espejo instagrameable','💡 Barra neon','🎨 Vasos y platos temáticos'],
   gomitas:     ['🍶 Servicio de barra personalizado','🍬 Dulces de regalo incluidos','🫙 3 vitroleros 15L de cortesía','🌙 Experiencia Bajón Lunar','🪞 Espejo instagrameable','💡 Barra neon','🎨 Vasos y platos temáticos'],
-  cantaritos:  ['🍶 Servicio de barra personalizado','🥃 3 botellas tradicionales de cortesía','🥔 Bolsa gigante de papas incluida','🌙 Experiencia Bajón Lunar','🪞 Espejo instagrameable','💡 Barra neon','🎨 Vasos y platos temáticos'],
+  cantaritos:  ['🍶 Servicio de barra personalizado','🥃 3 botellas de tequila económico de cortesía','🥔 Bolsa gigante de papas incluida','🌙 Experiencia Bajón Lunar','🪞 Espejo instagrameable','💡 Barra neon','🎨 Vasos y platos temáticos'],
 };
 // Precio por porción para barras de comida / precio por botella para cantaritos
 const BARRA_PRECIOS = {
   chilaquiles: { tipo:'porcion', precio:75,  label:'$75/bowl 16 oz (sin proteína)' },
   maruchan:    { tipo:'porcion', precio:60,  label:'$60/porción' },
   gomitas:     { tipo:'porcion', precio:60,  label:'$60/porción' },
-  cantaritos:  { tipo:'botella', precio:450, label:'$450 por botella (tequila tradicional)' },
+  cantaritos:  { tipo:'botella', precio:450, label:'$450 por botella (tequila económico)' },
 };
 
 // ════════ CANTARITOS – BOTELLAS ════════
 const TEQUILAS = [
-  { id:'tradicional', nombre:'Tequila Tradicional', desc:'Cuervo, Jimador u otro tradicional', precio:450 },
-  { id:'donjulio',    nombre:'Don Julio 70',         desc:'Cristalino',                        precio:950 },
-  { id:'dobel',       nombre:'Maestro Dobel Diamante', desc:'Diamante',                        precio:1050 },
+  { id:'tradicional', nombre:'Tequila económico', desc:'José Cuervo Especial, El Jimador, Gran Centenario Plata o similar', precio:450 },
+  { id:'media',       nombre:'Tequila gama media',   desc:'Cuervo Tradicional, Centenario Reposado, Hornitos, 1800 Reposado o Herradura Plata', precio:650 },
+  { id:'premium',     nombre:'Tequila premium',      desc:'Don Julio 70, Maestro Dobel Diamante, 1800 Cristalino o Herradura Añejo', precio:1200 },
   { id:'otro',        nombre:'Otro / A elegir',      desc:'Platica con nosotros el tequila que prefieres', precio:0, custom:true },
 ];
 const CANT_MIN = { nebula:4, cosmos:8, after:14, moonlight:22 };
@@ -3890,8 +3890,8 @@ function calcVitCortesia(paq, personas) {
 // Cortesías de cantaritos por paquete: nebula=0, cosmos=1 botella tradicional, after=2 botellas tradicionales
 const CANT_CORTESIA_LABEL = {
   nebula: null,  // sin cortesía
-  cosmos: '🥃 1 botella tradicional cortesía',
-  after:  '🥃 2 botellas tradicionales cortesía',
+  cosmos: '🥃 1 botella de tequila económico de cortesía',
+  after:  '🥃 2 botellas de tequila económico de cortesía',
 };
 // Textos de vitrolero originales por paquete
 const VIT_LABEL_ORIG = {
@@ -3985,7 +3985,7 @@ function actualizarPreciosPaquetes() {
       chilaquiles: 'Para eventos de <strong style="color:var(--blanco);">más de 110 personas</strong>. Incluye <strong style="color:var(--blanco);">3 vitroleros 20L</strong>  ó  <strong style="color:var(--blanco);">café para todos los invitados</strong> (a elegir). Llena el formulario o mándanos un mensaje.',
       maruchan:    'Para eventos de <strong style="color:var(--blanco);">más de 110 personas</strong>. Incluye <strong style="color:var(--blanco);">dulces de regalo</strong> y <strong style="color:var(--blanco);">3 vitroleros 15L</strong> de cortesía. Llena el formulario o mándanos un mensaje.',
       gomitas:     'Para eventos de <strong style="color:var(--blanco);">más de 110 personas</strong>. Incluye <strong style="color:var(--blanco);">dulces de regalo</strong> y <strong style="color:var(--blanco);">3 vitroleros 15L</strong> de cortesía. Llena el formulario o mándanos un mensaje.',
-      cantaritos:  'Para eventos de <strong style="color:var(--blanco);">más de 110 personas</strong>. Incluye <strong style="color:var(--blanco);">3 botellas tradicionales de cortesía</strong> y <strong style="color:var(--blanco);">bolsa gigante de papas</strong>. Llena el formulario o mándanos un mensaje.',
+      cantaritos:  'Para eventos de <strong style="color:var(--blanco);">más de 110 personas</strong>. Incluye <strong style="color:var(--blanco);">3 botellas de tequila económico de cortesía</strong> y <strong style="color:var(--blanco);">bolsa gigante de papas</strong>. Llena el formulario o mándanos un mensaje.',
     };
     mlDesc.innerHTML = mlTextos[barraActiva] || mlTextos['chilaquiles'];
   }
@@ -4178,7 +4178,7 @@ function calcularTotal() {
     } else if (barraActiva === 'cantaritos') {
       const botExtras = Math.floor(Math.max(0, personas - 110) / 50);
       const botTotal = 3 + botExtras;
-      txt = `${botTotal} botella${botTotal>1?'s':''} tradicional${botTotal>1?'es':''} de cortesía + Bolsa gigante de papas`;
+      txt = `${botTotal} botella${botTotal>1?'s':''} de tequila económico de cortesía + Bolsa gigante de papas`;
     }
     if (cortMLVal) cortMLVal.textContent = txt || '—';
 
@@ -4188,7 +4188,7 @@ function calcularTotal() {
     if (vitLabelEl) vitLabelEl.textContent = 'Botellas cortesía';
     const cortesiaBot = CANT_CORTESIA[paqActivo] || 0;
     if (vitValEl) vitValEl.textContent = cortesiaBot > 0
-      ? `${cortesiaBot} botella${cortesiaBot>1?'s':''} tradicional${cortesiaBot>1?'es':''} cortesía`
+      ? `${cortesiaBot} botella${cortesiaBot>1?'s':''} de tequila económico de cortesía`
       : 'Sin botellas de cortesía';
 
   } else {
